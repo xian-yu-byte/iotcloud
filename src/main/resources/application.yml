@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: IOTCloudSpring
+  datasource:
+    url: jdbc:mysql://localhost:3306/iotcloud?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=UTC
+    username: qrs
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+    ddl-auto: update
+    show-sql: true
+  jwt:
+    secret: iRvjyRQmlF/1BvXz7TqH3jLSgw9jvxVLFrUR1Ou7ytQ=
+server:
+  port: 9000
+  address: 0.0.0.0
