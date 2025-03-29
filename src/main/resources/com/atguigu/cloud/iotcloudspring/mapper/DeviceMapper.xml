@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.cloud.iotcloudspring.mapper.DeviceMapper">
+    <insert id="insertDeviceType" parameterType="com.atguigu.cloud.iotcloudspring.pojo.device.DeviceType">
+        INSERT INTO devicetype
+        (projectid, typename, accesscategory, communicationmode, protocol, dataformat, createtime, updatetime)
+        VALUES (#{projectid}, #{typename}, #{accesscategory}, #{communicationmode}, #{protocol}, #{dataformat}, NOW(),
+                NOW())
+    </insert>
+
+    <select id="selectDeviceTypeList" resultType="com.atguigu.cloud.iotcloudspring.pojo.device.DeviceType">
+        select id, typename, accesscategory, protocol
+        from devicetype
+        where projectid = #{projectid}
+    </select>
+
+    <select id="selectDeviceTypeNameList" resultType="com.atguigu.cloud.iotcloudspring.pojo.device.DeviceType">
+        select id, typename
+        from devicetype
+        where projectid = #{projectid}
+    </select>
+
+    <insert id="insertDeviceTypeAttribute" parameterType="com.atguigu.cloud.iotcloudspring.pojo.device.DeviceTypeAttribute">
+        INSERT INTO devicetypeattribute (devicetypeid, attributename, attributeunit, datatype,
+                                         devicetypeattribute.attributetype, attributedesc, expandoptions,createtime, updatetime)
+        VALUES (#{devicetypeid}, #{attributename}, #{attributeunit}, #{datatype}, #{attributetype}, #{attributedesc},#{expandoptions},
+                NOW(), NOW())
+    </insert>
+
+    <select id="selectAttributesByDeviceTypeId" resultType="com.atguigu.cloud.iotcloudspring.pojo.device.DeviceTypeAttribute">
+        SELECT id,
+               devicetypeid,
+               attributename,
+               attributeunit,
+               datatype,
+               attributetype,
+               attributedesc,
+               expandoptions
+        FROM devicetypeattribute
+        WHERE devicetypeid = #{devicetypeid}
+    </select>
+
+    <delete id="deleteDeviceTypeAttributeById" parameterType="java.lang.Integer">
+        DELETE FROM devicetypeattribute WHERE id = #{id}
+    </delete>
+
+    <insert id="insertDevice" parameterType="com.atguigu.cloud.iotcloudspring.pojo.device.Device">
+        INSERT INTO device (projectid, devicetypeid, devicename, devicekey,deviceinformation, createtime, updatetime)
+        VALUES (#{projectId}, #{deviceTypeId}, #{deviceName}, #{deviceKey},#{deviceinformation},NOW(), NOW())
+    </insert>
+
+    <select id="selectDeviceById" parameterType="int" resultType="com.atguigu.cloud.iotcloudspring.pojo.device.Device">
+        SELECT id,
+               projectid,
+               devicetypeid,
+               devicename,
+               devicekey,
+               deviceinformation,
+               createtime,
+               updatetime
+        FROM device
+        WHERE id = #{id}
+    </select>
+</mapper>

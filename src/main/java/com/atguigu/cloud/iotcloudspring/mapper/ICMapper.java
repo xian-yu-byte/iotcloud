@@ -35,7 +35,7 @@ public interface ICMapper {
     // 根据项目创建者（admin 字段）查询该用户创建的所有项目
     List<ProjectAdd> selectProjectsByAdmin(@Param("projectadministrator") String projectadministrator);
 
-    // 根据项目名称查询项目（假设项目名称在同一系统中是唯一的）
+    // 根据项目名称查询项目
     ProjectAdd selectProjectByName(@Param("projectname") String projectname);
 
     // 删除用户-项目关联记录（退出项目）

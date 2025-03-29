@@ -65,7 +65,7 @@
     <!-- 删除关联记录 -->
     <delete id="deleteUserProject" parameterType="map">
         DELETE
-        FROM user_project
+        FROM userproject
         WHERE userid = #{userid}
           AND projectid = #{projectid}
     </delete>
@@ -75,14 +75,14 @@
             resultType="com.atguigu.cloud.iotcloudspring.pojo.ProjectAdd">
         SELECT p.id, p.projectname, p.projectadministrator, p.region, p.projectdescription
         FROM projectadd p
-                 JOIN user_project up ON p.id = up.projectid
+                 JOIN userproject up ON p.id = up.projectid
         WHERE up.userid = #{userid}
     </select>
 
     <select id="selectUserProjectByUserIdAndProjectId" parameterType="map"
             resultType="com.atguigu.cloud.iotcloudspring.pojo.User.UserProject">
         SELECT id, userid, projectid, role, joinedat
-        FROM user_project
+        FROM userproject
         WHERE userid = #{userid}
           AND projectid = #{projectid}
     </select>

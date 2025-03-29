@@ -6,7 +6,6 @@ import com.atguigu.cloud.iotcloudspring.DTO.LeaveProjectRequest;
 import com.atguigu.cloud.iotcloudspring.pojo.ProjectAdd;
 import com.atguigu.cloud.iotcloudspring.pojo.Result;
 import com.atguigu.cloud.iotcloudspring.pojo.User.ChangePasswordRequest;
-import com.atguigu.cloud.iotcloudspring.pojo.User.UserProject;
 import com.atguigu.cloud.iotcloudspring.pojo.User.users;
 import com.atguigu.cloud.iotcloudspring.service.ICSpringService;
 import com.atguigu.cloud.iotcloudspring.service.UserService;
@@ -28,7 +27,7 @@ public class ICSpringController {
 
     // 获取项目
     @GetMapping("GetProject")
-    public Result getProject(Authentication authentication) {
+    public Result<List<ProjectAdd>> getProject(Authentication authentication) {
         // 1. 从认证信息中拿到当前登录用户
         String currentUsername = authentication.getName();
         // 2. 调用带参方法，只查当前用户的项目
