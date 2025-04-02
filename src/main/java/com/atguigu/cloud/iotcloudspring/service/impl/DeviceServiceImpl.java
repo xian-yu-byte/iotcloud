@@ -1,14 +1,13 @@
 package com.atguigu.cloud.iotcloudspring.service.impl;
 
 import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceDTO;
+import com.atguigu.cloud.iotcloudspring.DTO.Device.Response.DeviceDataResponse;
 import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceTypeAttributeDTO;
 import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceTypeDTO;
-import com.atguigu.cloud.iotcloudspring.DTO.Device.Response.DeviceResponse;
-import com.atguigu.cloud.iotcloudspring.DTO.Device.Response.DeviceTypeAttributeResponse;
-import com.atguigu.cloud.iotcloudspring.DTO.Device.Response.DeviceTypeNameResponse;
-import com.atguigu.cloud.iotcloudspring.DTO.Device.Response.DeviceTypeResponse;
+import com.atguigu.cloud.iotcloudspring.DTO.Device.Response.*;
 import com.atguigu.cloud.iotcloudspring.mapper.DeviceMapper;
 import com.atguigu.cloud.iotcloudspring.pojo.device.Device;
+import com.atguigu.cloud.iotcloudspring.pojo.device.DeviceData;
 import com.atguigu.cloud.iotcloudspring.pojo.device.DeviceType;
 import com.atguigu.cloud.iotcloudspring.pojo.device.DeviceTypeAttribute;
 import com.atguigu.cloud.iotcloudspring.service.DeviceService;
@@ -110,14 +109,53 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    public DeviceResponse getDeviceById(Integer id) {
-        Device device = deviceMapper.selectDeviceById(id);
+    public DeviceDetailResponse getDeviceDetail(Integer deviceId) {
+        // 1. 查询设备静态信息
+        Device device = deviceMapper.selectDeviceById(deviceId);
         if (device == null) {
-            return null;
+            return null; // 可根据需要抛出异常或返回特定错误信息
         }
-        DeviceResponse response = new DeviceResponse();
-        BeanUtils.copyProperties(device, response);
-        // 如果需要，可以通过 device.getDeviceTypeId() 关联查询设备类型属性并加入 response
+
+        DeviceDetailResponse response = new DeviceDetailResponse();
+        response.setId(device.getId());
+        response.setDevicename(device.getDevicename());
+        response.setDevicekey(device.getDevicekey());
+        response.setProjectid(device.getProjectid());
+
+        // 2. 根据 deviceTypeId 查询设备类型名称
+        DeviceType deviceType = deviceMapper.selectDeviceTypeById(device.getDevicetypeid());
+        if (deviceType != null) {
+            response.setDevicetypename(deviceType.getTypename());
+        }
+
+        // 3. 查询设备动态数据（例如，根据设备ID查询最新上报数据）
+        List<DeviceData> dataList = deviceMapper.selectDeviceDataByDeviceId(deviceId);
+        List<DeviceDataResponse> deviceDataResponses = dataList.stream().map(data -> {
+            DeviceDataResponse d = new DeviceDataResponse();
+            BeanUtils.copyProperties(data, d);
+            return d;
+        }).collect(Collectors.toList());
+        response.setDevicedata(deviceDataResponses);
+
+        // 4. 查询该设备类型定义的属性
+        List<DeviceTypeAttribute> attributes = deviceMapper.selectAttributesByDeviceTypeId(device.getDevicetypeid());
+        List<DeviceTypeAttributeResponse> attributeResponses = attributes.stream().map(attr -> {
+            DeviceTypeAttributeResponse a = new DeviceTypeAttributeResponse();
+            BeanUtils.copyProperties(attr, a);
+            return a;
+        }).collect(Collectors.toList());
+        response.setAttributes(attributeResponses);
+
         return response;
+    }
+
+    @Override
+    public List<DeviceDetailResponse> getDeviceDetailsByProject(Integer projectId) {
+        // 首先，根据项目ID查询所有设备
+        List<Device> devices = deviceMapper.selectDevicesByProjectId(projectId);
+        // 对于每个设备，调用 getDeviceDetail(device.getId())
+        return devices.stream()
+                .map(device -> getDeviceDetail(device.getId()))
+                .collect(Collectors.toList());
     }
 }

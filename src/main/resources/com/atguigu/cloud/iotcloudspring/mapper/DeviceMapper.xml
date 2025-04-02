@@ -47,8 +47,10 @@
     </delete>
 
     <insert id="insertDevice" parameterType="com.atguigu.cloud.iotcloudspring.pojo.device.Device">
-        INSERT INTO device (projectid, devicetypeid, devicename, devicekey,deviceinformation, createtime, updatetime)
-        VALUES (#{projectId}, #{deviceTypeId}, #{deviceName}, #{deviceKey},#{deviceinformation},NOW(), NOW())
+        INSERT INTO device (projectid, devicetypeid, devicename, devicekey, devicecommunication, deviceinformation,
+                            createtime, updatetime)
+        VALUES (#{projectid}, #{devicetypeid}, #{devicename}, #{devicekey}, #{devicecommunication},
+                #{deviceinformation}, NOW(), NOW())
     </insert>
 
     <select id="selectDeviceById" parameterType="int" resultType="com.atguigu.cloud.iotcloudspring.pojo.device.Device">
@@ -57,10 +59,53 @@
                devicetypeid,
                devicename,
                devicekey,
+               devicecommunication,
                deviceinformation,
                createtime,
                updatetime
         FROM device
         WHERE id = #{id}
     </select>
+
+    <select id="selectDeviceTypeById" parameterType="java.lang.Integer" resultType="com.atguigu.cloud.iotcloudspring.pojo.device.DeviceType">
+        SELECT
+            id,
+            projectid,
+            typename,
+            accesscategory,
+            communicationmode,
+            protocol,
+            dataformat,
+            createtime,
+            updatetime
+        FROM devicetype
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectDeviceDataByDeviceId" parameterType="java.lang.Integer" resultType="com.atguigu.cloud.iotcloudspring.pojo.device.DeviceData">
+        SELECT
+            id,
+            deviceid,
+            devicetypeattributeid,
+            datakey,
+            datavalue,
+            timestamp,
+            devicestatus
+        FROM devicedata
+        WHERE deviceid = #{deviceid}
+    </select>
+
+    <select id="selectDevicesByProjectId" parameterType="java.lang.Integer" resultType="com.atguigu.cloud.iotcloudspring.pojo.device.Device">
+        SELECT
+            id,
+            projectid,
+            devicetypeid,
+            devicename,
+            devicekey,
+            createtime,
+            updatetime
+        FROM device
+        WHERE projectid = #{projectid}
+    </select>
+
 </mapper>

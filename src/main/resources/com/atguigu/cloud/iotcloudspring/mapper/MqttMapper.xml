@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.cloud.iotcloudspring.mapper.MqttMapper">
+
+    <resultMap id="MqttConfigResultMap" type="com.atguigu.cloud.iotcloudspring.pojo.mqtt.MqttConfig">
+        <id property="id" column="id"/>
+        <result property="projectId" column="project_id"/>
+        <result property="brokerAddress" column="broker_address"/>
+        <result property="brokerPort" column="broker_port"/>
+        <result property="clientId" column="client_id"/>
+        <result property="qos" column="qos"/>
+        <result property="keepAlive" column="keep_alive"/>
+        <result property="cleanSession" column="clean_session"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <!-- 查询指定 projectId 的 MQTT 配置 -->
+    <select id="selectByProjectId" resultMap="MqttConfigResultMap">
+        SELECT
+        id,
+        project_id,
+        broker_address,
+        broker_port,
+        client_id,
+        qos,
+        keep_alive,
+        clean_session,
+        created_at,
+        updated_at
+        FROM mqtt_config
+        <where>
+            <if test="projectId != null">
+                project_id = #{projectId}
+            </if>
+        </where>
+    </select>
+
+<!--    <select id="selectByDeviceId" resultType="com.atguigu.cloud.iotcloudspring.pojo.mqtt.MqttTopicConfig">-->
+<!--        SELECT id,-->
+<!--               project_id,-->
+<!--               device_id,-->
+<!--               topic,-->
+<!--               topic_type,-->
+<!--               description,-->
+<!--               created_at,-->
+<!--               updated_at-->
+<!--        FROM mqtt_topic_config-->
+<!--        WHERE device_id = #{deviceId}-->
+<!--    </select>-->
+
+    <select id="selectDeviceTopicByKey" resultType="com.atguigu.cloud.iotcloudspring.pojo.mqtt.MqttTopicConfig">
+        SELECT user_id, project_id, device_id, topic, id
+        FROM mqtt_topic_config
+        WHERE user_id = #{userId}
+          AND project_id = #{projectId}
+          AND device_id = #{deviceId}
+          AND topic = #{topic}
+    </select>
+
+    <update id="updateDeviceTopicByKey">
+        UPDATE mqtt_topic_config
+        SET topic = #{newTopic},
+        description = #{description},
+        updated_at = NOW()
+        WHERE user_id = #{userId}
+        AND project_id = #{projectId}
+        AND device_id = #{deviceId}
+        AND topic = #{topic}  <!-- 这里的 topic 为旧值 -->
+    </update>
+
+    <select id="selectDeviceTopics" resultType="com.atguigu.cloud.iotcloudspring.pojo.mqtt.MqttTopicConfig">
+        SELECT id,
+               user_id,
+               project_id,
+               device_id,
+               topic,
+               topic_type AS topicType,
+               description
+        FROM mqtt_topic_config
+        WHERE user_id = #{userId}
+          AND project_id = #{projectId}
+          AND device_id = #{deviceId}
+    </select>
+
+    <!-- 更新自定义主题 -->
+<!--    <update id="updateDeviceTopic">-->
+<!--        UPDATE mqtt_topic_config-->
+<!--        SET topic = #{topic}-->
+<!--        WHERE user_id = #{userId}-->
+<!--          AND project_id = #{projectId}-->
+<!--          AND device_id = #{deviceId}-->
+<!--    </update>-->
+
+    <!-- 插入自定义主题 -->
+    <insert id="insertDeviceTopic" parameterType="com.atguigu.cloud.iotcloudspring.pojo.mqtt.MqttTopicConfig">
+        INSERT INTO mqtt_topic_config (user_id, project_id, device_id, topic, topic_type, description)
+        VALUES (#{userId}, #{projectId}, #{deviceId}, #{topic}, #{topicType}, #{description})
+    </insert>
+
+</mapper>

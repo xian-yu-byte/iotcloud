@@ -1,6 +1,7 @@
 package com.atguigu.cloud.iotcloudspring.mapper;
 
 import com.atguigu.cloud.iotcloudspring.pojo.device.Device;
+import com.atguigu.cloud.iotcloudspring.pojo.device.DeviceData;
 import com.atguigu.cloud.iotcloudspring.pojo.device.DeviceType;
 import com.atguigu.cloud.iotcloudspring.pojo.device.DeviceTypeAttribute;
 import org.apache.ibatis.annotations.Mapper;
@@ -25,4 +26,15 @@ public interface DeviceMapper {
     //创建设备,返回设备及删除
     int insertDevice(Device device);
     Device selectDeviceById(@Param("id") Integer id);
+
+    // 根据设备类型ID查询设备类型信息
+    DeviceType selectDeviceTypeById(@Param("id") Integer id);
+
+    // 根据设备ID查询设备上报的动态数据列表
+    List<DeviceData> selectDeviceDataByDeviceId(@Param("deviceid") Integer deviceid);
+
+    // 根据项目ID查询设备列表
+    List<Device> selectDevicesByProjectId(@Param("projectid") Integer projectid);
+
+
 }

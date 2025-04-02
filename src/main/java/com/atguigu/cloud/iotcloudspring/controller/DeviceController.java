@@ -3,10 +3,7 @@ package com.atguigu.cloud.iotcloudspring.controller;
 import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceDTO;
 import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceTypeAttributeDTO;
 import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceTypeDTO;
-import com.atguigu.cloud.iotcloudspring.DTO.Device.Response.DeviceResponse;
-import com.atguigu.cloud.iotcloudspring.DTO.Device.Response.DeviceTypeAttributeResponse;
-import com.atguigu.cloud.iotcloudspring.DTO.Device.Response.DeviceTypeNameResponse;
-import com.atguigu.cloud.iotcloudspring.DTO.Device.Response.DeviceTypeResponse;
+import com.atguigu.cloud.iotcloudspring.DTO.Device.Response.*;
 import com.atguigu.cloud.iotcloudspring.pojo.Result;
 import com.atguigu.cloud.iotcloudspring.service.DeviceService;
 import com.atguigu.cloud.iotcloudspring.service.UserService;
@@ -87,10 +84,15 @@ public class DeviceController {
         return Result.success(id);
     }
 
-    // 根据设备ID查询设备详情
-    @GetMapping("createDevice/{id}")
-    public Result<DeviceResponse> getDevice(@PathVariable Integer id) {
-        DeviceResponse response = deviceService.getDeviceById(id);
+    @GetMapping("/detail/{id}")
+    public Result<DeviceDetailResponse> getDeviceDetail(@PathVariable Integer id) {
+        DeviceDetailResponse response = deviceService.getDeviceDetail(id);
         return Result.success(response);
+    }
+
+    @GetMapping("/detail/project/{projectid}")
+    public Result<List<DeviceDetailResponse>> getDeviceDetailsByProject(@PathVariable Integer projectid) {
+        List<DeviceDetailResponse> responses = deviceService.getDeviceDetailsByProject(projectid);
+        return Result.success(responses);
     }
 }

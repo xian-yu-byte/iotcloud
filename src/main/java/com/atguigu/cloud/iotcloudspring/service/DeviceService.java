@@ -3,10 +3,7 @@ package com.atguigu.cloud.iotcloudspring.service;
 import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceDTO;
 import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceTypeAttributeDTO;
 import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceTypeDTO;
-import com.atguigu.cloud.iotcloudspring.DTO.Device.Response.DeviceResponse;
-import com.atguigu.cloud.iotcloudspring.DTO.Device.Response.DeviceTypeAttributeResponse;
-import com.atguigu.cloud.iotcloudspring.DTO.Device.Response.DeviceTypeNameResponse;
-import com.atguigu.cloud.iotcloudspring.DTO.Device.Response.DeviceTypeResponse;
+import com.atguigu.cloud.iotcloudspring.DTO.Device.Response.*;
 
 import java.util.List;
 
@@ -32,6 +29,8 @@ public interface DeviceService {
     // 创建设备
     Integer createDevice(DeviceDTO deviceDTO);
 
-    //返回所有设备
-    DeviceResponse getDeviceById(Integer id);
+    DeviceDetailResponse getDeviceDetail(Integer deviceId);
+
+    // 根据项目 ID 查询该项目下所有设备的详情
+    List<DeviceDetailResponse> getDeviceDetailsByProject(Integer projectId);
 }

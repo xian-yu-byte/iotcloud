@@ -34,7 +34,7 @@
     <!-- UserProject 插入 -->
     <insert id="insertUserProject" parameterType="com.atguigu.cloud.iotcloudspring.pojo.User.UserProject"
             useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO user_project (userid, projectid, role, joinedat)
+        INSERT INTO userproject (userid, projectid, role, joinedat)
         VALUES (#{userid}, #{projectid}, #{role}, #{joinedat})
     </insert>
 
@@ -42,7 +42,7 @@
     <select id="selectByUserId" parameterType="Integer"
             resultType="com.atguigu.cloud.iotcloudspring.pojo.User.UserProject">
         SELECT id, userid, projectid, role, joinedat
-        FROM user_project
+        FROM userproject
         WHERE userid = #{userid}
     </select>
 

@@ -50,7 +50,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         // 允许的前端地址（开发环境可用 *，生产环境建议写具体域名）
-        config.setAllowedOrigins(List.of("http://localhost:5173"));
+        config.setAllowedOrigins(List.of("http://localhost:5173", "http://iotcloud.yundatech.top","https://d318-125-220-160-45.ngrok-free.app"));
         // 允许的请求方法
         config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
         // 允许的请求头
