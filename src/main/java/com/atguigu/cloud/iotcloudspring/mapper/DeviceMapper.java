@@ -25,7 +25,11 @@ public interface DeviceMapper {
 
     //创建设备,返回设备及删除
     int insertDevice(Device device);
+
     Device selectDeviceById(@Param("id") Integer id);
+    DeviceTypeAttribute selectByTypeAndName(@Param("deviceid") int deviceid,
+                                            @Param("attributename") String attributename);
+
 
     // 根据设备类型ID查询设备类型信息
     DeviceType selectDeviceTypeById(@Param("id") Integer id);
@@ -35,6 +39,5 @@ public interface DeviceMapper {
 
     // 根据项目ID查询设备列表
     List<Device> selectDevicesByProjectId(@Param("projectid") Integer projectid);
-
 
 }

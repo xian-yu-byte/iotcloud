@@ -67,6 +67,14 @@
         WHERE id = #{id}
     </select>
 
+    <select id="selectByTypeAndName" resultType="com.atguigu.cloud.iotcloudspring.pojo.device.DeviceTypeAttribute">
+        SELECT dta.*
+        FROM device d
+                 JOIN devicetypeattribute dta ON d.devicetypeid = dta.devicetypeid
+        WHERE d.id = #{deviceid}
+          AND dta.attributename = #{attributename}
+    </select>
+
     <select id="selectDeviceTypeById" parameterType="java.lang.Integer" resultType="com.atguigu.cloud.iotcloudspring.pojo.device.DeviceType">
         SELECT
             id,

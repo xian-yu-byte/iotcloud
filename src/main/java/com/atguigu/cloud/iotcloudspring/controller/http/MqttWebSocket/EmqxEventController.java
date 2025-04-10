@@ -1,4 +1,4 @@
-package com.atguigu.cloud.iotcloudspring.controller.MqttWebSocket;
+package com.atguigu.cloud.iotcloudspring.controller.http.MqttWebSocket;
 
 
 import org.springframework.beans.factory.annotation.Autowired;

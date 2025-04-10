@@ -1,6 +1,7 @@
 package com.atguigu.cloud.iotcloudspring.mapper;
 
 import com.atguigu.cloud.iotcloudspring.DTO.Mqtt.MqttTopicConfigDTO;
+import com.atguigu.cloud.iotcloudspring.pojo.device.DeviceData;
 import com.atguigu.cloud.iotcloudspring.pojo.mqtt.MqttConfig;
 import com.atguigu.cloud.iotcloudspring.pojo.mqtt.MqttTopicConfig;
 import org.apache.ibatis.annotations.Mapper;
@@ -35,4 +36,7 @@ public interface MqttMapper {
 
     // 插入自定义的设备主题
     int insertDeviceTopic(MqttTopicConfig config);
+
+    //插入设备传递过来的数值
+    void insertEmqxDeviceData(DeviceData deviceData);
 }

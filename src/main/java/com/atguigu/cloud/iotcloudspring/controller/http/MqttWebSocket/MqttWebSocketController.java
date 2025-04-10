@@ -1,4 +1,4 @@
-package com.atguigu.cloud.iotcloudspring.controller.MqttWebSocket;
+package com.atguigu.cloud.iotcloudspring.controller.http.MqttWebSocket;
 
 import com.atguigu.cloud.iotcloudspring.DTO.Mqtt.Response.MqttConnectResponse;
 import com.atguigu.cloud.iotcloudspring.service.impl.MqttEclipsePaho;

@@ -1,4 +1,4 @@
-package com.atguigu.cloud.iotcloudspring.controller;
+package com.atguigu.cloud.iotcloudspring.controller.http;
 
 import com.atguigu.cloud.iotcloudspring.DTO.JoinProjectByNameRequest;
 import com.atguigu.cloud.iotcloudspring.DTO.JoinProjectRequest;

@@ -100,4 +100,19 @@
         VALUES (#{userId}, #{projectId}, #{deviceId}, #{topic}, #{topicType}, #{description})
     </insert>
 
+    <insert id="insertEmqxDeviceData" parameterType="com.atguigu.cloud.iotcloudspring.pojo.device.DeviceData">
+        INSERT INTO devicedata (deviceid,
+                                devicetypeattributeid,
+                                datakey,
+                                datavalue,
+                                devicestatus,
+                                timestamp)
+        VALUES (#{deviceid},
+                #{devicetypeattributeid},
+                #{datakey},
+                #{datavalue},
+                #{devicestatus},
+                #{timestamp})
+    </insert>
+
 </mapper>

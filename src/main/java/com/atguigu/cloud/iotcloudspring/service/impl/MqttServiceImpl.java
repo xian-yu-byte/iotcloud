@@ -64,6 +64,7 @@ public class MqttServiceImpl implements MqttService {
                     + "/device" + deviceId
                     + "/" + config.getTopic();
             MqttTopicConfigResponse vo = new MqttTopicConfigResponse();
+            vo.setId(config.getId());
             vo.setFullTopic(fullTopic);
             vo.setTopicType(config.getTopicType());
             vo.setDescription(config.getDescription());
