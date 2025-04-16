@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.cloud.iotcloudspring.mapper.DeviceStatusMapper">
+
+    <select id="selectByDeviceId" resultType="com.atguigu.cloud.iotcloudspring.DTO.Device.Response.DeviceStatusResponse">
+        SELECT id, devicestatus
+        FROM device
+        WHERE id = #{id}
+    </select>
+
+<!--    <select id="selectByUsername" resultType="com.atguigu.cloud.iotcloudspring.pojo.device.Device">-->
+<!--        SELECT id, devicestatus FROM device WHERE mqttusername = #{mqttusername}-->
+<!--    </select>-->
+
+    <insert id="insertDeviceStatus">
+        INSERT INTO device (id, devicestatus)
+        VALUES (#{id}, #{devicestatus})
+    </insert>
+
+    <update id="updateDeviceStatus" parameterType="com.atguigu.cloud.iotcloudspring.DTO.Device.Response.DeviceStatusResponse">
+        UPDATE device
+        SET devicestatus = #{devicestatus}
+        WHERE id = #{id}
+    </update>
+</mapper>

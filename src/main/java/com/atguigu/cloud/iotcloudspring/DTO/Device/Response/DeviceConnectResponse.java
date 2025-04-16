@@ -7,11 +7,11 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class DeviceDataResponse {
-    private Integer devicetypeattributeid;
-    private String datakey;
-    private String datavalue;
-    private LocalDateTime timestamp;
+@AllArgsConstructor
+public class DeviceConnectResponse {
+    private Integer id;
+    private String devicename;
+    private String devicestatus;
+    private LocalDateTime updatetime;
 }

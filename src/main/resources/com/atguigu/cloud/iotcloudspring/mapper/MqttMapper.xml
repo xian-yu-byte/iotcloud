@@ -60,9 +60,10 @@
           AND topic = #{topic}
     </select>
 
-    <update id="updateDeviceTopicByKey">
+    <update id="updateDeviceTopicByKey" >
         UPDATE mqtt_topic_config
         SET topic = #{newTopic},
+        topic_type = #{topicType},
         description = #{description},
         updated_at = NOW()
         WHERE user_id = #{userId}
@@ -105,14 +106,16 @@
                                 devicetypeattributeid,
                                 datakey,
                                 datavalue,
-                                devicestatus,
                                 timestamp)
         VALUES (#{deviceid},
                 #{devicetypeattributeid},
                 #{datakey},
                 #{datavalue},
-                #{devicestatus},
                 #{timestamp})
     </insert>
+
+    <delete id="deleteDeviceTopicById" parameterType="java.lang.Integer">
+        DELETE FROM mqtt_topic_config WHERE id = #{id}
+    </delete>
 
 </mapper>

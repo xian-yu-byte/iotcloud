@@ -22,7 +22,7 @@ public interface MqttMapper {
                                            @Param("deviceId") Integer deviceId,
                                            @Param("topic") String topic);
 
-    int updateDeviceTopicByKey(MqttTopicConfig dto);
+    int updateDeviceTopicByKey(MqttTopicConfigDTO dto);
 
     List<MqttTopicConfig> selectDeviceTopics(@Param("userId") Integer userId,
                                              @Param("projectId") Integer projectId,
@@ -39,4 +39,7 @@ public interface MqttMapper {
 
     //插入设备传递过来的数值
     void insertEmqxDeviceData(DeviceData deviceData);
+
+    //删除主题
+    int deleteDeviceTopicById(@Param("id") Integer id);
 }

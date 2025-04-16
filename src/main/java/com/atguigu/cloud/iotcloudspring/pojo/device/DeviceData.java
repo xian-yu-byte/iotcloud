@@ -15,6 +15,5 @@ public class DeviceData {
     private Integer devicetypeattributeid;
     private String datakey;
     private String datavalue;
-    private String devicestatus;
     private LocalDateTime timestamp;
 }

@@ -18,7 +18,6 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
@@ -105,29 +104,33 @@ public class MqttSubscriber {
 
                 // ④ 遍历 JSON 对象中的每个字段
                 // 使用 Jackson 迭代器遍历所有键值对
-                json.fields().forEachRemaining(entry -> {
-                    String dataKey = entry.getKey();
-                    String dataValue = entry.getValue().asText();
+                try {
+                    json.fields().forEachRemaining(entry -> {
+                        String dataKey = entry.getKey();
+                        String dataValue = entry.getValue().asText();
 
-                    // 根据设备类型及属性名称查询 devicetypeattribute 表中对应的记录
-                    DeviceTypeAttribute devTypeAttr = deviceMapper
-                            .selectByTypeAndName(devicetypeid, dataKey);
-                    if (devTypeAttr == null) {
-                        System.out.println("未找到 devicetypeattribute，devicetypeid="
-                                + devicetypeid + ", attributename=" + dataKey + "，跳过该属性");
-                        return;
-                    }
-                    DeviceData deviceData = new DeviceData();
-                    deviceData.setDeviceid(deviceId);
-                    deviceData.setDevicetypeattributeid(devTypeAttr.getId());
-                    deviceData.setDatakey(dataKey);
-                    deviceData.setDatavalue(dataValue);
-                    deviceData.setDevicestatus("ONLINE");
-                    deviceData.setTimestamp(LocalDateTime.now());
-                    mqttMapper.insertEmqxDeviceData(deviceData);
+                        // 根据设备类型及属性名称查询 devicetypeattribute 表中对应的记录
+                        DeviceTypeAttribute devTypeAttr = deviceMapper
+                                .selectByTypeAndName(devicetypeid, dataKey);
+                        if (devTypeAttr == null) {
+                            System.out.println("未找到 devicetypeattribute，devicetypeid="
+                                    + devicetypeid + ", attributename=" + dataKey + "，跳过该属性");
+                            return;
+                        }
+                        DeviceData deviceData = new DeviceData();
+                        deviceData.setDeviceid(deviceId);
+                        deviceData.setDevicetypeattributeid(devTypeAttr.getId());
+                        deviceData.setDatakey(dataKey);
+                        deviceData.setDatavalue(dataValue);
+                        deviceData.setTimestamp(LocalDateTime.now());
+                        mqttMapper.insertEmqxDeviceData(deviceData);
 
-                    System.out.println("已写入 devicedata：" + deviceData);
-                });
+                        System.out.println("已写入 devicedata：" + deviceData);
+                    });
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+
 
 //                messagingTemplate.convertAndSend("/topic/" + receivedTopic, payload);
                 try {

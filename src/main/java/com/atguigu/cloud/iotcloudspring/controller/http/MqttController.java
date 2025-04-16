@@ -63,6 +63,18 @@ public class MqttController {
         }
     }
 
+    // 删除主题
+    @DeleteMapping("/deleteTopic/{topiId}")
+    public Result<Void> deleteTopic(@PathVariable("topiId") Integer topicId) {
+        boolean success = mqttService.deleteDeviceTopic(topicId);
+        if (success) {
+            return Result.success();
+        } else {
+            return Result.error("删除失败");
+        }
+
+    }
+
     // 订阅主题
     @PostMapping("/mqtt/subscribe")
     public Result<String> subscribeTopic(@RequestBody TopicRequest request) {

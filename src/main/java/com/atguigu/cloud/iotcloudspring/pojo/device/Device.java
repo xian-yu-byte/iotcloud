@@ -20,6 +20,7 @@ public class Device {
     private String mqttpassword;
     private String devicegroup;
     private String deviceinformation;
+    private String devicestatus;
     private LocalDateTime createtime;
     private LocalDateTime updatetime;
 }

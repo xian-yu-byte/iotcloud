@@ -13,6 +13,10 @@ import java.util.List;
 public interface DeviceMapper {
     //创建设备类型及返回设备类型
     int insertDeviceType(DeviceType deviceType);
+
+    //删除设备类型
+    int deleteDeviceType(@Param("id") Integer id);
+
     List<DeviceType> selectDeviceTypeList(@Param("projectid") Integer projectid);
 
     // 返回设备类型名称
@@ -20,13 +24,20 @@ public interface DeviceMapper {
 
     //创建设备类型属性,返回设备类型属性及删除
     int insertDeviceTypeAttribute(DeviceTypeAttribute attribute);
+
     List<DeviceTypeAttribute> selectAttributesByDeviceTypeId(@Param("devicetypeid") Integer devicetypeid);
+
     int deleteDeviceTypeAttributeById(@Param("id") Integer id);
 
     //创建设备,返回设备及删除
     int insertDevice(Device device);
 
+    String selectDeviceNameById(@Param("id") Integer id);
+
+    int deleteDeviceById(@Param("id") Integer id);
+
     Device selectDeviceById(@Param("id") Integer id);
+
     DeviceTypeAttribute selectByTypeAndName(@Param("deviceid") int deviceid,
                                             @Param("attributename") String attributename);
 
@@ -39,5 +50,11 @@ public interface DeviceMapper {
 
     // 根据项目ID查询设备列表
     List<Device> selectDevicesByProjectId(@Param("projectid") Integer projectid);
+
+    //根据设备类型id查询关联设备
+    List<Device> selectDeviceByDeviceTypeId(@Param("devicetypeid") Integer devicetypeid);
+
+    //根据设备类型id查询设备类型名字
+    String selectDeviceTypeNameById(@Param("id") Integer id);
 
 }

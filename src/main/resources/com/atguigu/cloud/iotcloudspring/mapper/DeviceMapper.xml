@@ -10,6 +10,10 @@
                 NOW())
     </insert>
 
+    <delete id="deleteDeviceType" parameterType="java.lang.Integer">
+        DELETE FROM devicetype WHERE id = #{id}
+    </delete>
+
     <select id="selectDeviceTypeList" resultType="com.atguigu.cloud.iotcloudspring.pojo.device.DeviceType">
         select id, typename, accesscategory, protocol
         from devicetype
@@ -52,6 +56,18 @@
         VALUES (#{projectid}, #{devicetypeid}, #{devicename}, #{devicekey}, #{devicecommunication},
                 #{deviceinformation}, NOW(), NOW())
     </insert>
+
+    <select id="selectDeviceNameById" resultType="java.lang.String">
+        SELECT devicename
+        from device
+        where id = #{id}
+    </select>
+
+    <delete id="deleteDeviceById" parameterType="java.lang.Integer">
+        delete
+        from device
+        where id = #{id}
+    </delete>
 
     <select id="selectDeviceById" parameterType="int" resultType="com.atguigu.cloud.iotcloudspring.pojo.device.Device">
         SELECT id,
@@ -97,8 +113,7 @@
             devicetypeattributeid,
             datakey,
             datavalue,
-            timestamp,
-            devicestatus
+            timestamp
         FROM devicedata
         WHERE deviceid = #{deviceid}
     </select>
@@ -114,6 +129,22 @@
             updatetime
         FROM device
         WHERE projectid = #{projectid}
+    </select>
+
+    <select id="selectDeviceByDeviceTypeId" resultType="com.atguigu.cloud.iotcloudspring.pojo.device.Device">
+        SELECT
+            id,
+            devicename,
+            devicestatus,
+            updatetime
+        FROM device
+        WHERE devicetypeid = #{devicetypeid}
+    </select>
+
+    <select id="selectDeviceTypeNameById" resultType="java.lang.String">
+        select typename
+        from devicetype
+        where id = #{id}
     </select>
 
 </mapper>

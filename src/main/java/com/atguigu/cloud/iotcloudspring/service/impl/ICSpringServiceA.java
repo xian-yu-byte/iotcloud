@@ -1,5 +1,6 @@
 package com.atguigu.cloud.iotcloudspring.service.impl;
 
+import com.atguigu.cloud.iotcloudspring.DTO.User.UserResponse;
 import com.atguigu.cloud.iotcloudspring.mapper.ICMapper;
 import com.atguigu.cloud.iotcloudspring.pojo.ProjectAdd;
 import com.atguigu.cloud.iotcloudspring.pojo.Result;
@@ -89,9 +90,10 @@ public class ICSpringServiceA implements ICSpringService {
 
         // 使用统一密钥生成 token
         String token = jwtUtil.generateToken(username);
+        UserResponse userResponse = new UserResponse(token, existUser.getId());
 
         // 返回登录成功和 token
-        return Result.success(token);
+        return Result.success(userResponse);
     }
 
     /**

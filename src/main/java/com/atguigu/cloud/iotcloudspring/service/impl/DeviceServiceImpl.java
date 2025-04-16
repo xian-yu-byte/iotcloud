@@ -1,7 +1,6 @@
 package com.atguigu.cloud.iotcloudspring.service.impl;
 
 import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceDTO;
-import com.atguigu.cloud.iotcloudspring.DTO.Device.Response.DeviceDataResponse;
 import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceTypeAttributeDTO;
 import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceTypeDTO;
 import com.atguigu.cloud.iotcloudspring.DTO.Device.Response.*;
@@ -35,6 +34,12 @@ public class DeviceServiceImpl implements DeviceService {
         deviceType.setDataformat(deviceTypeDto.getDataformat());
         // 调用 Mapper 执行插入
         deviceMapper.insertDeviceType(deviceType);
+    }
+
+    @Override
+    public boolean deleteDeviceType(Integer id) {
+        int rows = deviceMapper.deleteDeviceType(id);
+        return rows > 0;
     }
 
     @Override
@@ -109,6 +114,17 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
+    public String getDeviceName(Integer id) {
+        return deviceMapper.selectDeviceNameById(id);
+    }
+
+    @Override
+    public boolean deleteDevice(Integer id) {
+        int rows = deviceMapper.deleteDeviceById(id);
+        return rows > 0;
+    }
+
+    @Override
     public DeviceDetailResponse getDeviceDetail(Integer deviceId) {
         // 1. 查询设备静态信息
         Device device = deviceMapper.selectDeviceById(deviceId);
@@ -157,5 +173,23 @@ public class DeviceServiceImpl implements DeviceService {
         return devices.stream()
                 .map(device -> getDeviceDetail(device.getId()))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<DeviceConnectResponse> getConnectedDevices(Integer deviceTypeId) {
+        List<Device> devices = deviceMapper.selectDeviceByDeviceTypeId(deviceTypeId);
+        return devices.stream().map(device -> {
+            DeviceConnectResponse dto = new DeviceConnectResponse();
+            dto.setId(device.getId());
+            dto.setDevicename(device.getDevicename());
+            dto.setDevicestatus(device.getDevicestatus());
+            dto.setUpdatetime(device.getUpdatetime());
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public String getDeviceTypeName(Integer id) {
+        return deviceMapper.selectDeviceTypeNameById(id);
     }
 }

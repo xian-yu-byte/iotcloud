@@ -14,8 +14,9 @@ public interface MqttService {
 
     List<MqttTopicConfigResponse> getDeviceTopics(Integer userId, Integer projectId, Integer deviceId);
 
-    /**
-     * 保存或更新用户自定义设备主题（Upsert）
-     */
+    //保存或更新用户自定义设备主题（Upsert）
     boolean saveOrUpdateDeviceTopic(MqttTopicConfigDTO dto);
+
+    //删除设备主题
+    boolean deleteDeviceTopic(Integer id);
 }

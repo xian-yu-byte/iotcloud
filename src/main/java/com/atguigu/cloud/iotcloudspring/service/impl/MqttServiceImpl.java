@@ -75,35 +75,46 @@ public class MqttServiceImpl implements MqttService {
 
     @Override
     public boolean saveOrUpdateDeviceTopic(MqttTopicConfigDTO dto) {
-        // 先将 DTO 转换为实体对象
+        // 保证 update 操作时 newTopic 不为 null：
+        if (dto.getNewTopic() == null || dto.getNewTopic().trim().isEmpty()) {
+            // 若 newTopic 为空，则使用原始 topic 作为新主题
+            dto.setNewTopic(dto.getTopic());
+        }
+
+        // 先尝试执行 update 操作
+        int rows = mqttMapper.updateDeviceTopicByKey(dto);
+        if (rows == 0) {
+            // 如果更新未生效，则记录不存在，执行插入操作
+            MqttTopicConfig entity = convertToEntity(dto);
+            rows = mqttMapper.insertDeviceTopic(entity);
+        }
+        return rows > 0;
+    }
+
+    /**
+     * 将 MqttTopicConfigDTO 转换为 MqttTopicConfig 实体对象。
+     * <p>
+     * 转换规则为：如果 newTopic 不为空，则实体的 topic 使用 newTopic，否则使用 dto 中的 topic 字段。
+     *
+     * @param dto 前端传入的 MqttTopicConfigDTO 对象
+     * @return 转换后的 MqttTopicConfig 实体对象
+     */
+    private MqttTopicConfig convertToEntity(MqttTopicConfigDTO dto) {
         MqttTopicConfig config = new MqttTopicConfig();
         config.setUserId(dto.getUserId());
         config.setProjectId(dto.getProjectId());
         config.setDeviceId(dto.getDeviceId());
-
-        // 如果有 newTopic 表示需要更新为新主题，否则用旧的 topic
-        if (dto.getNewTopic() != null && !dto.getNewTopic().isEmpty()) {
-            config.setTopic(dto.getNewTopic());
-        } else {
-            config.setTopic(dto.getTopic());
-        }
-
-        config.setTopicType(dto.getTopicType());  // 直接赋值枚举类型（前提 DTO 和实体中的类型一致）
+        // 若 newTopic 存在，则最终要保存的 topic 使用 newTopic，否则使用原始 topic
+        String finalTopic = (dto.getNewTopic() != null && !dto.getNewTopic().trim().isEmpty()) ? dto.getNewTopic() : dto.getTopic();
+        config.setTopic(finalTopic);
+        config.setTopicType(dto.getTopicType());
         config.setDescription(dto.getDescription());
+        // createdAt、updatedAt 字段可由数据库自动维护或根据业务需要设置
+        return config;
+    }
 
-        // 根据 userId, projectId, deviceId 和原始 topic 判断记录是否存在
-        // 注意：如果你希望以旧的 topic 作为唯一键判断，则这里使用 dto.getTopic()
-        MqttTopicConfig existing = mqttMapper.selectDeviceTopicByKey(
-                dto.getUserId(), dto.getProjectId(), dto.getDeviceId(), dto.getTopic());
-
-        int rows = 0;
-        if (existing == null) {
-            // 如果记录不存在，则插入新记录，传入转换后的实体对象
-            rows = mqttMapper.insertDeviceTopic(config);
-        } else {
-            // 如果记录存在，则更新记录（可以选择更新 description、以及 topic（如果有 newTopic）等字段）
-            rows = mqttMapper.updateDeviceTopicByKey(config);
-        }
-        return rows > 0;
+    @Override
+    public boolean deleteDeviceTopic(Integer id) {
+        return mqttMapper.deleteDeviceTopicById(id) > 0;
     }
 }
