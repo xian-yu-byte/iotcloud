@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DeviceTypeResponse {
-    private Integer id;
+    private Long id;
     private String typename;
     private AccessCategory accesscategory;
     private ProtocolType protocol;

@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DeviceType {
-    private Integer id;
-    private Integer projectid;
+    private Long id;
+    private Long projectid;
     private String typename;
     private AccessCategory accesscategory;
     private CommunicationMode communicationmode;

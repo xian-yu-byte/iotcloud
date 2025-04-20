@@ -30,7 +30,7 @@ public class DeviceController {
         //  从 Authentication 中获取当前登录用户的用户名
         String username = (String) authentication.getPrincipal();
         //  根据用户名查询出用户 ID
-        Integer userId = userService.findUserIdByUsername(username);
+        Long userId = userService.findUserIdByUsername(username);
 
         // 验证当前用户是否有权限操作该项目(后面再用)
         // if (!projectService.checkUserOwnsProject(userId, deviceTypeDTO.getProjectId())) {
@@ -45,7 +45,7 @@ public class DeviceController {
 
     //删除设备类型
     @DeleteMapping("/deleteType/{id}")
-    public Result<Void> deleteDeviceType(@PathVariable Integer id) {
+    public Result<Void> deleteDeviceType(@PathVariable Long id) {
         boolean success = deviceService.deleteDeviceType(id);
         if (success) {
             return Result.success();
@@ -55,32 +55,32 @@ public class DeviceController {
     }
 
     @GetMapping("/deviceType/{projectid}")
-    public Result<List<DeviceTypeResponse>> getDeviceTypeList(@PathVariable Integer projectid) {
+    public Result<List<DeviceTypeResponse>> getDeviceTypeList(@PathVariable Long projectid) {
         List<DeviceTypeResponse> list = deviceService.getDeviceTypeList(projectid);
         return Result.success(list);
     }
 
     @GetMapping("/deviceTypeName/{projectid}")
-    public Result<List<DeviceTypeNameResponse>> getDeviceTypeById(@PathVariable Integer projectid) {
+    public Result<List<DeviceTypeNameResponse>> getDeviceTypeById(@PathVariable Long projectid) {
         List<DeviceTypeNameResponse> list = deviceService.getDeviceTypeNameList(projectid);
         return Result.success(list);
     }
 
     @PostMapping("/createTypeAttribute")
-    public Result<Integer> createDeviceTypeAttribute(@RequestBody DeviceTypeAttributeDTO attributeDTO) {
-        Integer id = deviceService.createDeviceTypeAttribute(attributeDTO);
+    public Result<Long> createDeviceTypeAttribute(@RequestBody DeviceTypeAttributeDTO attributeDTO) {
+        Long id = deviceService.createDeviceTypeAttribute(attributeDTO);
         return Result.success(id);
     }
 
     // 根据设备类型ID查询属性列表
     @GetMapping("/deviceAttributeType/{devicetypeid}")
-    public Result<List<DeviceTypeAttributeResponse>> getAttributesByDeviceTypeId(@PathVariable Integer devicetypeid) {
+    public Result<List<DeviceTypeAttributeResponse>> getAttributesByDeviceTypeId(@PathVariable Long devicetypeid) {
         List<DeviceTypeAttributeResponse> list = deviceService.getAttributesByDeviceTypeId(devicetypeid);
         return Result.success(list);
     }
 
     @DeleteMapping("/delete/{id}")
-    public Result<Void> deleteDeviceTypeAttribute(@PathVariable Integer id) {
+    public Result<Void> deleteDeviceTypeAttribute(@PathVariable Long id) {
         boolean success = deviceService.deleteDeviceTypeAttribute(id);
         if (success) {
             return Result.success();
@@ -91,21 +91,21 @@ public class DeviceController {
 
     // 创建设备
     @PostMapping("/createDevice")
-    public Result<Integer> createDevice(@RequestBody DeviceDTO deviceDTO) {
-        Integer id = deviceService.createDevice(deviceDTO);
+    public Result<Long> createDevice(@RequestBody DeviceDTO deviceDTO) {
+        Long id = deviceService.createDevice(deviceDTO);
         return Result.success(id);
     }
 
     //获取设备id获取设备名称
     @GetMapping("/deviceName/{id}")
-    public Result<String> getDeviceName(@PathVariable Integer id) {
+    public Result<String> getDeviceName(@PathVariable Long id) {
         String deviceName = deviceService.getDeviceName(id);
         return Result.success(deviceName);
     }
 
     //删除设备
     @DeleteMapping("/deleteDevice/{id}")
-    public Result<Void> deleteDevice(@PathVariable Integer id) {
+    public Result<Void> deleteDevice(@PathVariable Long id) {
         boolean success = deviceService.deleteDevice(id);
         if (success) {
             return Result.success();
@@ -115,27 +115,27 @@ public class DeviceController {
     }
 
     @GetMapping("/detail/{id}")
-    public Result<DeviceDetailResponse> getDeviceDetail(@PathVariable Integer id) {
+    public Result<DeviceDetailResponse> getDeviceDetail(@PathVariable Long id) {
         DeviceDetailResponse response = deviceService.getDeviceDetail(id);
         return Result.success(response);
     }
 
     @GetMapping("/detail/project/{projectid}")
-    public Result<List<DeviceDetailResponse>> getDeviceDetailsByProject(@PathVariable Integer projectid) {
+    public Result<List<DeviceDetailResponse>> getDeviceDetailsByProject(@PathVariable Long projectid) {
         List<DeviceDetailResponse> responses = deviceService.getDeviceDetailsByProject(projectid);
         return Result.success(responses);
     }
 
     //查询关联的设备
     @GetMapping("/connectedDevices/{devicetypeid}")
-    public Result<List<DeviceConnectResponse>> getConnectedDevices(@PathVariable Integer devicetypeid) {
+    public Result<List<DeviceConnectResponse>> getConnectedDevices(@PathVariable Long devicetypeid) {
         List<DeviceConnectResponse> responses = deviceService.getConnectedDevices(devicetypeid);
         return Result.success(responses);
     }
 
     //根据设备类型id查询设备类型名称
     @GetMapping("/deviceType/deviceTypeName/{id}")
-    public Result<String> getDeviceTypeName(@PathVariable Integer id) {
+    public Result<String> getDeviceTypeName(@PathVariable Long id) {
         String deviceTypeName = deviceService.getDeviceTypeName(id);
         return Result.success(deviceTypeName);
     }

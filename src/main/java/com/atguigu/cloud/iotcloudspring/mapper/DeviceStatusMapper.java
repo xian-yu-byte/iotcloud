@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface DeviceStatusMapper {
     // 根据 deviceId 查询状态记录
-    DeviceStatusResponse selectByDeviceId(@Param("id") Integer id);
+    DeviceStatusResponse selectByDeviceId(@Param("id") Long id);
 
     // 根据 username 查询状态记录
 //    Device selectByUsername(@Param("mqttusername") String mqttusername);

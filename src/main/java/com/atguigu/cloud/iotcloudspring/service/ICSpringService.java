@@ -24,23 +24,23 @@ public interface ICSpringService {
     boolean changePassword(String username, String newPassword);
 
     // 当前登录用户加入项目（通过项目ID加入）
-    Result<Void> joinProject(Integer userid, Integer projectid, String role);
+    Result<Void> joinProject(Long userid, Long projectid, String role);
 
     // 获取当前用户加入的项目关联记录
-    Result<List<UserProject>> getProjectsByUser(Integer userid);
+    Result<List<UserProject>> getProjectsByUser(Long userid);
 
     // 根据传入的用户名查询该用户创建的所有项目
     Result<List<ProjectAdd>> getProjectsByUsername(String username);
 
     // 用户退出项目
-    Result<Void> leaveProject(Integer userid, Integer projectid);
+    Result<Void> leaveProject(Long userid, Long projectid);
 
     // 当前登录用户通过项目名称加入项目
-    Result<Void> joinProjectByName(Integer userid, String projectname);
+    Result<Void> joinProjectByName(Long userid, String projectname);
 
     // 根据用户ID查询项目信息
-    Result<List<ProjectAdd>> getJoinedProjects(Integer userid);
+    Result<List<ProjectAdd>> getJoinedProjects(Long userid);
 
     // 根据项目ID查询项目信息
-    Result<ProjectAdd> getProjectById(Integer projectid);
+    Result<ProjectAdd> getProjectById(Long projectid);
 }

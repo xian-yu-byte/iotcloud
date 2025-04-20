@@ -12,11 +12,11 @@ public interface MqttService {
 
     MqttConfigDTO getConfigByProjectId();
 
-    List<MqttTopicConfigResponse> getDeviceTopics(Integer userId, Integer projectId, Integer deviceId);
+    List<MqttTopicConfigResponse> getDeviceTopics(Long userId, Long projectId, Long deviceId);
 
     //保存或更新用户自定义设备主题（Upsert）
     boolean saveOrUpdateDeviceTopic(MqttTopicConfigDTO dto);
 
     //删除设备主题
-    boolean deleteDeviceTopic(Integer id);
+    boolean deleteDeviceTopic(Long id);
 }

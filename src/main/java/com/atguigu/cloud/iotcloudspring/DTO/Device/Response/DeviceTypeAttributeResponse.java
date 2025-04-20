@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DeviceTypeAttributeResponse {
-    private Integer id;
-    private Integer devicetypeid;
+    private Long id;
+    private Long devicetypeid;
     private String attributename;
     private String attributeunit;
     private String attributetype;

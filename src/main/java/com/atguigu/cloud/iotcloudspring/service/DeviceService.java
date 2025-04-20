@@ -12,40 +12,40 @@ public interface DeviceService {
     void createDeviceType(DeviceTypeDTO deviceTypeDto);
 
     // 删除设备类型
-    boolean deleteDeviceType(Integer deviceTypeId);
+    boolean deleteDeviceType(Long deviceTypeId);
 
     // 返回所有设备类型
-    List<DeviceTypeResponse> getDeviceTypeList(Integer projectid);
+    List<DeviceTypeResponse> getDeviceTypeList(Long projectid);
 
     // 返回设备类型名称
-    List<DeviceTypeNameResponse> getDeviceTypeNameList(Integer projectid);
+    List<DeviceTypeNameResponse> getDeviceTypeNameList(Long projectid);
 
     // 创建设备类型属性
-    Integer createDeviceTypeAttribute(DeviceTypeAttributeDTO attributeDTO);
+    Long createDeviceTypeAttribute(DeviceTypeAttributeDTO attributeDTO);
 
     // 根据设备类型id获取设备类型属性
-    List<DeviceTypeAttributeResponse> getAttributesByDeviceTypeId(Integer deviceTypeId);
+    List<DeviceTypeAttributeResponse> getAttributesByDeviceTypeId(Long deviceTypeId);
 
     // 新增删除接口，返回 true 表示删除成功
-    boolean deleteDeviceTypeAttribute(Integer id);
+    boolean deleteDeviceTypeAttribute(Long id);
 
     // 创建设备
-    Integer createDevice(DeviceDTO deviceDTO);
+    Long createDevice(DeviceDTO deviceDTO);
 
     // 根据设备id获取设备名称
-    String getDeviceName(Integer deviceId);
+    String getDeviceName(Long deviceId);
 
     //根据设备id删除设备
-    boolean deleteDevice(Integer deviceId);
+    boolean deleteDevice(Long deviceId);
 
-    DeviceDetailResponse getDeviceDetail(Integer deviceId);
+    DeviceDetailResponse getDeviceDetail(Long deviceId);
 
     // 根据项目 ID 查询该项目下所有设备的详情
-    List<DeviceDetailResponse> getDeviceDetailsByProject(Integer projectId);
+    List<DeviceDetailResponse> getDeviceDetailsByProject(Long projectId);
 
     // 根据设备类型id获取设备类型关联设备数据
-    List<DeviceConnectResponse> getConnectedDevices(Integer deviceTypeId);
+    List<DeviceConnectResponse> getConnectedDevices(Long deviceTypeId);
 
     // 根据设备id获取设备关联设备类型数据
-    String getDeviceTypeName(Integer deviceTypeId);
+    String getDeviceTypeName(Long deviceTypeId);
 }

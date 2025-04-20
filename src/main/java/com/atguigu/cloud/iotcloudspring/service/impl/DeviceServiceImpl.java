@@ -37,13 +37,13 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    public boolean deleteDeviceType(Integer id) {
-        int rows = deviceMapper.deleteDeviceType(id);
+    public boolean deleteDeviceType(Long id) {
+        Long rows = deviceMapper.deleteDeviceType(id);
         return rows > 0;
     }
 
     @Override
-    public List<DeviceTypeResponse> getDeviceTypeList(Integer projectid) {
+    public List<DeviceTypeResponse> getDeviceTypeList(Long projectid) {
         List<DeviceType> list = deviceMapper.selectDeviceTypeList(projectid);
         // 将 DeviceType 转换为返回 DTO DeviceTypeResponse
         return list.stream().map(device -> {
@@ -57,7 +57,7 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    public List<DeviceTypeNameResponse> getDeviceTypeNameList(Integer projectid) {
+    public List<DeviceTypeNameResponse> getDeviceTypeNameList(Long projectid) {
         List<DeviceType> list = deviceMapper.selectDeviceTypeNameList(projectid);
         return list.stream().map(device -> {
             DeviceTypeNameResponse response = new DeviceTypeNameResponse();
@@ -68,7 +68,7 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    public Integer createDeviceTypeAttribute(DeviceTypeAttributeDTO attributeDTO) {
+    public Long createDeviceTypeAttribute(DeviceTypeAttributeDTO attributeDTO) {
         DeviceTypeAttribute attribute = new DeviceTypeAttribute();
         attribute.setDevicetypeid(attributeDTO.getDevicetypeid());
         attribute.setAttributename(attributeDTO.getAttributename());
@@ -83,7 +83,7 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    public List<DeviceTypeAttributeResponse> getAttributesByDeviceTypeId(Integer deviceTypeId) {
+    public List<DeviceTypeAttributeResponse> getAttributesByDeviceTypeId(Long deviceTypeId) {
         List<DeviceTypeAttribute> list = deviceMapper.selectAttributesByDeviceTypeId(deviceTypeId);
         return list.stream().map(attr -> {
             DeviceTypeAttributeResponse response = new DeviceTypeAttributeResponse();
@@ -100,13 +100,13 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    public boolean deleteDeviceTypeAttribute(Integer id) {
-        int rows = deviceMapper.deleteDeviceTypeAttributeById(id);
+    public boolean deleteDeviceTypeAttribute(Long id) {
+        Long rows = deviceMapper.deleteDeviceTypeAttributeById(id);
         return rows > 0;
     }
 
     @Override
-    public Integer createDevice(DeviceDTO deviceDTO) {
+    public Long createDevice(DeviceDTO deviceDTO) {
         Device device = new Device();
         BeanUtils.copyProperties(deviceDTO, device);
         deviceMapper.insertDevice(device);
@@ -114,18 +114,18 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    public String getDeviceName(Integer id) {
+    public String getDeviceName(Long id) {
         return deviceMapper.selectDeviceNameById(id);
     }
 
     @Override
-    public boolean deleteDevice(Integer id) {
-        int rows = deviceMapper.deleteDeviceById(id);
+    public boolean deleteDevice(Long id) {
+        Long rows = deviceMapper.deleteDeviceById(id);
         return rows > 0;
     }
 
     @Override
-    public DeviceDetailResponse getDeviceDetail(Integer deviceId) {
+    public DeviceDetailResponse getDeviceDetail(Long deviceId) {
         // 1. 查询设备静态信息
         Device device = deviceMapper.selectDeviceById(deviceId);
         if (device == null) {
@@ -166,7 +166,7 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    public List<DeviceDetailResponse> getDeviceDetailsByProject(Integer projectId) {
+    public List<DeviceDetailResponse> getDeviceDetailsByProject(Long projectId) {
         // 首先，根据项目ID查询所有设备
         List<Device> devices = deviceMapper.selectDevicesByProjectId(projectId);
         // 对于每个设备，调用 getDeviceDetail(device.getId())
@@ -176,7 +176,7 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    public List<DeviceConnectResponse> getConnectedDevices(Integer deviceTypeId) {
+    public List<DeviceConnectResponse> getConnectedDevices(Long deviceTypeId) {
         List<Device> devices = deviceMapper.selectDeviceByDeviceTypeId(deviceTypeId);
         return devices.stream().map(device -> {
             DeviceConnectResponse dto = new DeviceConnectResponse();
@@ -189,7 +189,7 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    public String getDeviceTypeName(Integer id) {
+    public String getDeviceTypeName(Long id) {
         return deviceMapper.selectDeviceTypeNameById(id);
     }
 }

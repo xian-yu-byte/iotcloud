@@ -16,7 +16,7 @@ public class DeviceWebsocketController {
 
     @MessageMapping("/detail/{id}")
     @SendTo("/topic/detail/{id}")
-    public Result<DeviceDetailResponse> getDeviceDetail(@DestinationVariable Integer id) {
+    public Result<DeviceDetailResponse> getDeviceDetail(@DestinationVariable Long id) {
         DeviceDetailResponse response = deviceService.getDeviceDetail(id);
         return Result.success(response);
     }

@@ -1,13 +1,12 @@
 package com.atguigu.cloud.iotcloudspring.DTO;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class LeaveProjectRequest {
-    private Integer projectid;
-
-    public Integer getProjectid() {
-        return projectid;
-    }
-
-    public void setProjectid(Integer projectid) {
-        this.projectid = projectid;
-    }
+    private Long projectid;
 }

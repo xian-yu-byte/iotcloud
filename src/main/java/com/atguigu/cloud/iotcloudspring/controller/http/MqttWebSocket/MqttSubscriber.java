@@ -72,7 +72,7 @@ public class MqttSubscriber {
                 System.out.println("收到 EMQX 消息，主题：" + receivedTopic + "，内容：" + payload);
 
                 // ① 解析主题获取 deviceId
-                int deviceId = parseDeviceIdFromTopic(receivedTopic);
+                Long deviceId = parseDeviceIdFromTopic(receivedTopic);
                 if (deviceId <= 0) {
                     System.out.println("解析 deviceId 失败，跳过处理");
                     return;
@@ -96,7 +96,7 @@ public class MqttSubscriber {
                     System.out.println("未找到对应的 device 记录，deviceId=" + deviceId);
                     return;
                 }
-                Integer devicetypeid = device.getDevicetypeid();
+                Long devicetypeid = device.getDevicetypeid();
                 if (devicetypeid == null) {
                     System.out.println("deviceTypeId 为空，无法查找属性");
                     return;
@@ -153,16 +153,16 @@ public class MqttSubscriber {
      * 假设第三段是形如 "device1" => 返回 int 1
      * 若无法解析则返回 -1 或 0 表示失败
      */
-    private int parseDeviceIdFromTopic(String topic) {
+    private Long parseDeviceIdFromTopic(String topic) {
         String[] parts = topic.split("/");
         if (parts.length < 3) {
-            return -1;
+            return (long) -1;
         }
         String deviceStr = parts[2].replace("device", "");
         try {
-            return Integer.parseInt(deviceStr);
+            return Long.parseLong(deviceStr);
         } catch (NumberFormatException e) {
-            return -1;
+            return (long) -1;
         }
     }
 

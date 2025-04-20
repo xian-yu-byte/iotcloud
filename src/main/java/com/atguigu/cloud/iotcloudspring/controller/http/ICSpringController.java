@@ -69,7 +69,7 @@ public class ICSpringController {
         // 从 Authentication 中取出存储的用户名
         String username = (String) authentication.getPrincipal();
         // 通过 UserService 查询该用户名对应的数字 ID
-        Integer userid = userService.findUserIdByUsername(username);
+        Long userid = userService.findUserIdByUsername(username);
         if (userid == null) {
             return Result.error("无效的用户标识");
         }
@@ -81,7 +81,7 @@ public class ICSpringController {
     @GetMapping("/myJoin")
     public Result<List<ProjectAdd>> getMyJoinedProjects(Authentication authentication) {
         String username = (String) authentication.getPrincipal();
-        Integer userid = userService.findUserIdByUsername(username);
+        Long userid = userService.findUserIdByUsername(username);
         if (userid == null) {
             return Result.error("无效的用户标识");
         }
@@ -95,7 +95,7 @@ public class ICSpringController {
         // 从 Authentication 中获取存储的用户名
         String username = (String) authentication.getPrincipal();
         // 根据用户名查询用户的数字 ID
-        Integer userid = userService.findUserIdByUsername(username);
+        Long userid = userService.findUserIdByUsername(username);
         if (userid == null) {
             return Result.error("无效的用户标识");
         }
@@ -113,9 +113,9 @@ public class ICSpringController {
     public Result<Void> joinProjectByName(@RequestBody JoinProjectByNameRequest request,
                                           Authentication authentication) {
         String principal = (String) authentication.getPrincipal();
-        Integer userid;
+        Long userid;
         try {
-            userid = Integer.valueOf(principal);
+            userid = Long.valueOf(principal);
         } catch (NumberFormatException e) {
             return Result.error("无效的用户标识");
         }
@@ -124,10 +124,10 @@ public class ICSpringController {
 
     //根据项目id获取项目详情
     @GetMapping("/project/{projectid}")
-    public Result<ProjectAdd> getProjectDetail(@PathVariable Integer projectid, Authentication authentication) {
+    public Result<ProjectAdd> getProjectDetail(@PathVariable Long projectid, Authentication authentication) {
         // 从 Authentication 中获取当前登录用户
         String username = (String) authentication.getPrincipal();
-        Integer userid = userService.findUserIdByUsername(username);
+        Long userid = userService.findUserIdByUsername(username);
         if (userid == null) {
             return Result.error("无效的用户标识");
         }

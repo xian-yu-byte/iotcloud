@@ -23,7 +23,7 @@ public class MqttController {
     private MqttSubscriber mqttSubscriber;
 
     @GetMapping("/mqtt/config")
-    public Result<MqttConfigDTO> getMqttConfig(@RequestParam(required = false) Integer projectId) {
+    public Result<MqttConfigDTO> getMqttConfig(@RequestParam(required = false) Long projectId) {
         MqttConfigDTO configDto = mqttService.getConfigByProjectId();
         if (configDto != null) {
             return Result.success(configDto);
@@ -34,9 +34,9 @@ public class MqttController {
 
     // 查询设备自定义主题接口
     @GetMapping("/mqtt/topic")
-    public Result<List<MqttTopicConfigResponse>> getDeviceTopics(@RequestParam("userId") Integer userId,
-                                                                 @RequestParam("projectId") Integer projectId,
-                                                                 @RequestParam("deviceId") Integer deviceId) {
+    public Result<List<MqttTopicConfigResponse>> getDeviceTopics(@RequestParam("userId") Long userId,
+                                                                 @RequestParam("projectId") Long projectId,
+                                                                 @RequestParam("deviceId") Long deviceId) {
         List<MqttTopicConfigResponse> fullTopics = mqttService.getDeviceTopics(userId, projectId, deviceId);
         if (fullTopics == null || fullTopics.isEmpty()) {
             return Result.error("自定义主题未设置");
@@ -65,7 +65,7 @@ public class MqttController {
 
     // 删除主题
     @DeleteMapping("/deleteTopic/{topiId}")
-    public Result<Void> deleteTopic(@PathVariable("topiId") Integer topicId) {
+    public Result<Void> deleteTopic(@PathVariable("topiId") Long topicId) {
         boolean success = mqttService.deleteDeviceTopic(topicId);
         if (success) {
             return Result.success();

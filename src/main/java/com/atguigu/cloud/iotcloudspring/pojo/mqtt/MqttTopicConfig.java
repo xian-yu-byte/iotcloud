@@ -11,10 +11,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MqttTopicConfig {
-    private Integer id;
-    private Integer userId;
-    private Integer projectId;     // mqtt_topic.project_id
-    private Integer deviceId;      // mqtt_topic.device_id
+    private Long id;
+    private Long userId;
+    private Long projectId;     // mqtt_topic.project_id
+    private Long deviceId;      // mqtt_topic.device_id
     private String topic;          // mqtt_topic.topic
     private mqttTopicConfig topicType;      // mqtt_topic.topic_type (enum) 固定主题 自定义主题
     private String description;    // mqtt_topic.description

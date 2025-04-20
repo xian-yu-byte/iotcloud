@@ -51,7 +51,7 @@ public class MqttServiceImpl implements MqttService {
     }
 
     @Override
-    public List<MqttTopicConfigResponse> getDeviceTopics(Integer userId, Integer projectId, Integer deviceId) {
+    public List<MqttTopicConfigResponse> getDeviceTopics(Long userId, Long projectId, Long deviceId) {
         List<MqttTopicConfig> configs = mqttMapper.selectDeviceTopics(userId, projectId, deviceId);
         if (configs == null || configs.isEmpty()) {
             return Collections.emptyList();
@@ -82,7 +82,7 @@ public class MqttServiceImpl implements MqttService {
         }
 
         // 先尝试执行 update 操作
-        int rows = mqttMapper.updateDeviceTopicByKey(dto);
+        Long rows = mqttMapper.updateDeviceTopicByKey(dto);
         if (rows == 0) {
             // 如果更新未生效，则记录不存在，执行插入操作
             MqttTopicConfig entity = convertToEntity(dto);
@@ -114,7 +114,7 @@ public class MqttServiceImpl implements MqttService {
     }
 
     @Override
-    public boolean deleteDeviceTopic(Integer id) {
+    public boolean deleteDeviceTopic(Long id) {
         return mqttMapper.deleteDeviceTopicById(id) > 0;
     }
 }

@@ -10,9 +10,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserProject {
-    private Integer id;
-    private Integer userid;
-    private Integer projectid;
+    private Long id;
+    private Long userid;
+    private Long projectid;
     private String role;
     private LocalDateTime joinedat;
 }

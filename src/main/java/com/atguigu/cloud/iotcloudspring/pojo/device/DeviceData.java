@@ -10,9 +10,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DeviceData {
-    private Integer id;
-    private Integer deviceid;
-    private Integer devicetypeattributeid;
+    private Long id;
+    private Long deviceid;
+    private Long devicetypeattributeid;
     private String datakey;
     private String datavalue;
     private LocalDateTime timestamp;

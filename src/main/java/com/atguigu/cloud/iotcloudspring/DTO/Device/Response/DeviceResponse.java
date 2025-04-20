@@ -8,9 +8,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DeviceResponse {
-    private  Integer id;
-    private Integer projectid;
-    private Integer devicetypeid;
+    private  Long id;
+    private Long projectid;
+    private Long devicetypeid;
     private String devicename;
     private String devicekey;
     private String deviceinformation;

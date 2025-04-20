@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MqttTopicConfigDTO {
-    private Integer userId;
-    private Integer projectId;
-    private Integer deviceId;
+    private Long userId;
+    private Long projectId;
+    private Long deviceId;
     private String newTopic;
     private String topic;
     private mqttTopicConfig topicType;

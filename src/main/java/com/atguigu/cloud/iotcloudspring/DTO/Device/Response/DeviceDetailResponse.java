@@ -10,10 +10,10 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DeviceDetailResponse {
-    private Integer id;
+    private Long id;
     private String devicename;
     private String devicekey;
-    private Integer projectid;
+    private Long projectid;
 
     // 设备类型信息
     private String devicetypename;

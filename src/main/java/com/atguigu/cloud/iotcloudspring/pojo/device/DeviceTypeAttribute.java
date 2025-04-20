@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DeviceTypeAttribute {
-    private Integer id;
-    private Integer devicetypeid;
+    private Long id;
+    private Long devicetypeid;
     private String attributename;
     private String attributeunit;
     private String attributetype;

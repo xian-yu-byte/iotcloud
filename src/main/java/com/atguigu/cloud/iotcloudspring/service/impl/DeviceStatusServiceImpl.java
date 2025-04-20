@@ -15,7 +15,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
 
     @Override
     @Transactional
-    public DeviceStatusResponse updateOrInsertDeviceStatus(Integer id, String devicestatus) {
+    public DeviceStatusResponse updateOrInsertDeviceStatus(Long id, String devicestatus) {
         // 先根据设备 id 查询记录
         DeviceStatusResponse deviceStatusResponse = deviceStatusMapper.selectByDeviceId(id);
         if (deviceStatusResponse == null) {

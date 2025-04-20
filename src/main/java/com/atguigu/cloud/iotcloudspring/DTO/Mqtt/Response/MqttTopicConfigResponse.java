@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MqttTopicConfigResponse {
-    private Integer id;
+    private Long id;
     private String fullTopic;
     private mqttTopicConfig topicType;
     private String description;

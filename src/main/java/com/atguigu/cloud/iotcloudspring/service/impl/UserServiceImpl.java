@@ -13,7 +13,7 @@ public class UserServiceImpl implements UserService {
     private ICMapper icMapper;
 
     @Override
-    public Integer findUserIdByUsername(String username) {
+    public Long findUserIdByUsername(String username) {
         users user = icMapper.selectUserByUsername(username);
         return user != null ? user.getId() : null;
     }

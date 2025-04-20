@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProjectAdd {
-    private Integer id;
+    private Long id;
     private String projectname;
     private String projectadministrator;
     private String region;

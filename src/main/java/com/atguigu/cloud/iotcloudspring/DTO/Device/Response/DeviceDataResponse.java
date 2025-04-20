@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DeviceDataResponse {
-    private Integer devicetypeattributeid;
+    private Long devicetypeattributeid;
     private String datakey;
     private String datavalue;
     private LocalDateTime timestamp;

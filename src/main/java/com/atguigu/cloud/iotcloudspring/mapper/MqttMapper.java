@@ -17,16 +17,16 @@ public interface MqttMapper {
 //    List<MqttTopicConfig> selectByDeviceId(Integer deviceId);
 
     // 根据项目id查询mqtt主题配置
-    MqttTopicConfig selectDeviceTopicByKey(@Param("userId") Integer userId,
-                                           @Param("projectId") Integer projectId,
-                                           @Param("deviceId") Integer deviceId,
+    MqttTopicConfig selectDeviceTopicByKey(@Param("userId") Long userId,
+                                           @Param("projectId") Long projectId,
+                                           @Param("deviceId") Long deviceId,
                                            @Param("topic") String topic);
 
-    int updateDeviceTopicByKey(MqttTopicConfigDTO dto);
+    Long updateDeviceTopicByKey(MqttTopicConfigDTO dto);
 
-    List<MqttTopicConfig> selectDeviceTopics(@Param("userId") Integer userId,
-                                             @Param("projectId") Integer projectId,
-                                             @Param("deviceId") Integer deviceId);
+    List<MqttTopicConfig> selectDeviceTopics(@Param("userId") Long userId,
+                                             @Param("projectId") Long projectId,
+                                             @Param("deviceId") Long deviceId);
 
     // 更新自定义的设备主题
 //    int updateDeviceTopic(@Param("userId") Integer userId,
@@ -35,11 +35,11 @@ public interface MqttMapper {
 //                          @Param("topic") String topic);
 
     // 插入自定义的设备主题
-    int insertDeviceTopic(MqttTopicConfig config);
+    Long insertDeviceTopic(MqttTopicConfig config);
 
     //插入设备传递过来的数值
     void insertEmqxDeviceData(DeviceData deviceData);
 
     //删除主题
-    int deleteDeviceTopicById(@Param("id") Integer id);
+    Long deleteDeviceTopicById(@Param("id") Long id);
 }

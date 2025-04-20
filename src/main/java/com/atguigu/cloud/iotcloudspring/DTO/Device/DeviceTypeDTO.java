@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DeviceTypeDTO {
-    private Integer projectid;
+    private Long projectid;
     private String typename;
     private AccessCategory accesscategory;
     private CommunicationMode communicationmode;

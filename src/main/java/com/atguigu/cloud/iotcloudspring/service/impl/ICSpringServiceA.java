@@ -63,7 +63,7 @@ public class ICSpringServiceA implements ICSpringService {
         // user.setSecret_key(null); // 不设置该字段
 
         // 保存用户信息到数据库
-        int rows = icMapper.RegisteredUser(user);
+        Long rows = icMapper.RegisteredUser(user);
         if (rows > 0) {
             return Result.success("注册成功");
         } else {
@@ -109,12 +109,12 @@ public class ICSpringServiceA implements ICSpringService {
         }
 
         // 修改密码并返回更新条数是否大于 0
-        int rows = icMapper.updatePassword(username, newPassword);
+        Long rows = icMapper.updatePassword(username, newPassword);
         return rows > 0;
     }
 
     @Override
-    public Result<Void> joinProject(Integer userid, Integer projectid, String role) {
+    public Result<Void> joinProject(Long userid, Long projectid, String role) {
         // 先查询该用户是否已加入该项目
         UserProject existingRecord = icMapper.selectUserProjectByUserIdAndProjectId(userid, projectid);
         if (existingRecord != null) {
@@ -126,12 +126,12 @@ public class ICSpringServiceA implements ICSpringService {
         userProject.setProjectid(projectid);
         userProject.setRole(role);
         userProject.setJoinedat(LocalDateTime.now());
-        int rows = icMapper.insertUserProject(userProject);
+        Long rows = icMapper.insertUserProject(userProject);
         return rows > 0 ? Result.success() : Result.error("加入项目失败");
     }
 
     @Override
-    public Result<List<UserProject>> getProjectsByUser(Integer userid) {
+    public Result<List<UserProject>> getProjectsByUser(Long userid) {
         List<UserProject> list = icMapper.selectByUserId(userid);
         return Result.success(list);
     }
@@ -140,7 +140,7 @@ public class ICSpringServiceA implements ICSpringService {
     public Result<List<ProjectAdd>> getProjectsByUsername(String username) {
         // 这里假设 projectadd 表中 admin 字段存放创建者的用户名
         // 先通过 UserService 检查该用户名是否存在
-        Integer userid = userService.findUserIdByUsername(username);
+        Long userid = userService.findUserIdByUsername(username);
         if (userid == null) {
             return Result.error("该用户名不存在");
         }
@@ -149,31 +149,31 @@ public class ICSpringServiceA implements ICSpringService {
     }
 
     @Override
-    public Result<Void> leaveProject(Integer userid, Integer projectid) {
-        int rows = icMapper.deleteUserProject(userid, projectid);
+    public Result<Void> leaveProject(Long userid, Long projectid) {
+        Long rows = icMapper.deleteUserProject(userid, projectid);
         return rows > 0 ? Result.success() : Result.error("退出项目失败");
     }
 
     @Override
-    public Result<Void> joinProjectByName(Integer userid, String projectname) {
+    public Result<Void> joinProjectByName(Long userid, String projectname) {
         // 根据项目名称查询项目
         ProjectAdd project = icMapper.selectProjectByName(projectname);
         if (project == null) {
             return Result.error("项目不存在");
         }
-        Integer projectid = project.getId();
+        Long projectid = project.getId();
         // 调用 joinProject 方法插入关联记录
         return joinProject(userid, projectid, "member");
     }
 
     @Override
-    public Result<List<ProjectAdd>> getJoinedProjects(Integer userid) {
+    public Result<List<ProjectAdd>> getJoinedProjects(Long userid) {
         List<ProjectAdd> projects = icMapper.selectJoinedProjectsByUser(userid);
         return Result.success(projects);
     }
 
     @Override
-    public Result<ProjectAdd> getProjectById(Integer projectid) {
+    public Result<ProjectAdd> getProjectById(Long projectid) {
         ProjectAdd project = icMapper.selectProjectById(projectid);
         return project != null ? Result.success(project) : Result.error("项目不存在");
     }

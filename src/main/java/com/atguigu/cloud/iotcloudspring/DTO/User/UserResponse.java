@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserResponse {
     private String token;
-    private Integer userId;
+    private Long userId;
 }

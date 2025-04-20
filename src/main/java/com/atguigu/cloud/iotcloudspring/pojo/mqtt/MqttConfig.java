@@ -10,13 +10,13 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MqttConfig {
-    private Integer id;
-    private Integer projectId;
+    private Long id;
+    private Long projectId;
     private String brokerAddress;
-    private Integer brokerPort;
+    private Long brokerPort;
     private String clientId;
-    private Integer qos;
-    private Integer keepAlive;
+    private Long qos;
+    private Long keepAlive;
     private Boolean cleanSession;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

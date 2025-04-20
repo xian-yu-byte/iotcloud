@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DeviceTypeAttributeDTO {
-    private Integer devicetypeid;
+    private Long devicetypeid;
     private String attributename;
     private String attributeunit;
     private String attributetype;

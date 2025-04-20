@@ -12,12 +12,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class users {
-    private Integer id;
+    private Long id;
     private String username;
     private String password;
     private String email;
     private String phone;
     private String role_id;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime created_at;
+    private LocalDateTime created_date;
 }
