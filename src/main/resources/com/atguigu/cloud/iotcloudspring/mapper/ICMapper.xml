@@ -21,8 +21,8 @@
     </select>
 
     <insert id="RegisteredUser">
-        insert into users (username, password, email, phone, role_id, created_at)
-        VALUES (#{username}, #{password}, #{email}, #{phone}, #{role_id}, #{created_at})
+        insert into users (username, password, email, phone, role_id, create_date)
+        VALUES (#{username}, #{password}, #{email}, #{phone}, #{role_id}, #{create_date})
     </insert>
 
     <update id="updatePassword">
@@ -39,7 +39,7 @@
     </insert>
 
     <!-- 根据用户ID查询关联记录 -->
-    <select id="selectByUserId" parameterType="Integer"
+    <select id="selectByUserId" parameterType="Long"
             resultType="com.atguigu.cloud.iotcloudspring.pojo.User.UserProject">
         SELECT id, userid, projectid, role, joinedat
         FROM userproject
@@ -71,7 +71,7 @@
     </delete>
 
     <!-- 新增：查询当前用户已加入的项目详情 -->
-    <select id="selectJoinedProjectsByUser" parameterType="Integer"
+    <select id="selectJoinedProjectsByUser" parameterType="Long"
             resultType="com.atguigu.cloud.iotcloudspring.pojo.ProjectAdd">
         SELECT p.id, p.projectname, p.projectadministrator, p.region, p.projectdescription
         FROM projectadd p
@@ -87,7 +87,7 @@
           AND projectid = #{projectid}
     </select>
 
-    <select id="selectProjectById" parameterType="Integer"
+    <select id="selectProjectById" parameterType="Long"
             resultType="com.atguigu.cloud.iotcloudspring.pojo.ProjectAdd">
         SELECT id, projectname, projectadministrator, region, projectdescription
         FROM projectadd

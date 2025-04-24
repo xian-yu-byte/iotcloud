@@ -48,4 +48,5 @@ public interface DeviceService {
 
     // 根据设备id获取设备关联设备类型数据
     String getDeviceTypeName(Long deviceTypeId);
+
 }

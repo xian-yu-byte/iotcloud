@@ -19,5 +19,5 @@ public class users {
     private String phone;
     private String role_id;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime created_date;
+    private LocalDateTime create_date;
 }

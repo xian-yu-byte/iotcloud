@@ -10,9 +10,13 @@ import lombok.NoArgsConstructor;
 public class DeviceTypeAttributeDTO {
     private Long devicetypeid;
     private String attributename;
+    private String displayname;   // 新增
+    private String fieldkey;      // 新增
+    private Boolean iscontrol;    // 新增
+    private Boolean isquery;      // 新增
     private String attributeunit;
     private String attributetype;
-    private String datatype;       // 建议使用 'STRING', 'INT', 'FLOAT' 等字符串
+    private String datatype;
     private String attributedesc;
     private String expandoptions;
 }

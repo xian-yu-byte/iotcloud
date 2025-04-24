@@ -5,6 +5,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -50,7 +52,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         // 允许的前端地址（开发环境可用 *，生产环境建议写具体域名）
-        config.setAllowedOrigins(List.of("http://localhost:5173", "http://iotcloud.yundatech.top","https://d318-125-220-160-45.ngrok-free.app"));
+        config.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:63343","http://iotcloud.yundatech.top","https://d318-125-220-160-45.ngrok-free.app"));
         // 允许的请求方法
         config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
         // 允许的请求头
@@ -63,5 +65,10 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", config);
 
         return source;
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(10);
     }
 }

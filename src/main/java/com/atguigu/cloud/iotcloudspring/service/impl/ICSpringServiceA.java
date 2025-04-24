@@ -10,7 +10,7 @@ import com.atguigu.cloud.iotcloudspring.service.ICSpringService;
 import com.atguigu.cloud.iotcloudspring.service.UserService;
 import com.atguigu.cloud.iotcloudspring.until.JwtUtil;
 import jakarta.annotation.Resource;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -25,8 +25,11 @@ public class ICSpringServiceA implements ICSpringService {
     @Resource
     private UserService userService;
 
-    @Autowired
+    @Resource
     private JwtUtil jwtUtil;  // 注入 JwtUtil 实例
+
+    @Resource
+    private PasswordEncoder passwordEncoder;
 
     /**
      * 前端获取所有项目
@@ -58,11 +61,15 @@ public class ICSpringServiceA implements ICSpringService {
             return Result.error("用户名重复");
         }
 
-        // 统一密钥模式时，不需要为每个用户生成独有的密钥，
-        // 所以这部分逻辑可以去掉，也可以将 secret_key 字段设置为默认值
-        // user.setSecret_key(null); // 不设置该字段
+        // 密码加密
+        String raw = user.getPassword();
+        String hash = passwordEncoder.encode(raw);
+        user.setPassword(hash);
 
-        // 保存用户信息到数据库
+        // （可选）secret_key 保持默认或按业务赋值
+        // user.setSecret_key(null);
+
+        // 插入数据库
         Long rows = icMapper.RegisteredUser(user);
         if (rows > 0) {
             return Result.success("注册成功");
@@ -84,7 +91,7 @@ public class ICSpringServiceA implements ICSpringService {
         }
 
         // 校验密码是否正确
-        if (!existUser.getPassword().equals(password)) {
+        if (!passwordEncoder.matches(password, existUser.getPassword())) {
             return Result.error("密码错误");
         }
 

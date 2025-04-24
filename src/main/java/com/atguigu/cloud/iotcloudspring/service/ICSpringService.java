@@ -14,13 +14,13 @@ public interface ICSpringService {
     //添加项目
     boolean addProject(ProjectAdd project);
 
-    //删除项目
+    //注册项目
     Result register(users user);
 
     //用户登录
     Result login(String username, String password);
 
-    //用户注册
+    //更改密码
     boolean changePassword(String username, String newPassword);
 
     // 当前登录用户加入项目（通过项目ID加入）

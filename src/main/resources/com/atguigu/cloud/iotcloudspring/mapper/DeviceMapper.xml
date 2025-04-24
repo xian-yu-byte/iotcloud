@@ -10,7 +10,7 @@
                 NOW())
     </insert>
 
-    <delete id="deleteDeviceType" parameterType="java.lang.Integer">
+    <delete id="deleteDeviceType" parameterType="java.lang.Long">
         DELETE FROM devicetype WHERE id = #{id}
     </delete>
 
@@ -27,9 +27,17 @@
     </select>
 
     <insert id="insertDeviceTypeAttribute" parameterType="com.atguigu.cloud.iotcloudspring.pojo.device.DeviceTypeAttribute">
-        INSERT INTO devicetypeattribute (devicetypeid, attributename, attributeunit, datatype,
-                                         devicetypeattribute.attributetype, attributedesc, expandoptions,createtime, updatetime)
-        VALUES (#{devicetypeid}, #{attributename}, #{attributeunit}, #{datatype}, #{attributetype}, #{attributedesc},#{expandoptions},
+        INSERT INTO devicetypeattribute (devicetypeid, attributename, displayname,
+                                         fieldkey,
+                                         iscontrol,
+                                         isquery, attributeunit, datatype,
+                                         devicetypeattribute.attributetype, attributedesc, expandoptions, createtime,
+                                         updatetime)
+        VALUES (#{devicetypeid}, #{attributename}, #{displayname},
+                #{fieldkey},
+                #{iscontrol},
+                #{isquery}, #{attributeunit}, #{datatype}, #{attributetype}, #{attributedesc},
+                #{expandoptions},
                 NOW(), NOW())
     </insert>
 
@@ -46,7 +54,7 @@
         WHERE devicetypeid = #{devicetypeid}
     </select>
 
-    <delete id="deleteDeviceTypeAttributeById" parameterType="java.lang.Integer">
+    <delete id="deleteDeviceTypeAttributeById" parameterType="java.lang.Long">
         DELETE FROM devicetypeattribute WHERE id = #{id}
     </delete>
 
@@ -63,13 +71,13 @@
         where id = #{id}
     </select>
 
-    <delete id="deleteDeviceById" parameterType="java.lang.Integer">
+    <delete id="deleteDeviceById" parameterType="java.lang.Long">
         delete
         from device
         where id = #{id}
     </delete>
 
-    <select id="selectDeviceById" parameterType="int" resultType="com.atguigu.cloud.iotcloudspring.pojo.device.Device">
+    <select id="selectDeviceById" parameterType="Long" resultType="com.atguigu.cloud.iotcloudspring.pojo.device.Device">
         SELECT id,
                projectid,
                devicetypeid,
@@ -91,7 +99,7 @@
           AND dta.attributename = #{attributename}
     </select>
 
-    <select id="selectDeviceTypeById" parameterType="java.lang.Integer" resultType="com.atguigu.cloud.iotcloudspring.pojo.device.DeviceType">
+    <select id="selectDeviceTypeById" parameterType="java.lang.Long" resultType="com.atguigu.cloud.iotcloudspring.pojo.device.DeviceType">
         SELECT
             id,
             projectid,
@@ -106,7 +114,7 @@
         WHERE id = #{id}
     </select>
 
-    <select id="selectDeviceDataByDeviceId" parameterType="java.lang.Integer" resultType="com.atguigu.cloud.iotcloudspring.pojo.device.DeviceData">
+    <select id="selectDeviceDataByDeviceId" parameterType="java.lang.Long" resultType="com.atguigu.cloud.iotcloudspring.pojo.device.DeviceData">
         SELECT
             id,
             deviceid,
@@ -118,7 +126,7 @@
         WHERE deviceid = #{deviceid}
     </select>
 
-    <select id="selectDevicesByProjectId" parameterType="java.lang.Integer" resultType="com.atguigu.cloud.iotcloudspring.pojo.device.Device">
+    <select id="selectDevicesByProjectId" parameterType="java.lang.Long" resultType="com.atguigu.cloud.iotcloudspring.pojo.device.Device">
         SELECT
             id,
             projectid,

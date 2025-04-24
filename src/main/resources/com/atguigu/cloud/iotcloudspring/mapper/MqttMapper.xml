@@ -114,7 +114,7 @@
                 #{timestamp})
     </insert>
 
-    <delete id="deleteDeviceTopicById" parameterType="java.lang.Integer">
+    <delete id="deleteDeviceTopicById" parameterType="java.lang.Long">
         DELETE FROM mqtt_topic_config WHERE id = #{id}
     </delete>
 

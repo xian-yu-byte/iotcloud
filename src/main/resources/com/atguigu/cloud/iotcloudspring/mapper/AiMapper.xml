@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.cloud.iotcloudspring.mapper.AiMapper">
+
+    <select id="getDeviceCountByAgentId" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM ai_device WHERE agent_id = #{agentId}
+    </select>
+
+    <select id="selectMaxSort" resultType="java.lang.Integer">
+        SELECT MAX(sort) FROM ai_agent
+    </select>
+
+</mapper>

@@ -11,6 +11,8 @@ import com.atguigu.cloud.iotcloudspring.service.ICSpringService;
 import com.atguigu.cloud.iotcloudspring.service.UserService;
 import jakarta.annotation.Resource;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

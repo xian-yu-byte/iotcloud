@@ -5,7 +5,9 @@ import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceTypeAttributeDTO;
 import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceTypeDTO;
 import com.atguigu.cloud.iotcloudspring.DTO.Device.Response.*;
 import com.atguigu.cloud.iotcloudspring.pojo.Result;
+import com.atguigu.cloud.iotcloudspring.pojo.device.FieldTemplate;
 import com.atguigu.cloud.iotcloudspring.service.DeviceService;
+import com.atguigu.cloud.iotcloudspring.service.FieldTemplateService;
 import com.atguigu.cloud.iotcloudspring.service.UserService;
 import jakarta.annotation.Resource;
 import org.springframework.security.core.Authentication;
@@ -19,6 +21,9 @@ import java.util.List;
 public class DeviceController {
     @Resource
     private DeviceService deviceService;
+
+    @Resource
+    private FieldTemplateService fieldTemplateService;
 
     @Resource
     private UserService userService;
@@ -138,5 +143,11 @@ public class DeviceController {
     public Result<String> getDeviceTypeName(@PathVariable Long id) {
         String deviceTypeName = deviceService.getDeviceTypeName(id);
         return Result.success(deviceTypeName);
+    }
+
+    @GetMapping("/fieldTemplates")
+    public Result<List<FieldTemplate>> listAll() {
+        List<FieldTemplate> list = fieldTemplateService.listAll();
+        return Result.success(list);
     }
 }

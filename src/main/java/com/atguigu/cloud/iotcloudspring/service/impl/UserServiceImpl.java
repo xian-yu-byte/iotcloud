@@ -1,5 +1,6 @@
 package com.atguigu.cloud.iotcloudspring.service.impl;
 
+import com.atguigu.cloud.iotcloudspring.Common.user.UserDetail;
 import com.atguigu.cloud.iotcloudspring.mapper.ICMapper;
 import com.atguigu.cloud.iotcloudspring.pojo.User.users;
 import com.atguigu.cloud.iotcloudspring.service.UserService;
@@ -17,4 +18,5 @@ public class UserServiceImpl implements UserService {
         users user = icMapper.selectUserByUsername(username);
         return user != null ? user.getId() : null;
     }
+
 }

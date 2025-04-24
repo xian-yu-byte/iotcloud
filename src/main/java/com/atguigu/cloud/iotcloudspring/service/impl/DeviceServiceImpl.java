@@ -72,6 +72,10 @@ public class DeviceServiceImpl implements DeviceService {
         DeviceTypeAttribute attribute = new DeviceTypeAttribute();
         attribute.setDevicetypeid(attributeDTO.getDevicetypeid());
         attribute.setAttributename(attributeDTO.getAttributename());
+        attribute.setDisplayname(attributeDTO.getDisplayname());   // 新增
+        attribute.setFieldkey(attributeDTO.getFieldkey());         // 新增
+        attribute.setIscontrol(attributeDTO.getIscontrol() != null && attributeDTO.getIscontrol() ? 1 : 0);
+        attribute.setIsquery(attributeDTO.getIsquery() != null && attributeDTO.getIsquery() ? 1 : 0);
         attribute.setAttributeunit(attributeDTO.getAttributeunit());
         attribute.setDatatype(attributeDTO.getDatatype());
         attribute.setAttributetype(attributeDTO.getAttributetype());
