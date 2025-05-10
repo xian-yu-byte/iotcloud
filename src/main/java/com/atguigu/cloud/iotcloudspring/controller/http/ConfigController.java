@@ -6,6 +6,7 @@ import com.atguigu.cloud.iotcloudspring.Common.utils.ResultConfig;
 import com.atguigu.cloud.iotcloudspring.Common.utils.ValidatorUtils;
 import com.atguigu.cloud.iotcloudspring.DTO.Ai.AgentModelsDTO;
 import com.atguigu.cloud.iotcloudspring.DTO.Config.ConfigSecretDTO;
+import com.atguigu.cloud.iotcloudspring.DTO.IdDTO;
 import com.atguigu.cloud.iotcloudspring.pojo.Result;
 import com.atguigu.cloud.iotcloudspring.service.ConfigService;
 import com.atguigu.cloud.iotcloudspring.service.SysParamsService;
@@ -48,5 +49,12 @@ public class ConfigController {
         if (StringUtils.isBlank(secret) || !secret.equals(secretParam)) {
             throw new RenException("密钥错误");
         }
+    }
+
+    @PostMapping("devicekey/{devicekey}")
+    @Operation(summary = "根据设备key所有基础信息")
+    public Result<IdDTO> getIdByDeviceKey(@PathVariable("devicekey") String devicekey) {
+        IdDTO id = configService.getById(devicekey);
+        return Result.success(id);
     }
 }

@@ -17,7 +17,19 @@ public class MqttWebSocketController {
     /**
      * 前端发送连接请求（比如包含 brokerUrl, clientId, username, password 等参数）
      */
-    @MessageMapping("/mqtt/connect")
+//    @MessageMapping("/mqtt/connect")
+//    @SendTo("/topic/connectionStatus")
+//    public String connect(MqttConnectResponse request) {
+//        try {
+//            mqttEclipsePaho.connect(request.getBrokerUrl(), request.getClientId(),
+//                    request.getUsername(), request.getPassword());
+//            return "连接成功";
+//        } catch (MqttException e) {
+//            e.printStackTrace();
+//            return "连接失败：" + e.getMessage();
+//        }
+//    }
+    @MessageMapping("/mqtt/connects")
     @SendTo("/topic/connectionStatus")
     public String connect(MqttConnectResponse request) {
         try {

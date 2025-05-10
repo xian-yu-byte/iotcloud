@@ -1,5 +1,8 @@
 package com.atguigu.cloud.iotcloudspring.mapper;
 
+import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceAttributePointDTO;
+import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceDataFieldKeysDTO;
+import com.atguigu.cloud.iotcloudspring.DTO.IdDTO;
 import com.atguigu.cloud.iotcloudspring.pojo.device.Device;
 import com.atguigu.cloud.iotcloudspring.pojo.device.DeviceData;
 import com.atguigu.cloud.iotcloudspring.pojo.device.DeviceType;
@@ -7,6 +10,7 @@ import com.atguigu.cloud.iotcloudspring.pojo.device.DeviceTypeAttribute;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
@@ -34,11 +38,16 @@ public interface DeviceMapper {
 
     String selectDeviceNameById(@Param("id") Long id);
 
+    Long selectDeviceNameByName(@Param("name") String name);
+
     Long deleteDeviceById(@Param("id") Long id);
 
     Device selectDeviceById(@Param("id") Long id);
 
-    DeviceTypeAttribute selectByTypeAndName(@Param("deviceid") Long deviceid,
+    /** 根据 deviceKey 查设备 */
+    Device selectByDeviceKey(@Param("deviceKey") String deviceKey);
+
+    DeviceTypeAttribute selectByTypeAndName(@Param("deviceTypeId") Long deviceTypeId,
                                             @Param("attributename") String attributename);
 
 
@@ -56,5 +65,45 @@ public interface DeviceMapper {
 
     //根据设备类型id查询设备类型名字
     String selectDeviceTypeNameById(@Param("id") Long id);
+
+    // 查询设备三元设备id
+    IdDTO selectDeviceKeyById(@Param("devicekey") String devicekey);
+
+    // 根绝设备id查询devicekey
+    String selectDeviceKeyByDeviceId(@Param("deviceid") Long deviceid);
+
+    // 根据 deviceKey 和 attributeName 查最新一条 devicedata 记录
+    String selectLatestValueByDeviceKeyAndFieldKey(
+            @Param("deviceKey") String deviceKey,
+            @Param("fieldkey") String fieldkey
+    );
+    // 根据 deviceKey 和 attributeName 查最新多条 devicedata 记录
+    List<DeviceDataFieldKeysDTO> selectDeviceByDeviceKeyAndFieldKeys(
+            @Param("deviceKey") String deviceKey,
+            @Param("fieldKeys") List<String> fieldKeys
+    );
+
+    /**
+     * 查询某设备、某属性在指定时间区间内的历史数据
+     *
+     * @param deviceKey 设备唯一标识
+     * @param fieldKey  属性英文 key（或 datakey）
+     * @param startTime 起始时间（包含）
+     * @param endTime   结束时间（包含）
+     */
+    List<DeviceAttributePointDTO> selectHistoryByKey(
+            @Param("deviceKey") String deviceKey,
+            @Param("fieldKey")  String fieldKey,
+            @Param("startTime") LocalDateTime startTime,
+            @Param("endTime") LocalDateTime endTime
+    );
+
+    // 上面的第二张方法
+    List<DeviceAttributePointDTO> selectHistoryById(
+            @Param("deviceId")    Long deviceId,
+            @Param("attributeId") Long attributeId,
+            @Param("startTime")   LocalDateTime startTime,
+            @Param("endTime")     LocalDateTime endTime
+    );
 
 }

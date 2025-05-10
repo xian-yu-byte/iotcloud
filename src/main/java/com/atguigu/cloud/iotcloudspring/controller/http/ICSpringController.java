@@ -94,9 +94,7 @@ public class ICSpringController {
     @DeleteMapping("/leave")
     public Result<Void> leaveProject(@RequestBody LeaveProjectRequest request,
                                      Authentication authentication) {
-        // 从 Authentication 中获取存储的用户名
         String username = (String) authentication.getPrincipal();
-        // 根据用户名查询用户的数字 ID
         Long userid = userService.findUserIdByUsername(username);
         if (userid == null) {
             return Result.error("无效的用户标识");

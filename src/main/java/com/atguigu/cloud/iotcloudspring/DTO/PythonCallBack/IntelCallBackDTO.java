@@ -8,6 +8,7 @@ public class IntelCallBackDTO {
     private String projectId;
     private String agentId;
     private String deviceId;
+    private String deviceKey;
     private String intent;   // "turn_on" / "turn_off"...
     private String value;    // 可选
     private String text;

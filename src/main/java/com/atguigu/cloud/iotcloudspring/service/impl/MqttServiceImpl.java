@@ -1,8 +1,10 @@
 package com.atguigu.cloud.iotcloudspring.service.impl;
 
+import com.atguigu.cloud.iotcloudspring.DTO.IdDTO;
 import com.atguigu.cloud.iotcloudspring.DTO.Mqtt.MqttConfigDTO;
 import com.atguigu.cloud.iotcloudspring.DTO.Mqtt.MqttTopicConfigDTO;
 import com.atguigu.cloud.iotcloudspring.DTO.Mqtt.Response.MqttTopicConfigResponse;
+import com.atguigu.cloud.iotcloudspring.mapper.DeviceMapper;
 import com.atguigu.cloud.iotcloudspring.mapper.MqttMapper;
 import com.atguigu.cloud.iotcloudspring.pojo.mqtt.MqttConfig;
 import com.atguigu.cloud.iotcloudspring.pojo.mqtt.MqttTopicConfig;
@@ -23,15 +25,21 @@ public class MqttServiceImpl implements MqttService {
     private MqttMapper mqttMapper;
 
     @Resource
+    private DeviceMapper deviceMapper;
+
+    @Resource
     private WebSocketConfig webSocketConfig;
 
     private MqttClient mqttClient;
 
     @Override
-    public MqttConfigDTO getConfigByProjectId() {
+    public MqttConfigDTO getConfigByProjectId(Long deviceid) {
         // 从数据库获取实体
         MqttConfig config = mqttMapper.selectByProjectId();
 
+        String devicekey = deviceMapper.selectDeviceKeyByDeviceId(deviceid);
+
+//        IdDTO idDTO = deviceMapper.selectDeviceKeyById("123456789");
         if (config == null) {
             return null;
         }
@@ -39,6 +47,7 @@ public class MqttServiceImpl implements MqttService {
         MqttConfigDTO dto = new MqttConfigDTO();
         dto.setId(config.getId());
         dto.setProjectId(config.getProjectId());
+        dto.setDeviceKey(devicekey);
         dto.setBrokerAddress(config.getBrokerAddress());
         dto.setBrokerPort(config.getBrokerPort());
         dto.setClientId(config.getClientId());
@@ -67,6 +76,7 @@ public class MqttServiceImpl implements MqttService {
             vo.setId(config.getId());
             vo.setFullTopic(fullTopic);
             vo.setTopicType(config.getTopicType());
+            vo.setAutoSubscribed(config.getAutoSubscribed());
             vo.setDescription(config.getDescription());
             results.add(vo);
         }

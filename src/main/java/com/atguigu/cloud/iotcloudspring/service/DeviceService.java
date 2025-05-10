@@ -1,11 +1,17 @@
 package com.atguigu.cloud.iotcloudspring.service;
 
+import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceAttributePointDTO;
 import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceDTO;
 import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceTypeAttributeDTO;
 import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceTypeDTO;
 import com.atguigu.cloud.iotcloudspring.DTO.Device.Response.*;
+import com.atguigu.cloud.iotcloudspring.pojo.ProjectAdd;
+import com.atguigu.cloud.iotcloudspring.pojo.device.Device;
+import com.atguigu.cloud.iotcloudspring.pojo.device.DeviceData;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 public interface DeviceService {
     // 创建设备类型
@@ -35,6 +41,9 @@ public interface DeviceService {
     // 根据设备id获取设备名称
     String getDeviceName(Long deviceId);
 
+    // 根据设备类型名称获取设备类型ID
+    Long getDeviceTypeId(String deviceTypeName);
+
     //根据设备id删除设备
     boolean deleteDevice(Long deviceId);
 
@@ -49,4 +58,26 @@ public interface DeviceService {
     // 根据设备id获取设备关联设备类型数据
     String getDeviceTypeName(Long deviceTypeId);
 
+    // 获取某设备、某属性的最新数据
+    String getLatestData(String deviceKey, String fieldkey);
+
+    Map<String, String> getLatestDatas(String deviceKey, List<String> fieldKeys);
+
+    Device getByKey(String deviceKey);
+
+    ProjectAdd getById(Long projectId);
+
+    String createTopic(Long deviceId);
+
+    List<DeviceAttributePointDTO> fetchHistoryByKey(String deviceKey,
+                                                    String fieldKey,
+                                                    Integer days,
+                                                    LocalDateTime startTime,
+                                                    LocalDateTime endTime);
+
+    List<DeviceAttributePointDTO> fetchHistoryById(Long deviceId,
+                                             Long attributeId,
+                                             Integer days,
+                                             LocalDateTime startTime,
+                                             LocalDateTime endTime);
 }

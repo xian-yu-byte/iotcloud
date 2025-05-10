@@ -1,26 +1,41 @@
 package com.atguigu.cloud.iotcloudspring.service.impl;
 
-import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceDTO;
-import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceTypeAttributeDTO;
-import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceTypeDTO;
+import cn.hutool.core.lang.Snowflake;
+import com.atguigu.cloud.iotcloudspring.DTO.Device.*;
 import com.atguigu.cloud.iotcloudspring.DTO.Device.Response.*;
 import com.atguigu.cloud.iotcloudspring.mapper.DeviceMapper;
+import com.atguigu.cloud.iotcloudspring.mapper.ICMapper;
+import com.atguigu.cloud.iotcloudspring.mapper.MqttMapper;
+import com.atguigu.cloud.iotcloudspring.pojo.ProjectAdd;
 import com.atguigu.cloud.iotcloudspring.pojo.device.Device;
 import com.atguigu.cloud.iotcloudspring.pojo.device.DeviceData;
 import com.atguigu.cloud.iotcloudspring.pojo.device.DeviceType;
 import com.atguigu.cloud.iotcloudspring.pojo.device.DeviceTypeAttribute;
 import com.atguigu.cloud.iotcloudspring.service.DeviceService;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class DeviceServiceImpl implements DeviceService {
     @Resource
     private DeviceMapper deviceMapper;
+
+    @Resource
+    private MqttMapper mqttMapper;
+
+    @Resource
+    private ICMapper icMapper;
+
+    @Resource
+    private Snowflake snowflake;
 
     @Override
     public void createDeviceType(DeviceTypeDTO deviceTypeDto) {
@@ -94,6 +109,10 @@ public class DeviceServiceImpl implements DeviceService {
             response.setId(attr.getId());
             response.setDevicetypeid(attr.getDevicetypeid());
             response.setAttributename(attr.getAttributename());
+            response.setDisplayname(attr.getDisplayname());  // 新增
+            response.setFieldkey(attr.getFieldkey());        // 新增
+            response.setIscontrol(attr.getIscontrol());      // 新增
+            response.setIsquery(attr.getIsquery());          // 新增
             response.setAttributeunit(attr.getAttributeunit());
             response.setDatatype(attr.getDatatype());
             response.setAttributetype(attr.getAttributetype());
@@ -113,6 +132,9 @@ public class DeviceServiceImpl implements DeviceService {
     public Long createDevice(DeviceDTO deviceDTO) {
         Device device = new Device();
         BeanUtils.copyProperties(deviceDTO, device);
+        device.setMqttusername("ceshi");
+        device.setMqttpassword("123456");
+        device.setDevicekey("device_" + snowflake.nextIdStr());
         deviceMapper.insertDevice(device);
         return device.getId();
     }
@@ -123,11 +145,16 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
+    public Long getDeviceTypeId(String deviceTypeName) {
+        return deviceMapper.selectDeviceNameByName(deviceTypeName);
+    }
+
+    @Override
     public boolean deleteDevice(Long id) {
         Long rows = deviceMapper.deleteDeviceById(id);
         return rows > 0;
     }
-
+    // 后续需要优化
     @Override
     public DeviceDetailResponse getDeviceDetail(Long deviceId) {
         // 1. 查询设备静态信息
@@ -141,6 +168,7 @@ public class DeviceServiceImpl implements DeviceService {
         response.setDevicename(device.getDevicename());
         response.setDevicekey(device.getDevicekey());
         response.setProjectid(device.getProjectid());
+        response.setDevicelocation(device.getDevicelocation());
 
         // 2. 根据 deviceTypeId 查询设备类型名称
         DeviceType deviceType = deviceMapper.selectDeviceTypeById(device.getDevicetypeid());
@@ -195,5 +223,114 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     public String getDeviceTypeName(Long id) {
         return deviceMapper.selectDeviceTypeNameById(id);
+    }
+
+    @Override
+    public String getLatestData(String deviceKey, String fieldkey) {
+        return deviceMapper.selectLatestValueByDeviceKeyAndFieldKey(deviceKey, fieldkey);
+    }
+
+    @Override
+    public Map<String, String> getLatestDatas(
+            String deviceKey, List<String> fieldKeys
+    ) {
+        List<DeviceDataFieldKeysDTO> list = deviceMapper
+                .selectDeviceByDeviceKeyAndFieldKeys(deviceKey, fieldKeys);
+
+        return list.stream()
+                .collect(Collectors.toMap(
+                        DeviceDataFieldKeysDTO::getFieldKey,
+                        DeviceDataFieldKeysDTO::getValue
+                ));
+    }
+
+    @Override
+    public Device getByKey(String deviceKey) {
+        return deviceMapper.selectByDeviceKey(deviceKey);
+    }
+
+    @Override
+    public ProjectAdd getById(Long projectId) {
+        return icMapper.selectProjectById(projectId);
+    }
+
+    @Override
+    public String createTopic(Long deviceId) {
+        // 1. 先查 device 表
+        Device device = deviceMapper.selectDeviceById(deviceId);
+        if (device == null) {
+            throw new IllegalArgumentException("Device not found: " + deviceId);
+        }
+
+        Long projectId = device.getProjectid();
+        String deviceKey = device.getDevicekey();
+        if (deviceKey == null || deviceKey.isEmpty()) {
+            throw new IllegalArgumentException("DeviceKey is empty for deviceId: " + deviceId);
+        }
+
+        // 2. 用 deviceKey 查询 mqtt_topic_config
+        int cnt = mqttMapper.countByDeviceKey(deviceKey);
+        if (cnt > 0) {
+            throw new IllegalArgumentException("Topic already exists for deviceKey: ");
+        }
+
+        // 3. 查 project 表，拿 userId
+        ProjectAdd project = icMapper.selectProjectById(projectId);
+        if (project == null || project.getUserid() == null) {
+            throw new IllegalArgumentException("Project or user not found for projectId: " + projectId);
+        }
+        Long userId = project.getUserid();
+
+        // 4. 组装 topic
+        String fullTopic = String.format(
+                "user%s/project%s/device%s/%s",
+                userId, projectId, deviceId, deviceKey
+        );
+
+        // 5. 插入 mqtt_topic_config 表
+
+        try {
+            mqttMapper.insertNew(
+                    userId, projectId, deviceId, deviceKey,
+                    fullTopic, "下发", ""
+            );
+        } catch (Exception e) {
+            log.error("e: ", e);
+            throw new RuntimeException("插入订阅主题失败，请检查参数或数据库状态！");
+        }
+
+        // 6. 返回 topic
+        return fullTopic;
+    }
+
+    @Override
+    public List<DeviceAttributePointDTO> fetchHistoryByKey(String deviceKey,
+                                                           String fieldKey,
+                                                           Integer days,
+                                                           LocalDateTime startTime,
+                                                           LocalDateTime endTime) {
+        // 计算时间区间（同之前例子）
+        LocalDateTime[] range = calcRange(days, startTime, endTime);
+        return deviceMapper.selectHistoryByKey(deviceKey, fieldKey, range[0], range[1]);
+    }
+
+    @Override
+    public List<DeviceAttributePointDTO> fetchHistoryById(Long deviceId,
+                                                    Long attributeId,
+                                                    Integer days,
+                                                    LocalDateTime startTime,
+                                                    LocalDateTime endTime) {
+        LocalDateTime[] range = calcRange(days, startTime, endTime);
+        return deviceMapper.selectHistoryById(deviceId, attributeId, range[0], range[1]);
+    }
+
+    /** 计算 startTime/endTime，如果未传就用 days（默认为1） **/
+    private LocalDateTime[] calcRange(Integer days, LocalDateTime start, LocalDateTime end) {
+        if (start != null && end != null) {
+            return new LocalDateTime[]{start, end};
+        }
+        int d = (days != null && days > 0) ? days : 1;
+        LocalDateTime now = LocalDateTime.now();
+        return new LocalDateTime[]{now.minusDays(d), now};
     }
 }

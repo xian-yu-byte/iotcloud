@@ -35,9 +35,8 @@ public class MqttSubscriber {
     private DeviceMapper deviceMapper;
     @Resource
     private DeviceService deviceService;
-
-    // 这里替换成你自己的 EMQX Broker 地址和端口，例如 tcp://broker.emqx.io:1883
-    private final String brokerUrl = "ssl://vaa0511b.ala.cn-hangzhou.emqxsl.cn:8883";
+    @Resource
+    private SimpMessagingTemplate wsTemplate;
 
     @Resource
     private SimpMessagingTemplate messagingTemplate;
@@ -45,10 +44,13 @@ public class MqttSubscriber {
     @PostConstruct
     public void init() {
         try {
+            // 这里替换成你自己的 EMQX Broker 地址和端口，例如 tcp://broker.emqx.io:1883
+            // private final String brokerUrl = "ssl://vaa0511b.ala.cn-hangzhou.emqxsl.cn:8883";
+            String brokerUrl = "tcp://1.94.32.220:1883";
             client = new MqttClient(brokerUrl, MqttClient.generateClientId(), new MemoryPersistence());
             MqttConnectOptions options = new MqttConnectOptions();
             // 设置用户名和密码
-            options.setUserName("ceshi");
+            options.setUserName("cloud");
             options.setPassword("123456".toCharArray());
 //            options.setCleanSession(false);
 //            options.setAutomaticReconnect(true);

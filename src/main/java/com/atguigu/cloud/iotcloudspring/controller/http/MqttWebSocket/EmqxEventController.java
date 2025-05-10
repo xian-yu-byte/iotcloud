@@ -20,7 +20,7 @@ public class EmqxEventController {
     /**
      * 接收 EMQX 通过 HTTP 发送过来的连接事件
      */
-    @PostMapping("/connect")
+    @PostMapping("/connects")
     public String handleMqttConnectEvent(@RequestBody Map<String, Object> payload) {
         System.out.println("EMQX 传过来的数据：" + payload);
 

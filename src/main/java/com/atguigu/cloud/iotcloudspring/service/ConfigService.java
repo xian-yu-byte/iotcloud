@@ -1,5 +1,8 @@
 package com.atguigu.cloud.iotcloudspring.service;
 
+import com.atguigu.cloud.iotcloudspring.DTO.IdDTO;
+
+import java.util.List;
 import java.util.Map;
 
 public interface ConfigService {
@@ -19,4 +22,6 @@ public interface ConfigService {
      * @return 模型配置信息
      */
     Map<String, Object> getAgentModels(String macAddress, Map<String, String> selectedModule);
+
+    IdDTO getById(String devicekey);
 }

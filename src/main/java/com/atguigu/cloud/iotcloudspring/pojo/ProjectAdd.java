@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ProjectAdd {
     private Long id;
+    private Long userid;
     private String projectname;
     private String projectadministrator;
     private String region;

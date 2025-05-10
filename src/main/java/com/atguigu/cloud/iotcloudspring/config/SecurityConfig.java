@@ -3,6 +3,7 @@ package com.atguigu.cloud.iotcloudspring.config;
 import com.atguigu.cloud.iotcloudspring.filter.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -28,42 +29,40 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        // 这里通过 Lambda 风格配置 Security
         return http
-                // 1) 开启 CORS，并使用下面的 corsConfigurationSource()
+                // 1) 开启 CORS
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 // 2) 禁用 CSRF
                 .csrf(csrf -> csrf.disable())
                 // 3) 配置访问权限
                 .authorizeHttpRequests(auth -> auth
-                        //IC/GetProject 需要认证，其他都放行
+                        // 先把所有预检 OPTIONS 放行
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        // 真正需要认证的接口
                         .requestMatchers("/IC/GetProject").authenticated()
+                        // 其它接口都放行
                         .anyRequest().permitAll()
                 )
-                // 4) 把自定义的 JWT 过滤器加到 Spring Security 过滤器链之前
+                // 4) 在 JWT 过滤器之前加上你的自定义过滤器
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
-    /**
-     * 配置 CORS 策略，允许前端的跨域请求
-     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        // 允许的前端地址（开发环境可用 *，生产环境建议写具体域名）
-        config.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:63343","http://iotcloud.yundatech.top","https://d318-125-220-160-45.ngrok-free.app"));
-        // 允许的请求方法
-        config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
-        // 允许的请求头
+        // 放行所有来源
+        config.setAllowedOriginPatterns(List.of("*"));
+        // 放行所有方法
+        config.setAllowedMethods(List.of("*"));
+        // 放行所有请求头
         config.setAllowedHeaders(List.of("*"));
-        // 是否允许携带 Cookie
+        // 允许携带 Cookie
         config.setAllowCredentials(true);
 
-        // 映射到所有接口
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        // 对所有路径生效
         source.registerCorsConfiguration("/**", config);
-
         return source;
     }
 

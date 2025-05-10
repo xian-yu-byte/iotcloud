@@ -37,6 +37,24 @@ public interface MqttMapper {
     // 插入自定义的设备主题
     Long insertDeviceTopic(MqttTopicConfig config);
 
+    /**
+     * 判断是否已存在该 deviceId 的配置
+     */
+    int countByDeviceKey(@Param("deviceKey") String deviceKey);
+
+    /**
+     * 插入一条新的 mqtt_topic_config 记录
+     */
+    int insertNew(
+            @Param("userId") Long userId,
+            @Param("projectId") Long projectId,
+            @Param("deviceId") Long deviceId,
+            @Param("deviceKey") String deviceKey,
+            @Param("topic") String topic,
+            @Param("topicType") String topicType,
+            @Param("description") String description
+    );
+
     //插入设备传递过来的数值
     void insertEmqxDeviceData(DeviceData deviceData);
 

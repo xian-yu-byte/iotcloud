@@ -5,18 +5,23 @@ import com.atguigu.cloud.iotcloudspring.Common.exception.RenException;
 import com.atguigu.cloud.iotcloudspring.Common.redis.RedisKeys;
 import com.atguigu.cloud.iotcloudspring.Common.redis.RedisUtils;
 import com.atguigu.cloud.iotcloudspring.Common.utils.JsonUtils;
+import com.atguigu.cloud.iotcloudspring.DTO.Device.Response.DeviceTypeAttributeResponse;
+import com.atguigu.cloud.iotcloudspring.DTO.IdDTO;
 import com.atguigu.cloud.iotcloudspring.DTO.User.SysParamsDTO;
 import com.atguigu.cloud.iotcloudspring.VO.TimbreDetailsVO;
+import com.atguigu.cloud.iotcloudspring.mapper.DeviceMapper;
 import com.atguigu.cloud.iotcloudspring.pojo.Model.AiModelConfig;
 import com.atguigu.cloud.iotcloudspring.pojo.ai.AiAgent;
 import com.atguigu.cloud.iotcloudspring.pojo.ai.AiAgentTemplate;
 import com.atguigu.cloud.iotcloudspring.pojo.ai.AiDevice;
+import com.atguigu.cloud.iotcloudspring.pojo.device.DeviceTypeAttribute;
 import com.atguigu.cloud.iotcloudspring.service.*;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +38,7 @@ public class ConfigServiceImpl implements ConfigService {
     private final AgentTemplateService agentTemplateService;
     private final RedisUtils redisUtils;
     private final TimbreService timbreService;
+    private final DeviceMapper deviceMapper;
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -304,5 +310,17 @@ public class ConfigServiceImpl implements ConfigService {
             prompt = prompt.replace("{{assistant_name}}", "小智");
         }
         result.put("prompt", prompt);
+    }
+
+    @Override
+    public IdDTO getById(String deviceKey) {
+        // ① 查设备基础信息
+        IdDTO info = deviceMapper.selectDeviceKeyById(deviceKey);
+        // ② 查该设备类型的所有属性
+        List<DeviceTypeAttribute> attrs =
+                deviceMapper.selectAttributesByDeviceTypeId(info.getDevicetypeid());
+        // ③ 填充到 DTO
+        info.setAttributes(attrs);
+        return info;
     }
 }

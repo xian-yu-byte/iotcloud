@@ -12,5 +12,6 @@ public class MqttTopicConfigResponse {
     private Long id;
     private String fullTopic;
     private mqttTopicConfig topicType;
+    private String autoSubscribed;
     private String description;
 }

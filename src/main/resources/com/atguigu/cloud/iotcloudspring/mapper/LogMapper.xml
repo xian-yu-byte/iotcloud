@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.atguigu.cloud.iotcloudspring.mapper.LogMapper">
+
+    <!-- 结果映射 -->
+    <resultMap id="LogResultMap" type="com.atguigu.cloud.iotcloudspring.pojo.logs.logs">
+        <id     column="id"          property="id"/>
+        <result column="user_id"     property="userId"/>
+        <result column="description" property="description"/>
+        <result column="createtime"  property="createtime"/>
+    </resultMap>
+
+    <!-- 分页查询 -->
+    <select id="selectLogs" resultMap="LogResultMap" parameterType="map">
+        SELECT id, userid, description, createtime
+        FROM logs
+        ORDER BY createtime DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <!-- 总数 -->
+    <select id="countLogs" resultType="long">
+        SELECT COUNT(*) FROM logs
+    </select>
+
+    <!-- 插入 -->
+    <insert id="insertLog" useGeneratedKeys="true" keyProperty="id" parameterType="com.atguigu.cloud.iotcloudspring.pojo.logs.logs">
+        INSERT INTO logs(userid, description)
+        VALUES (#{userId}, #{description})
+    </insert>
+
+</mapper>

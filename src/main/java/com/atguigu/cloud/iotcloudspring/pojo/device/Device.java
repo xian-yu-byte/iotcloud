@@ -15,6 +15,7 @@ public class Device {
     private Long devicetypeid;
     private String devicename;
     private String devicekey;
+    private String devicelocation;
     private String devicecommunication;
     private String mqttusername;
     private String mqttpassword;

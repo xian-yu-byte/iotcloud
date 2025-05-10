@@ -15,8 +15,10 @@ public class MqttTopicConfig {
     private Long userId;
     private Long projectId;     // mqtt_topic.project_id
     private Long deviceId;      // mqtt_topic.device_id
+    private String deviceKey;
     private String topic;          // mqtt_topic.topic
     private mqttTopicConfig topicType;      // mqtt_topic.topic_type (enum) 固定主题 自定义主题
+    private String autoSubscribed;
     private String description;    // mqtt_topic.description
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

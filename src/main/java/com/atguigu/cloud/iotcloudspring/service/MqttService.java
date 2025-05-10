@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface MqttService {
 
-    MqttConfigDTO getConfigByProjectId();
+    MqttConfigDTO getConfigByProjectId(Long deviceid);
 
     List<MqttTopicConfigResponse> getDeviceTopics(Long userId, Long projectId, Long deviceId);
 

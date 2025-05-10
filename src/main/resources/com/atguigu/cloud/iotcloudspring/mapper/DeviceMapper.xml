@@ -11,7 +11,9 @@
     </insert>
 
     <delete id="deleteDeviceType" parameterType="java.lang.Long">
-        DELETE FROM devicetype WHERE id = #{id}
+        DELETE
+        FROM devicetype
+        WHERE id = #{id}
     </delete>
 
     <select id="selectDeviceTypeList" resultType="com.atguigu.cloud.iotcloudspring.pojo.device.DeviceType">
@@ -26,7 +28,8 @@
         where projectid = #{projectid}
     </select>
 
-    <insert id="insertDeviceTypeAttribute" parameterType="com.atguigu.cloud.iotcloudspring.pojo.device.DeviceTypeAttribute">
+    <insert id="insertDeviceTypeAttribute"
+            parameterType="com.atguigu.cloud.iotcloudspring.pojo.device.DeviceTypeAttribute">
         INSERT INTO devicetypeattribute (devicetypeid, attributename, displayname,
                                          fieldkey,
                                          iscontrol,
@@ -41,10 +44,15 @@
                 NOW(), NOW())
     </insert>
 
-    <select id="selectAttributesByDeviceTypeId" resultType="com.atguigu.cloud.iotcloudspring.pojo.device.DeviceTypeAttribute">
+    <select id="selectAttributesByDeviceTypeId"
+            resultType="com.atguigu.cloud.iotcloudspring.pojo.device.DeviceTypeAttribute">
         SELECT id,
                devicetypeid,
                attributename,
+               displayname,
+               fieldkey,
+               iscontrol,
+               isquery,
                attributeunit,
                datatype,
                attributetype,
@@ -55,13 +63,16 @@
     </select>
 
     <delete id="deleteDeviceTypeAttributeById" parameterType="java.lang.Long">
-        DELETE FROM devicetypeattribute WHERE id = #{id}
+        DELETE
+        FROM devicetypeattribute
+        WHERE id = #{id}
     </delete>
 
     <insert id="insertDevice" parameterType="com.atguigu.cloud.iotcloudspring.pojo.device.Device">
-        INSERT INTO device (projectid, devicetypeid, devicename, devicekey, devicecommunication, deviceinformation,
+        INSERT INTO device (projectid, devicetypeid, devicename, devicelocation, devicekey, devicecommunication,
+                            deviceinformation,
                             createtime, updatetime)
-        VALUES (#{projectid}, #{devicetypeid}, #{devicename}, #{devicekey}, #{devicecommunication},
+        VALUES (#{projectid}, #{devicetypeid}, #{devicename}, #{devicelocation}, #{devicekey}, #{devicecommunication},
                 #{deviceinformation}, NOW(), NOW())
     </insert>
 
@@ -69,6 +80,12 @@
         SELECT devicename
         from device
         where id = #{id}
+    </select>
+
+    <select id="selectDeviceNameByName" resultType="Long">
+        SELECT id
+        from devicetype
+        where typename = #{name}
     </select>
 
     <delete id="deleteDeviceById" parameterType="java.lang.Long">
@@ -83,6 +100,7 @@
                devicetypeid,
                devicename,
                devicekey,
+               devicelocation,
                devicecommunication,
                deviceinformation,
                createtime,
@@ -91,60 +109,81 @@
         WHERE id = #{id}
     </select>
 
-    <select id="selectByTypeAndName" resultType="com.atguigu.cloud.iotcloudspring.pojo.device.DeviceTypeAttribute">
+    <select id="selectByDeviceKey"
+            parameterType="string"
+            resultType="com.atguigu.cloud.iotcloudspring.pojo.device.Device">
+        SELECT id,
+               projectid,
+               devicetypeid,
+               devicename,
+               devicekey,
+               devicelocation,
+               devicecommunication,
+               mqttusername,
+               mqttpassword,
+               devicegroup,
+               deviceinformation,
+               devicestatus,
+               createtime,
+               updatetime
+        FROM device
+        WHERE devicekey = #{deviceKey}
+        LIMIT 1
+    </select>
+
+    <select id="selectByTypeAndName" parameterType="map" resultType="com.atguigu.cloud.iotcloudspring.pojo.device.DeviceTypeAttribute">
         SELECT dta.*
-        FROM device d
-                 JOIN devicetypeattribute dta ON d.devicetypeid = dta.devicetypeid
-        WHERE d.id = #{deviceid}
+        FROM devicetypeattribute dta
+        WHERE dta.devicetypeid = #{deviceTypeId}
           AND dta.attributename = #{attributename}
     </select>
 
-    <select id="selectDeviceTypeById" parameterType="java.lang.Long" resultType="com.atguigu.cloud.iotcloudspring.pojo.device.DeviceType">
-        SELECT
-            id,
-            projectid,
-            typename,
-            accesscategory,
-            communicationmode,
-            protocol,
-            dataformat,
-            createtime,
-            updatetime
+    <select id="selectDeviceTypeById" parameterType="java.lang.Long"
+            resultType="com.atguigu.cloud.iotcloudspring.pojo.device.DeviceType">
+        SELECT id,
+               projectid,
+               typename,
+               accesscategory,
+               communicationmode,
+               protocol,
+               dataformat,
+               createtime,
+               updatetime
         FROM devicetype
         WHERE id = #{id}
     </select>
 
-    <select id="selectDeviceDataByDeviceId" parameterType="java.lang.Long" resultType="com.atguigu.cloud.iotcloudspring.pojo.device.DeviceData">
-        SELECT
-            id,
-            deviceid,
-            devicetypeattributeid,
-            datakey,
-            datavalue,
-            timestamp
+    <select id="selectDeviceDataByDeviceId" parameterType="java.lang.Long"
+            resultType="com.atguigu.cloud.iotcloudspring.pojo.device.DeviceData">
+        SELECT id,
+               deviceid,
+               devicetypeattributeid,
+               datakey,
+               datavalue,
+               timestamp
         FROM devicedata
         WHERE deviceid = #{deviceid}
     </select>
 
-    <select id="selectDevicesByProjectId" parameterType="java.lang.Long" resultType="com.atguigu.cloud.iotcloudspring.pojo.device.Device">
-        SELECT
-            id,
-            projectid,
-            devicetypeid,
-            devicename,
-            devicekey,
-            createtime,
-            updatetime
+    <select id="selectDevicesByProjectId" parameterType="java.lang.Long"
+            resultType="com.atguigu.cloud.iotcloudspring.pojo.device.Device">
+        SELECT id,
+               projectid,
+               devicetypeid,
+               devicename,
+               devicekey,
+               devicelocation,
+               createtime,
+               updatetime
         FROM device
         WHERE projectid = #{projectid}
     </select>
 
     <select id="selectDeviceByDeviceTypeId" resultType="com.atguigu.cloud.iotcloudspring.pojo.device.Device">
-        SELECT
-            id,
-            devicename,
-            devicestatus,
-            updatetime
+        SELECT id,
+               devicename,
+               devicestatus,
+               updatetime
         FROM device
         WHERE devicetypeid = #{devicetypeid}
     </select>
@@ -155,4 +194,91 @@
         where id = #{id}
     </select>
 
+    <select id="selectDeviceKeyById" resultType="com.atguigu.cloud.iotcloudspring.DTO.IdDTO">
+        SELECT d.id             AS id,
+               d.projectid      AS projectid,
+               d.devicetypeid   AS devicetypeid,
+               d.devicename     AS devicename,
+               d.devicelocation AS devicelocation,
+               dt.typename      AS typename,
+               pa.userid        AS userid
+        FROM device d
+                 LEFT JOIN projectadd pa ON d.projectid = pa.id
+                 LEFT JOIN devicetype dt ON d.devicetypeid = dt.id
+        WHERE d.devicekey = #{devicekey}
+
+    </select>
+
+    <select id="selectDeviceKeyByDeviceId" resultType="java.lang.String">
+        SELECT devicekey
+        from device
+        where id = #{deviceid}
+    </select>
+
+    <select id="selectLatestValueByDeviceKeyAndFieldKey" resultType="java.lang.String">
+        SELECT dd.datavalue
+        FROM devicedata dd
+                 INNER JOIN device d
+                            ON dd.deviceid = d.id
+                 INNER JOIN devicetypeattribute dta
+                            ON dd.devicetypeattributeid = dta.id
+        WHERE d.devicekey = #{deviceKey}
+          AND dta.fieldkey = #{fieldkey}
+        ORDER BY dd.timestamp DESC
+        LIMIT 1
+    </select>
+
+    <select id="selectDeviceByDeviceKeyAndFieldKeys"
+            resultType="com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceDataFieldKeysDTO">
+        SELECT fieldKey, value
+        FROM (
+        SELECT
+        dta.fieldkey AS fieldKey,
+        dd.datavalue AS value,
+        ROW_NUMBER() OVER (
+        PARTITION BY dta.fieldkey
+        ORDER BY dd.timestamp DESC, dd.id DESC
+        ) AS rn
+        FROM devicedata dd
+        INNER JOIN device d
+        ON dd.deviceid = d.id
+        INNER JOIN devicetypeattribute dta
+        ON dd.devicetypeattributeid = dta.id
+        WHERE d.devicekey = #{deviceKey}
+        AND dta.fieldkey IN
+        <foreach collection="fieldKeys" item="fk" open="(" separator="," close=")">
+            #{fk}
+        </foreach>
+        ) t
+        WHERE rn = 1
+    </select>
+
+    <resultMap id="PointMap" type="com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceAttributePointDTO">
+        <result column="datavalue" property="value"/>
+        <result column="timestamp" property="timestamp"/>
+    </resultMap>
+
+    <!-- 方式 A：用 key 关联 -->
+    <select id="selectHistoryByKey" resultMap="PointMap">
+        SELECT dd.datavalue, dd.`timestamp`
+        FROM devicedata dd
+                 INNER JOIN device d
+                            ON dd.deviceid = d.id
+                 INNER JOIN devicetypeattribute dta
+                            ON dd.devicetypeattributeid = dta.id
+        WHERE d.devicekey   = #{deviceKey}
+          AND dta.fieldkey   = #{fieldKey}
+          AND dd.`timestamp` BETWEEN #{startTime} AND #{endTime}
+        ORDER BY dd.`timestamp`
+    </select>
+
+    <!-- 方式 B：直接用 ID -->
+    <select id="selectHistoryById" resultMap="PointMap">
+        SELECT dd.datavalue, dd.`timestamp`
+        FROM devicedata dd
+        WHERE dd.deviceid = #{deviceId}
+          AND dd.devicetypeattributeid = #{attributeId}
+          AND dd.`timestamp` BETWEEN #{startTime} AND #{endTime}
+        ORDER BY dd.`timestamp`
+    </select>
 </mapper>

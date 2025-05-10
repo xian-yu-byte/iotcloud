@@ -10,8 +10,8 @@
     </select>
 
     <insert id="AddProject">
-        insert into projectadd (projectname, projectadministrator, region, projectdescription)
-        VALUES (#{projectname}, #{projectadministrator}, #{region}, #{projectdescription})
+        insert into projectadd (userid, projectname, projectadministrator, region, projectdescription)
+        VALUES (#{userid}, #{projectname}, #{projectadministrator}, #{region}, #{projectdescription})
     </insert>
 
     <select id="selectUserByUsername" resultType="com.atguigu.cloud.iotcloudspring.pojo.User.users">
@@ -89,7 +89,7 @@
 
     <select id="selectProjectById" parameterType="Long"
             resultType="com.atguigu.cloud.iotcloudspring.pojo.ProjectAdd">
-        SELECT id, projectname, projectadministrator, region, projectdescription
+        SELECT id, userid, projectname, projectadministrator, region, projectdescription
         FROM projectadd
         WHERE id = #{id}
     </select>

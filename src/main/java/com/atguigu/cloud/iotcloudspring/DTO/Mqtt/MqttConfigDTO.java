@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 public class MqttConfigDTO {
     private Long id;
     private Long projectId;
+    private String deviceKey;
     private String brokerAddress;
     private Long brokerPort;
     private String clientId;

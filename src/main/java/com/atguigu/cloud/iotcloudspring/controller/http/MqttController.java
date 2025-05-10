@@ -1,11 +1,14 @@
 package com.atguigu.cloud.iotcloudspring.controller.http;
 
+import com.atguigu.cloud.iotcloudspring.DTO.Ai.DeviceIdDTO;
 import com.atguigu.cloud.iotcloudspring.DTO.Mqtt.MqttConfigDTO;
 import com.atguigu.cloud.iotcloudspring.DTO.Mqtt.MqttTopicConfigDTO;
 import com.atguigu.cloud.iotcloudspring.DTO.Mqtt.Response.MqttTopicConfigResponse;
 import com.atguigu.cloud.iotcloudspring.DTO.Mqtt.TopicRequest;
 import com.atguigu.cloud.iotcloudspring.controller.http.MqttWebSocket.MqttSubscriber;
 import com.atguigu.cloud.iotcloudspring.pojo.Result;
+import com.atguigu.cloud.iotcloudspring.service.DeviceService;
+import com.atguigu.cloud.iotcloudspring.service.ICSpringService;
 import com.atguigu.cloud.iotcloudspring.service.MqttService;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
@@ -20,11 +23,17 @@ public class MqttController {
     private MqttService mqttService;
 
     @Resource
+    private DeviceService deviceService;
+
+    @Resource
     private MqttSubscriber mqttSubscriber;
 
+    @Resource
+    private ICSpringService icSpringService;
+
     @GetMapping("/mqtt/config")
-    public Result<MqttConfigDTO> getMqttConfig(@RequestParam(required = false) Long projectId) {
-        MqttConfigDTO configDto = mqttService.getConfigByProjectId();
+    public Result<MqttConfigDTO> getMqttConfig(@RequestParam(required = false) Long deviceid) {
+        MqttConfigDTO configDto = mqttService.getConfigByProjectId(deviceid);
         if (configDto != null) {
             return Result.success(configDto);
         } else {
@@ -42,6 +51,25 @@ public class MqttController {
             return Result.error("自定义主题未设置");
         } else {
             return Result.success(fullTopics);
+        }
+    }
+
+    // 自动插入并订阅主题
+    @PostMapping("/createAndSubscribe")
+    public Result<String> createAndSubscribe(@RequestBody DeviceIdDTO dto) {
+        try {
+            // 通过 DTO 拿 deviceId
+            Long deviceId = dto.getDeviceId();
+
+            // 只负责组装 topic 字符串
+            String topic = deviceService.createTopic(deviceId);
+
+            // 拿到 topic 后立即订阅
+            mqttSubscriber.subscribeTopic(topic);
+
+            return Result.success("成功保存并订阅: " + topic);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
         }
     }
 
