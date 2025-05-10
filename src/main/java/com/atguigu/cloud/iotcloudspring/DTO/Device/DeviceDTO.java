@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DeviceDTO {
+    private Long id;
     private Long projectid;
     private Long devicetypeid;
     private String devicename;
@@ -17,4 +18,5 @@ public class DeviceDTO {
     private String devicekey;
     private String deviceinformation;
     private String devicecommunication;
+    private String devicestatus;
 }

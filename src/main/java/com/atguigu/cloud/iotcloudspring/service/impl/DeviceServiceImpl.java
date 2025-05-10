@@ -140,6 +140,14 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
+    public boolean updateDevice(DeviceDTO deviceDTO) {
+        Device device = new Device();
+        BeanUtils.copyProperties(deviceDTO, device);
+        Long rows = deviceMapper.updateDevice(device);
+        return rows > 0;
+    }
+
+    @Override
     public String getDeviceName(Long id) {
         return deviceMapper.selectDeviceNameById(id);
     }
@@ -169,6 +177,10 @@ public class DeviceServiceImpl implements DeviceService {
         response.setDevicekey(device.getDevicekey());
         response.setProjectid(device.getProjectid());
         response.setDevicelocation(device.getDevicelocation());
+        response.setDevicecommunication(device.getDevicecommunication());
+        response.setDeviceinformation(device.getDeviceinformation());
+        response.setDevicestatus(device.getDevicestatus());
+        response.setDevicetypeid(device.getDevicetypeid());
 
         // 2. 根据 deviceTypeId 查询设备类型名称
         DeviceType deviceType = deviceMapper.selectDeviceTypeById(device.getDevicetypeid());
@@ -322,6 +334,30 @@ public class DeviceServiceImpl implements DeviceService {
                                                     LocalDateTime endTime) {
         LocalDateTime[] range = calcRange(days, startTime, endTime);
         return deviceMapper.selectHistoryById(deviceId, attributeId, range[0], range[1]);
+    }
+
+    //  获取设备类型详情
+    @Override
+    public DeviceTypeDTO getDeviceTypeDetailById(Long typeId) {
+        return deviceMapper.selectTypeDetailById(typeId);
+    }
+
+    //  更新设备类型
+    @Override
+    public boolean updateDeviceType(DeviceTypeDTO deviceTypeDTO) {
+        return deviceMapper.updateDeviceType(deviceTypeDTO) > 0;
+    }
+
+    //  获取属性详情
+    @Override
+    public DeviceTypeAttributeResponse getDeviceAttributeById(Long id) {
+        return deviceMapper.selectDeviceAttributeById(id);
+    }
+
+    //  更新属性
+    @Override
+    public boolean updateDeviceAttribute(DeviceTypeAttributeDTO attributeDTO) {
+        return deviceMapper.updateDeviceAttribute(attributeDTO) > 0;
     }
 
     /** 计算 startTime/endTime，如果未传就用 days（默认为1） **/

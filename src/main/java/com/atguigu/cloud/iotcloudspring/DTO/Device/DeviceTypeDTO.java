@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DeviceTypeDTO {
+    private Long id;
     private Long projectid;
     private String typename;
     private AccessCategory accesscategory;

@@ -2,6 +2,9 @@ package com.atguigu.cloud.iotcloudspring.mapper;
 
 import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceAttributePointDTO;
 import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceDataFieldKeysDTO;
+import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceTypeAttributeDTO;
+import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceTypeDTO;
+import com.atguigu.cloud.iotcloudspring.DTO.Device.Response.DeviceTypeAttributeResponse;
 import com.atguigu.cloud.iotcloudspring.DTO.IdDTO;
 import com.atguigu.cloud.iotcloudspring.pojo.device.Device;
 import com.atguigu.cloud.iotcloudspring.pojo.device.DeviceData;
@@ -33,7 +36,7 @@ public interface DeviceMapper {
 
     Long deleteDeviceTypeAttributeById(@Param("id") Long id);
 
-    //创建设备,返回设备及删除
+    //创建设备,返回设备及删除，修改
     Long insertDevice(Device device);
 
     String selectDeviceNameById(@Param("id") Long id);
@@ -43,6 +46,8 @@ public interface DeviceMapper {
     Long deleteDeviceById(@Param("id") Long id);
 
     Device selectDeviceById(@Param("id") Long id);
+
+    Long updateDevice(Device device);
 
     /** 根据 deviceKey 查设备 */
     Device selectByDeviceKey(@Param("deviceKey") String deviceKey);
@@ -106,4 +111,15 @@ public interface DeviceMapper {
             @Param("endTime")     LocalDateTime endTime
     );
 
+    // 根据设备类型id查询设备类型详情
+    DeviceTypeDTO selectTypeDetailById(Long typeId);
+
+    //  更新设备类型
+    int updateDeviceType(DeviceTypeDTO deviceTypeDTO);
+
+    // 根据设备类型属性id查询设备类型属性详情
+    DeviceTypeAttributeResponse selectDeviceAttributeById(Long id);
+
+    // 更新属性
+    int updateDeviceAttribute(DeviceTypeAttributeDTO attributeDTO);
 }

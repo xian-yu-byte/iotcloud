@@ -52,6 +52,24 @@ public class DeviceController {
         return Result.success();
     }
 
+    //根据id查询设备类型
+    @GetMapping("/deviceType/detail/{typeId}")
+    public Result<DeviceTypeDTO> getDeviceTypeDetailById(@PathVariable Long typeId) {
+        DeviceTypeDTO deviceTypeDTO = deviceService.getDeviceTypeDetailById(typeId);
+        return Result.success(deviceTypeDTO);
+    }
+
+    //更新设备类型
+    @PutMapping("/updateDeviceType")
+    public Result<Void> updateDeviceType(@RequestBody DeviceTypeDTO deviceTypeDTO) {
+        boolean success = deviceService.updateDeviceType(deviceTypeDTO);
+        if (success) {
+            return Result.success();
+        } else {
+            return Result.error("更新失败");
+        }
+    }
+
     //删除设备类型
     @DeleteMapping("/deleteType/{id}")
     public Result<Void> deleteDeviceType(@PathVariable Long id) {
@@ -88,6 +106,24 @@ public class DeviceController {
         return Result.success(list);
     }
 
+    // 根据ID获取属性字段
+    @GetMapping("/deviceAttribute/{id}")
+    public Result<DeviceTypeAttributeResponse> getDeviceAttributeById(@PathVariable Long id) {
+        DeviceTypeAttributeResponse response = deviceService.getDeviceAttributeById(id);
+        return Result.success(response);
+    }
+
+    // 更新属性
+    @PutMapping("/updateDeviceAttribute")
+    public Result<Void> updateDeviceAttribute(@RequestBody DeviceTypeAttributeDTO attributeDTO) {
+        boolean success = deviceService.updateDeviceAttribute(attributeDTO);
+        if (success) {
+            return Result.success();
+        } else {
+            return Result.error("更新失败");
+        }
+    }
+
     @DeleteMapping("/delete/{id}")
     public Result<Void> deleteDeviceTypeAttribute(@PathVariable Long id) {
         boolean success = deviceService.deleteDeviceTypeAttribute(id);
@@ -103,6 +139,17 @@ public class DeviceController {
     public Result<Long> createDevice(@RequestBody DeviceDTO deviceDTO) {
         Long id = deviceService.createDevice(deviceDTO);
         return Result.success(id);
+    }
+
+    // 更新设备
+    @PutMapping("/updateDevice")
+    public Result<Void> updateDevice(@RequestBody DeviceDTO deviceDTO) {
+        boolean success = deviceService.updateDevice(deviceDTO);
+        if (success) {
+            return Result.success();
+        } else {
+            return Result.error("更新失败");
+        }
     }
 
     //获取设备id获取设备名称

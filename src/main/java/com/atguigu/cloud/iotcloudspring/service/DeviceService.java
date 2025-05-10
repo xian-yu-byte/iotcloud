@@ -38,6 +38,9 @@ public interface DeviceService {
     // 创建设备
     Long createDevice(DeviceDTO deviceDTO);
 
+    //更新设备
+    boolean updateDevice(DeviceDTO deviceDTO);
+
     // 根据设备id获取设备名称
     String getDeviceName(Long deviceId);
 
@@ -80,4 +83,15 @@ public interface DeviceService {
                                              Integer days,
                                              LocalDateTime startTime,
                                              LocalDateTime endTime);
+
+    //  获取设备类型详情
+    DeviceTypeDTO getDeviceTypeDetailById(Long typeId);
+
+    boolean updateDeviceType(DeviceTypeDTO deviceTypeDTO);
+
+    //  获取属性详情
+    DeviceTypeAttributeResponse getDeviceAttributeById(Long id);
+
+    //  更新属性
+    boolean updateDeviceAttribute(DeviceTypeAttributeDTO attributeDTO);
 }

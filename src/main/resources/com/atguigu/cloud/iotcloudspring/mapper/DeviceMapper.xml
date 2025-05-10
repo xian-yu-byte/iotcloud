@@ -76,6 +76,48 @@
                 #{deviceinformation}, NOW(), NOW())
     </insert>
 
+    <update id="updateDevice">
+        UPDATE device
+        <set>
+            <if test="devicetypeid != null">devicetypeid = #{devicetypeid},</if>
+            <if test="devicename != null">devicename = #{devicename},</if>
+            <if test="devicelocation != null">devicelocation = #{devicelocation},</if>
+            <if test="devicecommunication != null">devicecommunication = #{devicecommunication},</if>
+            <if test="deviceinformation != null">deviceinformation = #{deviceinformation},</if>
+            <if test="devicestatus != null">devicestatus = #{devicestatus},</if>
+            updatetime = now()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateDeviceType">
+        UPDATE devicetype
+        <set>
+            <if test="typename != null">typename = #{typename},</if>
+            <if test="accesscategory != null">accesscategory = #{accesscategory},</if>
+            <if test="communicationmode != null">communicationmode = #{communicationmode},</if>
+            <if test="protocol != null">protocol = #{protocol},</if>
+            <if test="dataformat != null">dataformat = #{dataformat},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+    <update id="updateDeviceAttribute">
+        UPDATE devicetypeattribute
+        <set>
+            <if test="attributename!= null">attributename = #{attributename},</if>
+            <if test="displayname!= null">displayname = #{displayname},</if>
+            <if test="fieldkey!= null">fieldkey = #{fieldkey},</if>
+            <if test="iscontrol!= null">iscontrol = #{iscontrol},</if>
+            <if test="isquery!= null">isquery = #{isquery},</if>
+            <if test="attributeunit!= null">attributeunit = #{attributeunit},</if>
+            <if test="attributetype!= null">attributetype = #{attributetype},</if>
+            <if test="datatype!= null">datatype = #{datatype},</if>
+            <if test="attributedesc!= null">attributedesc = #{attributedesc},</if>
+            <if test="expandoptions!= null">expandoptions = #{expandoptions},</if>
+        </set>
+        where id = #{id}
+    </update>
+
     <select id="selectDeviceNameById" resultType="java.lang.String">
         SELECT devicename
         from device
@@ -103,6 +145,7 @@
                devicelocation,
                devicecommunication,
                deviceinformation,
+               devicestatus,
                createtime,
                updatetime
         FROM device
@@ -280,5 +323,18 @@
           AND dd.devicetypeattributeid = #{attributeId}
           AND dd.`timestamp` BETWEEN #{startTime} AND #{endTime}
         ORDER BY dd.`timestamp`
+    </select>
+
+    <select id="selectTypeDetailById" resultType="com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceTypeDTO">
+        SELECT dt.id, dt.projectid, dt.typename, dt.accesscategory, dt.communicationmode, dt.protocol, dt.dataformat
+        FROM devicetype dt
+        WHERE dt.id = #{typeId}
+    </select>
+
+    <select id="selectDeviceAttributeById"
+            resultType="com.atguigu.cloud.iotcloudspring.DTO.Device.Response.DeviceTypeAttributeResponse">
+        select dt.id, dt.devicetypeid, dt.attributename, dt.displayname, dt.fieldkey, dt.iscontrol, dt.isquery, dt.attributeunit, dt.attributetype, dt.datatype, dt.attributedesc, dt.expandoptions
+        from devicetypeattribute dt
+        where dt.id = #{id}
     </select>
 </mapper>

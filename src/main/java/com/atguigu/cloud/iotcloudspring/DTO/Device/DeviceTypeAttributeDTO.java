@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DeviceTypeAttributeDTO {
+    private Long id;
     private Long devicetypeid;
     private String attributename;
     private String displayname;   // 新增

@@ -15,6 +15,10 @@ public class DeviceDetailResponse {
     private String devicekey;
     private Long projectid;
     private String devicelocation;
+    private String devicecommunication;
+    private String deviceinformation;
+    private String devicestatus;
+    private Long devicetypeid;
 
     // 设备类型信息
     private String devicetypename;
