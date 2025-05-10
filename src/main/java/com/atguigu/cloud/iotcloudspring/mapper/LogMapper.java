@@ -25,4 +25,19 @@ public interface LogMapper {
      * 插入一条日志，返回影响行数，insert 后会回填 id
      */
     int insertLog(logs log);
+    
+    /**
+     * 更新日志信息
+     */
+    int updateLog(logs log);
+    
+    /**
+     * 删除日志
+     */
+    int deleteLog(@Param("id") Long id);
+    
+    /**
+     * 根据ID查询日志
+     */
+    logs selectLogById(@Param("id") Long id);
 }

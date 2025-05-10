@@ -35,20 +35,63 @@ public class LogController {
     }
 
     /**
-     * 发布新日志
+     * 根据ID查询日志
+     */
+    @GetMapping("/{id}")
+    public Result<logs> getById(@PathVariable Long id) {
+        logs log = logService.getLogById(id);
+        if (log == null) {
+            return Result.error("日志不存在");
+        }
+        return Result.success(log);
+    }
+
+    /**
+     * 添加日志
      */
     @PostMapping
-    public Result<Void> create(
-            @RequestBody Map<String, String> body
-    ) {
-        String desc = body.get("description");
+    public Result<Void> create(@RequestBody logs log) {
+        String username = log.getUsername();
+        String desc = log.getDescription();
+        
         if (desc == null || desc.isBlank()) {
             return Result.error("description 不能为空");
         }
+        
+        if (username == null || username.isBlank()) {
+            return Result.error("username 不能为空");
+        }
 
-        // 如果你有登录，userId 可以从 SecurityContext 里取
-        Long userId = null;
-        logService.addLog(userId, desc);
+        logService.addLog(username, desc);
+        return Result.success();
+    }
+    
+    /**
+     * 更新日志
+     */
+    @PutMapping("/{id}")
+    public Result<Void> update(@PathVariable Long id, @RequestBody logs log) {
+        log.setId(id);
+        boolean success = logService.updateLog(log);
+        
+        if (!success) {
+            return Result.error("更新失败，日志可能不存在");
+        }
+        
+        return Result.success();
+    }
+    
+    /**
+     * 删除日志
+     */
+    @DeleteMapping("/{id}")
+    public Result<Void> delete(@PathVariable Long id) {
+        boolean success = logService.deleteLog(id);
+        
+        if (!success) {
+            return Result.error("删除失败，日志可能不存在");
+        }
+        
         return Result.success();
     }
 }

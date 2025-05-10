@@ -8,14 +8,14 @@
     <!-- 结果映射 -->
     <resultMap id="LogResultMap" type="com.atguigu.cloud.iotcloudspring.pojo.logs.logs">
         <id     column="id"          property="id"/>
-        <result column="user_id"     property="userId"/>
+        <result column="username"    property="username"/>
         <result column="description" property="description"/>
         <result column="createtime"  property="createtime"/>
     </resultMap>
 
     <!-- 分页查询 -->
     <select id="selectLogs" resultMap="LogResultMap" parameterType="map">
-        SELECT id, userid, description, createtime
+        SELECT id, username, description, createtime
         FROM logs
         ORDER BY createtime DESC
         LIMIT #{offset}, #{limit}
@@ -28,8 +28,30 @@
 
     <!-- 插入 -->
     <insert id="insertLog" useGeneratedKeys="true" keyProperty="id" parameterType="com.atguigu.cloud.iotcloudspring.pojo.logs.logs">
-        INSERT INTO logs(userid, description)
-        VALUES (#{userId}, #{description})
+        INSERT INTO logs(username, description, createtime)
+        VALUES (#{username}, #{description}, #{createtime})
     </insert>
-
+    
+    <!-- 根据ID查询 -->
+    <select id="selectLogById" resultMap="LogResultMap">
+        SELECT id, username, description, createtime
+        FROM logs
+        WHERE id = #{id}
+    </select>
+    
+    <!-- 更新 -->
+    <update id="updateLog" parameterType="com.atguigu.cloud.iotcloudspring.pojo.logs.logs">
+        UPDATE logs
+        <set>
+            <if test="username != null">username = #{username},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="createtime != null">createtime = #{createtime}</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+    
+    <!-- 删除 -->
+    <delete id="deleteLog">
+        DELETE FROM logs WHERE id = #{id}
+    </delete>
 </mapper>

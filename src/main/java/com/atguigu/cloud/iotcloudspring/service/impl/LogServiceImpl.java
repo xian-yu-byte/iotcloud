@@ -6,6 +6,7 @@ import com.atguigu.cloud.iotcloudspring.service.LogService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -26,10 +27,26 @@ public class LogServiceImpl implements LogService {
     }
 
     @Override
-    public void addLog(Long userId, String description) {
+    public void addLog(String username, String description) {
         logs log = new logs();
-        log.setUserId(userId);
+        log.setUsername(username);
         log.setDescription(description);
+        log.setCreatetime(LocalDateTime.now());
         logMapper.insertLog(log);
+    }
+    
+    @Override
+    public boolean updateLog(logs log) {
+        return logMapper.updateLog(log) > 0;
+    }
+    
+    @Override
+    public boolean deleteLog(Long id) {
+        return logMapper.deleteLog(id) > 0;
+    }
+    
+    @Override
+    public logs getLogById(Long id) {
+        return logMapper.selectLogById(id);
     }
 }

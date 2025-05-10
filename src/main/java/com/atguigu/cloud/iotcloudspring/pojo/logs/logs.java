@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class logs {
     private Long id;
-    private Long userId;
+    private String username;
     private String description;
     private LocalDateTime createtime;
 }
