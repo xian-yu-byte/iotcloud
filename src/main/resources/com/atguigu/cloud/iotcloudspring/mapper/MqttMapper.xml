@@ -112,7 +112,7 @@
         INSERT INTO mqtt_topic_config (user_id, project_id, device_id, device_key,
                                        topic, topic_type, auto_subscribed, description, created_at, updated_at)
         VALUES (#{userId}, #{projectId}, #{deviceId}, #{deviceKey},
-                #{deviceKey}, #{topicType}, 1, 'AI意图识别自动进行下发主题', NOW(), NOW())
+                #{deviceKey}, #{topicType}, 1, 'AI及所有平台任务等自动进行下发主题', NOW(), NOW())
     </insert>
 
     <insert id="insertEmqxDeviceData" parameterType="com.atguigu.cloud.iotcloudspring.pojo.device.DeviceData">

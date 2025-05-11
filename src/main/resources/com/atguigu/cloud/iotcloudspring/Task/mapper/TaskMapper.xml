@@ -5,29 +5,74 @@
 <mapper namespace="com.atguigu.cloud.iotcloudspring.Task.mapper.TaskMapper">
     <insert id="insertTask" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO `task`
-        (project_id, task_name, task_type, schedule_type, cron_expr,
+        (user_id,project_id, task_name, task_type, schedule_type, cron_expr,
          start_time, enabled, operation_config, task_description)
-        VALUES (#{projectId}, #{taskName}, #{taskType}, #{scheduleType}, #{cronExpr},
+        VALUES (#{userId},#{projectId}, #{taskName}, #{taskType}, #{scheduleType}, #{cronExpr},
                 #{startTime}, #{enabled}, #{operationConfig}, #{taskDescription})
     </insert>
 
     <select id="selectTaskListByProject"
             resultType="com.atguigu.cloud.iotcloudspring.Task.DTO.CreateTaskRequest.TaskListItemDTO"
             parameterType="long">
-
         SELECT t.id,
                t.task_name,
                t.task_type,
                t.schedule_type,
+               t.enabled,
                t.next_run_time,
+               t.last_run_time AS lastRunTime,
+               t.status        AS status,
                t.created_time,
                (SELECT target_type
                 FROM task_target
                 WHERE task_id = t.id
-                LIMIT 1) AS target_type
+                LIMIT 1)       AS target_type
         FROM task t
         WHERE t.project_id = #{projectId}
         ORDER BY t.created_time DESC
 
     </select>
+
+    <update id="updateEnabled">
+        UPDATE task SET enabled = #{enabled} WHERE id = #{id}
+    </update>
+
+    <select id="selectById" resultType="com.atguigu.cloud.iotcloudspring.Task.pojo.Task">
+        SELECT *
+        FROM task
+        WHERE id = #{taskId}
+    </select>
+
+    <delete id="deleteTaskById">
+        delete
+        FROM task
+        where id = #{taskId}
+    </delete>
+
+    <update id="updateById" parameterType="com.atguigu.cloud.iotcloudspring.Task.pojo.Task">
+        UPDATE task
+        <set>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="projectId != null">project_id = #{projectId},</if>
+            <if test="taskName != null">task_name = #{taskName},</if>
+            <if test="taskType != null">task_type = #{taskType},</if>
+            <if test="scheduleType != null">schedule_type = #{scheduleType},</if>
+            <if test="cronExpr != null">cron_expr = #{cronExpr},</if>
+            <if test="startTime != null">start_time = #{startTime},</if>
+            <if test="nextRunTime != null">next_run_time = #{nextRunTime},</if>
+            <if test="lastRunTime != null">last_run_time = #{lastRunTime},</if>
+            <if test="enabled != null">enabled = #{enabled},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="operationConfig != null">operation_config = #{operationConfig},</if>
+            <if test="taskDescription != null">task_description = #{taskDescription},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateStatus">
+        UPDATE task
+        SET status = #{status}
+        WHERE id = #{id}
+    </update>
+
 </mapper>

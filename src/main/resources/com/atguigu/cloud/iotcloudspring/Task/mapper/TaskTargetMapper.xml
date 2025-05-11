@@ -8,4 +8,10 @@
             (task_id, project_id, target_type, target_id)
         VALUES (#{taskId}, #{projectId}, #{targetType}, #{targetId})
     </insert>
+
+    <select id="selectByTaskId" resultType="com.atguigu.cloud.iotcloudspring.Task.pojo.TaskTarget">
+        SELECT id, task_id, project_id, target_type, target_id
+        FROM task_target
+        WHERE task_id = #{taskId}
+    </select>
 </mapper>

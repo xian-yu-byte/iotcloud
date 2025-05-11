@@ -174,7 +174,8 @@
         LIMIT 1
     </select>
 
-    <select id="selectByTypeAndName" parameterType="map" resultType="com.atguigu.cloud.iotcloudspring.pojo.device.DeviceTypeAttribute">
+    <select id="selectByTypeAndName" parameterType="map"
+            resultType="com.atguigu.cloud.iotcloudspring.pojo.device.DeviceTypeAttribute">
         SELECT dta.*
         FROM devicetypeattribute dta
         WHERE dta.devicetypeid = #{deviceTypeId}
@@ -309,8 +310,8 @@
                             ON dd.deviceid = d.id
                  INNER JOIN devicetypeattribute dta
                             ON dd.devicetypeattributeid = dta.id
-        WHERE d.devicekey   = #{deviceKey}
-          AND dta.fieldkey   = #{fieldKey}
+        WHERE d.devicekey = #{deviceKey}
+          AND dta.fieldkey = #{fieldKey}
           AND dd.`timestamp` BETWEEN #{startTime} AND #{endTime}
         ORDER BY dd.`timestamp`
     </select>
@@ -333,8 +334,32 @@
 
     <select id="selectDeviceAttributeById"
             resultType="com.atguigu.cloud.iotcloudspring.DTO.Device.Response.DeviceTypeAttributeResponse">
-        select dt.id, dt.devicetypeid, dt.attributename, dt.displayname, dt.fieldkey, dt.iscontrol, dt.isquery, dt.attributeunit, dt.attributetype, dt.datatype, dt.attributedesc, dt.expandoptions
+        select dt.id,
+               dt.devicetypeid,
+               dt.attributename,
+               dt.displayname,
+               dt.fieldkey,
+               dt.iscontrol,
+               dt.isquery,
+               dt.attributeunit,
+               dt.attributetype,
+               dt.datatype,
+               dt.attributedesc,
+               dt.expandoptions
         from devicetypeattribute dt
         where dt.id = #{id}
+    </select>
+
+    <select id="deviceIdSelectDeviceKeyById" parameterType="Long" resultType="String">
+        SELECT devicekey
+        FROM device
+        WHERE id = #{id}
+    </select>
+
+    <select id="listDeviceIdsByProjectAndType" resultType="long">
+        SELECT id
+        FROM device
+        WHERE projectid = #{projectId}
+          AND devicetypeid = #{deviceTypeId}
     </select>
 </mapper>

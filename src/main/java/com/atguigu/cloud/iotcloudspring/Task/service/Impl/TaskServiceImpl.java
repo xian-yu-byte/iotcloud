@@ -2,10 +2,12 @@ package com.atguigu.cloud.iotcloudspring.Task.service.Impl;
 
 import com.atguigu.cloud.iotcloudspring.Task.DTO.CreateTaskRequest.CreateTaskDTO;
 import com.atguigu.cloud.iotcloudspring.Task.DTO.CreateTaskRequest.TaskListItemDTO;
+import com.atguigu.cloud.iotcloudspring.Task.mapper.TaskExecutionLogMapper;
 import com.atguigu.cloud.iotcloudspring.Task.mapper.TaskMapper;
 import com.atguigu.cloud.iotcloudspring.Task.mapper.TaskPayloadMapper;
 import com.atguigu.cloud.iotcloudspring.Task.mapper.TaskTargetMapper;
 import com.atguigu.cloud.iotcloudspring.Task.pojo.Task;
+import com.atguigu.cloud.iotcloudspring.Task.pojo.TaskExecutionLog;
 import com.atguigu.cloud.iotcloudspring.Task.pojo.TaskPayload;
 import com.atguigu.cloud.iotcloudspring.Task.pojo.TaskTarget;
 import com.atguigu.cloud.iotcloudspring.Task.service.TaskService;
@@ -27,6 +29,8 @@ public class TaskServiceImpl implements TaskService {
     private TaskTargetMapper targetMapper;
     @Resource
     private TaskPayloadMapper payloadMapper;
+    @Resource
+    private TaskExecutionLogMapper taskExecutionLogMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -107,5 +111,61 @@ public class TaskServiceImpl implements TaskService {
             item.setRelativeTime(rel);
         }
         return list;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void setEnabled(Long id, boolean enabled) {
+        taskMapper.updateEnabled(id, enabled);
+        // 如果 enabled=false，可以把 next_run_time 置空；enabled=true 则重新计算 next_run_time
+    }
+
+    @Override
+    public Task getById(Long taskId) {
+        return taskMapper.selectById(taskId);
+    }
+
+    @Override
+    public List<TaskTarget> listTargets(Long taskId) {
+        return targetMapper.selectByTaskId(taskId);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void logExecution(Long taskId,
+                             Long deviceId,
+                             LocalDateTime plannedTime,
+                             LocalDateTime executeTime,
+                             String result,
+                             String message) {
+        // 从 Task 里拿 projectId
+        Task task = getById(taskId);
+
+        TaskExecutionLog log = new TaskExecutionLog();
+        log.setTaskId(taskId);
+        log.setProjectId(task.getProjectId());
+        log.setDeviceId(deviceId);
+        log.setPlannedTime(plannedTime);
+        log.setExecuteTime(executeTime);
+        log.setResult(result);
+        log.setMessage(message);
+
+        taskExecutionLogMapper.insertLog(log);
+    }
+
+    @Override
+    public boolean deleteTaskById(long taskId) {
+        long rows = taskMapper.deleteTaskById(taskId);
+        return rows > 0;
+    }
+
+    @Override
+    public boolean updateById(Task task) {
+        return taskMapper.updateById(task) > 0;
+    }
+
+    @Override
+    public boolean updateStatus(Long id, String status) {
+        return taskMapper.updateStatus(id, status) > 0;
     }
 }

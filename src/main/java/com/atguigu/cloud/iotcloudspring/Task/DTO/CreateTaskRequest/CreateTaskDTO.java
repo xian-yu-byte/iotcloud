@@ -7,6 +7,7 @@ import java.util.List;
 
 @Data
 public class CreateTaskDTO {
+    private Long userId;
     private Long projectId;
     private String taskName;
     private String taskType;

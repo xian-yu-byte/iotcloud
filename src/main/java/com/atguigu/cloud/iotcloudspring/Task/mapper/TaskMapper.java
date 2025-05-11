@@ -15,4 +15,16 @@ public interface TaskMapper {
     int insertTask(Task task);
 
     List<TaskListItemDTO> selectTaskListByProject(@Param("projectId") Long projectId);
+
+    int updateEnabled(@Param("id") Long id, @Param("enabled") Boolean enabled);
+
+    Task selectById(@Param("taskId") Long taskId);
+
+    long deleteTaskById(@Param("taskId") Long taskId);
+
+    // 通用更新：把传入对象中非空字段都更新到数据库
+    int updateById(Task task);
+
+    // 仅更新 status 字段
+    int updateStatus(@Param("id") Long id, @Param("status") String status);
 }

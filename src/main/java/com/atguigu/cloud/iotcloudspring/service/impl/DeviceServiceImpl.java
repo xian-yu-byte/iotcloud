@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -131,10 +132,11 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     public Long createDevice(DeviceDTO deviceDTO) {
         Device device = new Device();
+        String deviceKey = "device_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
         BeanUtils.copyProperties(deviceDTO, device);
         device.setMqttusername("ceshi");
         device.setMqttpassword("123456");
-        device.setDevicekey("device_" + snowflake.nextIdStr());
+        device.setDevicekey(deviceKey);
         deviceMapper.insertDevice(device);
         return device.getId();
     }
@@ -162,6 +164,7 @@ public class DeviceServiceImpl implements DeviceService {
         Long rows = deviceMapper.deleteDeviceById(id);
         return rows > 0;
     }
+
     // 后续需要优化
     @Override
     public DeviceDetailResponse getDeviceDetail(Long deviceId) {
@@ -328,10 +331,10 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     public List<DeviceAttributePointDTO> fetchHistoryById(Long deviceId,
-                                                    Long attributeId,
-                                                    Integer days,
-                                                    LocalDateTime startTime,
-                                                    LocalDateTime endTime) {
+                                                          Long attributeId,
+                                                          Integer days,
+                                                          LocalDateTime startTime,
+                                                          LocalDateTime endTime) {
         LocalDateTime[] range = calcRange(days, startTime, endTime);
         return deviceMapper.selectHistoryById(deviceId, attributeId, range[0], range[1]);
     }
@@ -360,7 +363,9 @@ public class DeviceServiceImpl implements DeviceService {
         return deviceMapper.updateDeviceAttribute(attributeDTO) > 0;
     }
 
-    /** 计算 startTime/endTime，如果未传就用 days（默认为1） **/
+    /**
+     * 计算 startTime/endTime，如果未传就用 days（默认为1）
+     **/
     private LocalDateTime[] calcRange(Integer days, LocalDateTime start, LocalDateTime end) {
         if (start != null && end != null) {
             return new LocalDateTime[]{start, end};
@@ -368,5 +373,15 @@ public class DeviceServiceImpl implements DeviceService {
         int d = (days != null && days > 0) ? days : 1;
         LocalDateTime now = LocalDateTime.now();
         return new LocalDateTime[]{now.minusDays(d), now};
+    }
+
+    @Override
+    public String getDeviceKeyById(Long id) {
+        return deviceMapper.deviceIdSelectDeviceKeyById(id);
+    }
+
+    @Override
+    public List<Long> listDeviceIdsByProjectAndType(Long projectId, Long deviceTypeId) {
+        return deviceMapper.listDeviceIdsByProjectAndType(projectId, deviceTypeId);
     }
 }

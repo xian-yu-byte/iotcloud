@@ -1,6 +1,6 @@
 package com.atguigu.cloud.iotcloudspring.DTO.Mqtt.Response;
 
-import com.atguigu.cloud.iotcloudspring.entity.enums.mqtt.mqttTopicConfig;
+import com.atguigu.cloud.iotcloudspring.filter.enums.mqtt.mqttTopicConfig;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

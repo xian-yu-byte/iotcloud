@@ -122,4 +122,12 @@ public interface DeviceMapper {
 
     // 更新属性
     int updateDeviceAttribute(DeviceTypeAttributeDTO attributeDTO);
+
+    // 根据设备id查询deviceKey
+    String deviceIdSelectDeviceKeyById(@Param("id") Long id);
+
+    /**
+     * 只查询某项目下、某设备类型的所有设备 ID
+     */
+    List<Long> listDeviceIdsByProjectAndType(Long projectId, Long deviceTypeId);
 }

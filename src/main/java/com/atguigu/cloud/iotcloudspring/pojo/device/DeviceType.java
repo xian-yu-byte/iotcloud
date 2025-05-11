@@ -1,8 +1,8 @@
 package com.atguigu.cloud.iotcloudspring.pojo.device;
 
-import com.atguigu.cloud.iotcloudspring.entity.enums.AccessCategory;
-import com.atguigu.cloud.iotcloudspring.entity.enums.CommunicationMode;
-import com.atguigu.cloud.iotcloudspring.entity.enums.ProtocolType;
+import com.atguigu.cloud.iotcloudspring.filter.enums.AccessCategory;
+import com.atguigu.cloud.iotcloudspring.filter.enums.CommunicationMode;
+import com.atguigu.cloud.iotcloudspring.filter.enums.ProtocolType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

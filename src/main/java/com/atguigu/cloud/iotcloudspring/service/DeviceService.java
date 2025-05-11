@@ -94,4 +94,10 @@ public interface DeviceService {
 
     //  更新属性
     boolean updateDeviceAttribute(DeviceTypeAttributeDTO attributeDTO);
+
+    // 根据设备id获取设备key
+    String getDeviceKeyById(Long id);
+
+    // 根据设备类型id和项目id获取设备id
+    List<Long> listDeviceIdsByProjectAndType(Long projectId, Long deviceTypeId);
 }

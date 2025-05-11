@@ -19,6 +19,6 @@ public class TaskExecutionLog {
     private LocalDateTime executeTime;
     private Integer durationMs;
     private Integer attempt;
-    private TaskExecutionLogResult result;
+    private String result;
     private String message;
 }
