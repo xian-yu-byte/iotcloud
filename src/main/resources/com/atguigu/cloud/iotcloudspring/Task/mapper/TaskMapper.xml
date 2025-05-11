@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.cloud.iotcloudspring.Task.mapper.TaskMapper">
+    <insert id="insertTask" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `task`
+        (project_id, task_name, task_type, schedule_type, cron_expr,
+         start_time, enabled, operation_config, task_description)
+        VALUES (#{projectId}, #{taskName}, #{taskType}, #{scheduleType}, #{cronExpr},
+                #{startTime}, #{enabled}, #{operationConfig}, #{taskDescription})
+    </insert>
+
+    <select id="selectTaskListByProject"
+            resultType="com.atguigu.cloud.iotcloudspring.Task.DTO.CreateTaskRequest.TaskListItemDTO"
+            parameterType="long">
+
+        SELECT t.id,
+               t.task_name,
+               t.task_type,
+               t.schedule_type,
+               t.next_run_time,
+               t.created_time,
+               (SELECT target_type
+                FROM task_target
+                WHERE task_id = t.id
+                LIMIT 1) AS target_type
+        FROM task t
+        WHERE t.project_id = #{projectId}
+        ORDER BY t.created_time DESC
+
+    </select>
+</mapper>
