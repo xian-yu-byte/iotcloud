@@ -3,13 +3,16 @@ package com.atguigu.cloud.iotcloudspring.controller.http;
 import com.atguigu.cloud.iotcloudspring.DTO.JoinProjectByNameRequest;
 import com.atguigu.cloud.iotcloudspring.DTO.JoinProjectRequest;
 import com.atguigu.cloud.iotcloudspring.DTO.LeaveProjectRequest;
+import com.atguigu.cloud.iotcloudspring.VO.ProjectMember;
 import com.atguigu.cloud.iotcloudspring.pojo.ProjectAdd;
 import com.atguigu.cloud.iotcloudspring.pojo.Result;
 import com.atguigu.cloud.iotcloudspring.pojo.User.ChangePasswordRequest;
+import com.atguigu.cloud.iotcloudspring.pojo.User.UserProject;
 import com.atguigu.cloud.iotcloudspring.pojo.User.users;
 import com.atguigu.cloud.iotcloudspring.service.ICSpringService;
 import com.atguigu.cloud.iotcloudspring.service.UserService;
 import jakarta.annotation.Resource;
+import org.apache.ibatis.annotations.Delete;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -77,6 +80,35 @@ public class ICSpringController {
         }
         // 使用查询到的 userid 调用 Service 层加入项目（默认角色 "member"）
         return iCSpringService.joinProject(userid, request.getProjectid(), "member");
+    }
+
+    //邀请加入项目
+    @PostMapping("/invite")
+    public Result<Void> inviteProject(@RequestParam Long projectid,
+                                      @RequestParam String username,
+                                      @RequestParam String role) {
+        return iCSpringService.inviteProject(projectid, username, role);
+    }
+
+    //修改用户角色
+    @PostMapping("/changeRole")
+    public Result<Void> changeRole(@RequestParam Long userid, @RequestParam String role) {
+        Boolean success = iCSpringService.changeRole(userid, role);
+        return success ? Result.success() : Result.error("修改失败");
+    }
+
+    //移除项目中的用户
+    @DeleteMapping("/removeMember")
+    public Result<Void> removeMember(@RequestParam Long userid) {
+        Boolean success = iCSpringService.removeMember(userid);
+        return success ? Result.success() : Result.error("移除失败");
+    }
+
+    //获取当前项目所有的用户列表
+    @GetMapping("/getProjectMember")
+    public Result<List<ProjectMember>> getProjectMember(Integer projectId) {
+        List<ProjectMember> members = iCSpringService.getProjectMember(projectId);
+        return Result.success(members);
     }
 
     //获取当前用户加入的项目列表

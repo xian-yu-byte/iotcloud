@@ -1,6 +1,8 @@
 package com.atguigu.cloud.iotcloudspring.mapper;
 
+import com.atguigu.cloud.iotcloudspring.VO.ProjectMember;
 import com.atguigu.cloud.iotcloudspring.pojo.ProjectAdd;
+import com.atguigu.cloud.iotcloudspring.pojo.Result;
 import com.atguigu.cloud.iotcloudspring.pojo.User.UserProject;
 import com.atguigu.cloud.iotcloudspring.pojo.User.users;
 import org.apache.ibatis.annotations.Mapper;
@@ -50,4 +52,16 @@ public interface ICMapper {
 
     // 根据项目ID查询项目
     ProjectAdd selectProjectById(@Param("id") Long id);
+
+    // 邀请用户加入项目
+    Boolean addUserProject(Long userid, Long projectid, String role);
+
+    //获取当前项目所有的用户列表
+    List<ProjectMember> getProjectMember(Integer projectId);
+
+    //修改用户角色
+    Long changeRole(Long userid, String role);
+
+    //移除项目成员
+    Long removeMember(Long userid);
 }

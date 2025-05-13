@@ -31,11 +31,24 @@
         WHERE username = #{username}
     </update>
 
+    <!--修改用户角色-->
+    <update id="changeRole">
+        UPDATE userproject
+        SET role = #{role}
+        WHERE userid = #{userid}
+    </update>
+
     <!-- UserProject 插入 -->
     <insert id="insertUserProject" parameterType="com.atguigu.cloud.iotcloudspring.pojo.User.UserProject"
             useGeneratedKeys="true" keyProperty="id">
         INSERT INTO userproject (userid, projectid, role, joinedat)
         VALUES (#{userid}, #{projectid}, #{role}, #{joinedat})
+    </insert>
+
+    <!-- 邀请用户加入项目 -->
+    <insert id="addUserProject">
+        INSERT INTO userproject (userid, projectid, role, joinedat)
+        VALUES (#{userid}, #{projectid}, #{role}, now())
     </insert>
 
     <!-- 根据用户ID查询关联记录 -->
@@ -70,6 +83,13 @@
           AND projectid = #{projectid}
     </delete>
 
+    <!--移除项目成员-->
+    <delete id="removeMember">
+        DELETE
+        FROM userproject
+        WHERE userid = #{userid}
+    </delete>
+
     <!-- 新增：查询当前用户已加入的项目详情 -->
     <select id="selectJoinedProjectsByUser" parameterType="Long"
             resultType="com.atguigu.cloud.iotcloudspring.pojo.ProjectAdd">
@@ -93,4 +113,13 @@
         FROM projectadd
         WHERE id = #{id}
     </select>
+
+    <!--获取当前项目所有的用户列表-->
+    <select id="getProjectMember" resultType="com.atguigu.cloud.iotcloudspring.VO.ProjectMember">
+        SELECT up.userid, u.username, up.role
+        FROM userproject up
+                 JOIN users u ON up.userid = u.id
+    </select>
+
+
 </mapper>

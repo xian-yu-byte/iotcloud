@@ -1,6 +1,7 @@
 package com.atguigu.cloud.iotcloudspring.service.impl;
 
 import com.atguigu.cloud.iotcloudspring.DTO.User.UserResponse;
+import com.atguigu.cloud.iotcloudspring.VO.ProjectMember;
 import com.atguigu.cloud.iotcloudspring.mapper.ICMapper;
 import com.atguigu.cloud.iotcloudspring.pojo.ProjectAdd;
 import com.atguigu.cloud.iotcloudspring.pojo.Result;
@@ -10,6 +11,8 @@ import com.atguigu.cloud.iotcloudspring.service.ICSpringService;
 import com.atguigu.cloud.iotcloudspring.service.UserService;
 import com.atguigu.cloud.iotcloudspring.until.JwtUtil;
 import jakarta.annotation.Resource;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -183,6 +186,49 @@ public class ICSpringServiceA implements ICSpringService {
     public Result<ProjectAdd> getProjectById(Long projectid) {
         ProjectAdd project = icMapper.selectProjectById(projectid);
         return project != null ? Result.success(project) : Result.error("项目不存在");
+    }
+
+    //  邀请用户加入项目
+    @Override
+    public Result<Void> inviteProject(Long projectid, String username, String role) {
+        // 获取当前登录用户的用户名
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication.getName();
+
+        // 判断是否是在邀请自己
+        if (currentUsername.equals(username)) {
+            return Result.error("不能邀请自己加入项目");
+        }
+        // 查找用户名是否存在
+        users existUser = icMapper.selectUserByUsername(username);
+        if (existUser == null) {
+            return Result.error("用户名不存在");
+        }
+        //  查询用户是否已加入该项目
+        UserProject existingRecord = icMapper.selectUserProjectByUserIdAndProjectId(existUser.getId(), projectid);
+        if (existingRecord != null) {
+            return Result.error("用户已加入该项目");
+        }
+
+        return icMapper.addUserProject(existUser.getId(), projectid, role) ? Result.success() : Result.error("邀请用户加入项目失败");
+    }
+
+    //获取当前项目所有的用户列表
+    @Override
+    public List<ProjectMember> getProjectMember(Integer projectId) {
+        return icMapper.getProjectMember(projectId);
+    }
+
+    //修改用户角色
+    @Override
+    public Boolean changeRole(Long userid, String role) {
+        return icMapper.changeRole(userid, role) > 0;
+    }
+
+    //移除项目成员
+    @Override
+    public Boolean removeMember(Long userid) {
+        return icMapper.removeMember(userid) > 0;
     }
 }
 

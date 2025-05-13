@@ -1,5 +1,6 @@
 package com.atguigu.cloud.iotcloudspring.service;
 
+import com.atguigu.cloud.iotcloudspring.VO.ProjectMember;
 import com.atguigu.cloud.iotcloudspring.pojo.ProjectAdd;
 import com.atguigu.cloud.iotcloudspring.pojo.Result;
 import com.atguigu.cloud.iotcloudspring.pojo.User.UserProject;
@@ -43,4 +44,16 @@ public interface ICSpringService {
 
     // 根据项目ID查询项目信息
     Result<ProjectAdd> getProjectById(Long projectid);
+
+    // 邀请用户加入项目
+    Result<Void> inviteProject(Long projectid, String username, String role);
+
+    //获取当前项目所有的用户列表
+    List<ProjectMember> getProjectMember(Integer projectId);
+
+    //修改用户角色
+    Boolean changeRole(Long userid, String role);
+
+    //移除项目成员
+    Boolean removeMember(Long userid);
 }
