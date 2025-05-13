@@ -1,7 +1,6 @@
 package com.atguigu.cloud.iotcloudspring.Task.service.Impl;
 
-import com.atguigu.cloud.iotcloudspring.Task.DTO.CreateTaskRequest.CreateTaskDTO;
-import com.atguigu.cloud.iotcloudspring.Task.DTO.CreateTaskRequest.TaskListItemDTO;
+import com.atguigu.cloud.iotcloudspring.Task.DTO.CreateTaskRequest.*;
 import com.atguigu.cloud.iotcloudspring.Task.mapper.TaskExecutionLogMapper;
 import com.atguigu.cloud.iotcloudspring.Task.mapper.TaskMapper;
 import com.atguigu.cloud.iotcloudspring.Task.mapper.TaskPayloadMapper;
@@ -11,6 +10,8 @@ import com.atguigu.cloud.iotcloudspring.Task.pojo.TaskExecutionLog;
 import com.atguigu.cloud.iotcloudspring.Task.pojo.TaskPayload;
 import com.atguigu.cloud.iotcloudspring.Task.pojo.TaskTarget;
 import com.atguigu.cloud.iotcloudspring.Task.service.TaskService;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -136,6 +137,7 @@ public class TaskServiceImpl implements TaskService {
                              Long deviceId,
                              LocalDateTime plannedTime,
                              LocalDateTime executeTime,
+                             long durationMs,
                              String result,
                              String message) {
         // 从 Task 里拿 projectId
@@ -147,6 +149,7 @@ public class TaskServiceImpl implements TaskService {
         log.setDeviceId(deviceId);
         log.setPlannedTime(plannedTime);
         log.setExecuteTime(executeTime);
+        log.setDurationMs(durationMs);
         log.setResult(result);
         log.setMessage(message);
 
@@ -167,5 +170,52 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public boolean updateStatus(Long id, String status) {
         return taskMapper.updateStatus(id, status) > 0;
+    }
+
+    @Override
+    public void updateNextRunTime(Long taskId, LocalDateTime nextRunTime) {
+        Task patch = new Task();
+        patch.setId(taskId);
+        patch.setNextRunTime(nextRunTime);
+        patch.setStatus("已禁用");
+        this.updateById(patch);
+    }
+
+    @Override
+    public List<TaskDTO> selectTaskDTOById(Long taskId) {
+        return taskMapper.selectTaskDTOsByTaskId(taskId);
+    }
+
+    @Override
+    public void updateOperationConfig(Long id, String operationConfig) {
+        Task task = new Task();
+        task.setId(id);
+        task.setOperationConfig(operationConfig);
+        taskMapper.updateById(task);
+    }
+
+    @Override
+    public void updateScheduleType(Long taskId, String ScheduleType) {
+        Task task = new Task();
+        task.setId(taskId);
+        task.setOperationConfig(ScheduleType);
+        taskMapper.updateById(task);
+    }
+
+    @Override
+    public TaskSummaryDTO selectTaskSummary(Long taskId) {
+        // 直接调用 Mapper，返回 DTO
+        return taskExecutionLogMapper.selectTaskSummary(taskId);
+    }
+
+    @Override
+    public List<DayCountDTO> selectTimeCounts(Long taskId, Integer days) {
+        return taskExecutionLogMapper.selectTimeCounts(taskId, days);
+    }
+
+    @Override
+    public IPage<LogDTO> getExecutionLogs(Long taskId, int pageNum, int pageSize) {
+        Page<LogDTO> page = new Page<>(pageNum, pageSize);
+        return taskExecutionLogMapper.selectLogs(page, taskId);
     }
 }

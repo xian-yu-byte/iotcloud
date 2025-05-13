@@ -60,6 +60,7 @@
             <if test="cronExpr != null">cron_expr = #{cronExpr},</if>
             <if test="startTime != null">start_time = #{startTime},</if>
             <if test="nextRunTime != null">next_run_time = #{nextRunTime},</if>
+            <if test="nextRunTime == null">next_run_time = null,</if>
             <if test="lastRunTime != null">last_run_time = #{lastRunTime},</if>
             <if test="enabled != null">enabled = #{enabled},</if>
             <if test="status != null">status = #{status},</if>
@@ -74,5 +75,34 @@
         SET status = #{status}
         WHERE id = #{id}
     </update>
+
+    <select id="selectTaskDTOsByTaskId"
+            parameterType="java.lang.Long"
+            resultType="com.atguigu.cloud.iotcloudspring.Task.DTO.CreateTaskRequest.TaskDTO">
+        SELECT tt.target_type     AS targetType,
+               CASE tt.target_type
+                   WHEN 'DEVICE' THEN d.devicename
+                   WHEN 'TYPE' THEN dt.typename
+                   END            AS Device,
+               t.task_name        AS taskName,
+               t.next_run_time    AS nextRunTime,
+               t.created_time     AS createdTime,
+               t.updated_time     AS updatedTime,
+               t.task_type        AS taskType,
+               t.operation_config AS operationConfig,
+               t.enabled          AS enabled
+        FROM task t
+                 JOIN task_target tt
+                      ON t.id = tt.task_id
+                 LEFT JOIN device d
+                           ON tt.target_type = 'DEVICE'
+                               AND tt.target_id = d.id
+                 LEFT JOIN devicetype dt
+                           ON tt.target_type = 'TYPE'
+                               AND tt.target_id = dt.id
+        WHERE t.id = #{taskId}
+        ORDER BY tt.id
+    </select>
+
 
 </mapper>

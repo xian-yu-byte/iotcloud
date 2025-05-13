@@ -14,7 +14,7 @@ public class CreateTaskDTO {
     private String scheduleType;
     private String cronExpr;
     private LocalDateTime startTime;
-    private Boolean enabled = true;
+    private Boolean enabled = false;
     private String operationConfig;
     private String taskDescription;
 

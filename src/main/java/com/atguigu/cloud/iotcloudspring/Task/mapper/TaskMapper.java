@@ -1,5 +1,6 @@
 package com.atguigu.cloud.iotcloudspring.Task.mapper;
 
+import com.atguigu.cloud.iotcloudspring.Task.DTO.CreateTaskRequest.TaskDTO;
 import com.atguigu.cloud.iotcloudspring.Task.DTO.CreateTaskRequest.TaskListItemDTO;
 import com.atguigu.cloud.iotcloudspring.Task.pojo.Task;
 import org.apache.ibatis.annotations.Mapper;
@@ -27,4 +28,6 @@ public interface TaskMapper {
 
     // 仅更新 status 字段
     int updateStatus(@Param("id") Long id, @Param("status") String status);
+
+    List<TaskDTO> selectTaskDTOsByTaskId(@Param("taskId") Long taskId);
 }

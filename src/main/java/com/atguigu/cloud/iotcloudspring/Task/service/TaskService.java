@@ -1,9 +1,9 @@
 package com.atguigu.cloud.iotcloudspring.Task.service;
 
-import com.atguigu.cloud.iotcloudspring.Task.DTO.CreateTaskRequest.CreateTaskDTO;
-import com.atguigu.cloud.iotcloudspring.Task.DTO.CreateTaskRequest.TaskListItemDTO;
+import com.atguigu.cloud.iotcloudspring.Task.DTO.CreateTaskRequest.*;
 import com.atguigu.cloud.iotcloudspring.Task.pojo.Task;
 import com.atguigu.cloud.iotcloudspring.Task.pojo.TaskTarget;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -42,6 +42,7 @@ public interface TaskService {
                       Long deviceId,
                       LocalDateTime plannedTime,
                       LocalDateTime executeTime,
+                      long durationMs,
                       String result,
                       String message);
 
@@ -53,4 +54,18 @@ public interface TaskService {
     boolean updateById(Task task);
 
     boolean updateStatus(Long id, String status);
+
+    void updateNextRunTime(Long taskId, LocalDateTime nextRunTime);
+
+    List<TaskDTO> selectTaskDTOById(Long id);
+
+    void updateOperationConfig(Long id, String operationConfig);
+
+    void updateScheduleType(Long id, String ScheduleType);
+
+    TaskSummaryDTO selectTaskSummary(Long taskId);
+
+    List<DayCountDTO> selectTimeCounts(Long taskId, Integer days);
+
+    IPage<LogDTO> getExecutionLogs(Long taskId, int pageNum, int pageSize);
 }
