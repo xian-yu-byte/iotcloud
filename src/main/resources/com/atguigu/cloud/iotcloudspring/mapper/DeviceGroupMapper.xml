@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.cloud.iotcloudspring.mapper.DeviceGroupMapper">
+
+    <insert id="createDeviceGroup">
+        insert into devicegroup(projectid,groupname,description,createtime,updatetime)
+        values(#{projectid},#{groupname},#{description},now(),now())
+    </insert>
+
+    <update id="addDeviceToGroup">
+        update device set devicegroup = #{groupId}
+        where id = #{deviceId}
+    </update>
+
+    <update id="updateDeviceGroup">
+        update devicegroup
+        <set>
+            <if test="groupname != null">
+                groupname = #{groupname},
+            </if>
+            <if test="description != null">
+                description = #{description},
+            </if>
+            updatetime = now()
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteDeviceGroup">
+        delete from devicegroup where id = #{id}
+    </delete>
+
+    <update id="removeDeviceFromGroup">
+        update device set devicegroup = null
+        where id = #{deviceId} and devicegroup = #{groupId}
+    </update>
+
+    <select id="getDeviceGroupList" resultType="com.atguigu.cloud.iotcloudspring.pojo.device.DeviceGroup">
+        select * from devicegroup where projectid = #{projectId}
+    </select>
+
+    <select id="getDeviceList" resultType="com.atguigu.cloud.iotcloudspring.pojo.device.Device">
+        select * from device where devicegroup = #{groupId}
+    </select>
+
+</mapper>
