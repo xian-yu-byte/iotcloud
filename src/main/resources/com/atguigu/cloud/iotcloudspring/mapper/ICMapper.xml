@@ -119,6 +119,7 @@
         SELECT up.userid, u.username, up.role
         FROM userproject up
                  JOIN users u ON up.userid = u.id
+        WHERE up.projectid = #{projectId}
     </select>
 
 
