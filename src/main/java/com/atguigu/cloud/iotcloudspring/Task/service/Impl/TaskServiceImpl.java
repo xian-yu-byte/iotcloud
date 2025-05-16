@@ -12,7 +12,7 @@ import com.atguigu.cloud.iotcloudspring.Task.pojo.TaskTarget;
 import com.atguigu.cloud.iotcloudspring.Task.service.TaskService;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import jakarta.annotation.Resource;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,16 +22,17 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class TaskServiceImpl implements TaskService {
 
-    @Resource
-    private TaskMapper taskMapper;
-    @Resource
-    private TaskTargetMapper targetMapper;
-    @Resource
-    private TaskPayloadMapper payloadMapper;
-    @Resource
-    private TaskExecutionLogMapper taskExecutionLogMapper;
+
+    private final TaskMapper taskMapper;
+
+    private final TaskTargetMapper targetMapper;
+
+    private final TaskPayloadMapper payloadMapper;
+
+    private final TaskExecutionLogMapper taskExecutionLogMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -217,5 +218,22 @@ public class TaskServiceImpl implements TaskService {
     public IPage<LogDTO> getExecutionLogs(Long taskId, int pageNum, int pageSize) {
         Page<LogDTO> page = new Page<>(pageNum, pageSize);
         return taskExecutionLogMapper.selectLogs(page, taskId);
+    }
+
+    @Override
+    public IPage<LogDTO> getExecutionLogsS(Long projectId, int pageNum, int pageSize) {
+        int offset = (pageNum - 1) * pageSize;
+
+        List<LogDTO> records = taskExecutionLogMapper.selectLogsS(projectId, offset, pageSize);
+
+        int total = taskExecutionLogMapper.countLogs();
+
+        Page<LogDTO> page = new Page<>();
+        page.setCurrent(pageNum);
+        page.setSize(pageSize);
+        page.setTotal(total);
+        page.setRecords(records);
+
+        return page;
     }
 }

@@ -236,6 +236,11 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
+    public List<DeviceIDName> getAttributeNamesByDeviceId(Long deviceId) {
+        return deviceMapper.selectAttributeNamesByDeviceId(deviceId);
+    }
+
+    @Override
     public String getDeviceTypeName(Long id) {
         return deviceMapper.selectDeviceTypeNameById(id);
     }

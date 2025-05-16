@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-public class ICSpringServiceA implements ICSpringService {
+public class ICSpringServiceImpl implements ICSpringService {
 
     @Resource
     private ICMapper icMapper;

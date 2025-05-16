@@ -68,4 +68,6 @@ public interface TaskService {
     List<DayCountDTO> selectTimeCounts(Long taskId, Integer days);
 
     IPage<LogDTO> getExecutionLogs(Long taskId, int pageNum, int pageSize);
+
+    IPage<LogDTO> getExecutionLogsS(Long projectId, int pageNum, int pageSize);
 }

@@ -232,6 +232,13 @@
         WHERE devicetypeid = #{devicetypeid}
     </select>
 
+    <select id="selectAttributeNamesByDeviceId" resultType="com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceIDName">
+        SELECT dta.attributename,dta.id
+        FROM device d
+                 JOIN devicetypeattribute dta ON d.devicetypeid = dta.devicetypeid
+        WHERE d.id = #{deviceId}
+    </select>
+
     <select id="selectDeviceTypeNameById" resultType="java.lang.String">
         select typename
         from devicetype

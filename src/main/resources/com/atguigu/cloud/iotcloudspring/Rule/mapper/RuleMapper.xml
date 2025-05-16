@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.cloud.iotcloudspring.Rule.mapper.RuleMapper">
+    <insert id="insert" parameterType="com.atguigu.cloud.iotcloudspring.Rule.pojo.Rule"
+            useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO `rule`
+            (project_id, name, description, trigger_event, outer_logic_op, enabled)
+        VALUES
+            (#{projectId}, #{name}, #{description}, #{triggerEvent}, #{outerLogicOp}, #{enabled})
+    </insert>
+
+    <select id="getRuleCard" resultType="com.atguigu.cloud.iotcloudspring.Rule.DTO.RuleCardDTO">
+        select r.id,
+               r.name,
+               r.trigger_event,
+               r.enabled,
+               rt.target_type,
+               ra.action_type
+        FROM rule r
+                 LEFT JOIN rule_target rt on r.id = rt.rule_id
+                 LEFT JOIN rule_action ra on r.id = ra.rule_id
+        where r.project_id = #{projectId}
+    </select>
+
+    <update id="updateEnableRule">
+        UPDATE rule
+        SET enabled = #{enabled}
+        WHERE id = #{ruleId}
+    </update>
+
+    <select id="selectEnabledByDevice" resultType="com.atguigu.cloud.iotcloudspring.Rule.pojo.Rule">
+        SELECT DISTINCT r.*
+        FROM rule                 r
+                 JOIN rule_target          t ON r.id = t.rule_id
+        WHERE r.enabled = 1
+          AND (
+            (t.target_type = 'DEVICE' AND t.target_id = #{deviceId})
+                OR (t.target_type = 'TYPE'   AND t.target_id =
+                                                 (SELECT devicetypeid FROM device WHERE id = #{deviceId}))
+            )
+    </select>
+</mapper>

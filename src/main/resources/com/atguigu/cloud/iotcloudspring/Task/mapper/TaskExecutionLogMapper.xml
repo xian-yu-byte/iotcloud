@@ -53,6 +53,7 @@
     </select>
 
     <resultMap id="LogDTOMap" type="com.atguigu.cloud.iotcloudspring.Task.DTO.CreateTaskRequest.LogDTO">
+        <result property="taskName" column="task_name"/>
         <result property="executeTime" column="execute_time"/>
         <result property="durationMs" column="duration_ms"/>
         <result property="attempt" column="attempt"/>
@@ -63,12 +64,29 @@
     <select id="selectLogs"
             resultMap="LogDTOMap">
         SELECT execute_time,
-               duration_ms,
-               attempt,
                result,
                message
         FROM task_execution_log
         WHERE task_id = #{taskId}
         ORDER BY execute_time DESC
+    </select>
+
+    <select id="selectLogsS" resultMap="LogDTOMap">
+        SELECT tt.task_name,
+               t.execute_time,
+               t.duration_ms,
+               t.attempt,
+               t.result,
+               t.message
+        FROM task_execution_log t
+                 LEFT JOIN task tt ON t.task_id = tt.id
+        WHERE t.project_id = #{projectId}
+        ORDER BY t.execute_time DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="countLogs" resultType="int">
+        SELECT COUNT(*)
+        FROM task_execution_log
     </select>
 </mapper>

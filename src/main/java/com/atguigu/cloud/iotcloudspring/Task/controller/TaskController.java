@@ -8,6 +8,7 @@ import com.atguigu.cloud.iotcloudspring.Task.until.CronUtils;
 import com.atguigu.cloud.iotcloudspring.pojo.Result;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import jakarta.annotation.Resource;
+import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -17,12 +18,11 @@ import java.util.Map;
 @RestController
 @RequestMapping("/IC")
 @CrossOrigin("*")
+@AllArgsConstructor
 public class TaskController {
-    @Resource
-    private TaskService taskService;
+    private final TaskService taskService;
 
-    @Resource
-    private MqttTaskScheduler mqttTaskScheduler;
+    private final MqttTaskScheduler mqttTaskScheduler;
 
 
     @PostMapping("/tasks")
@@ -162,6 +162,16 @@ public class TaskController {
             @RequestParam(defaultValue = "20") int pageSize) {
 
         IPage<LogDTO> page = taskService.getExecutionLogs(taskId, pageNum, pageSize);
+        return Result.success(page);
+    }
+
+    @GetMapping("/{projectId}/logsS")
+    public Result<IPage<LogDTO>> getExecutionLogsS(
+            @PathVariable Long projectId,
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "20") int pageSize) {
+
+        IPage<LogDTO> page = taskService.getExecutionLogsS(projectId,pageNum, pageSize);
         return Result.success(page);
     }
 }

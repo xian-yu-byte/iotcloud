@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LogDTO {
+    private String taskName;
     private LocalDateTime executeTime;
     private Integer durationMs;
     private Integer attempt;

@@ -1,6 +1,7 @@
 package com.atguigu.cloud.iotcloudspring.controller.http.MqttWebSocket;
 
 import com.atguigu.cloud.iotcloudspring.DTO.Device.Response.DeviceDetailResponse;
+import com.atguigu.cloud.iotcloudspring.Rule.config.RuleEngine;
 import com.atguigu.cloud.iotcloudspring.mapper.DeviceMapper;
 import com.atguigu.cloud.iotcloudspring.mapper.MqttMapper;
 import com.atguigu.cloud.iotcloudspring.pojo.Result;
@@ -21,8 +22,11 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class MqttSubscriber {
@@ -37,6 +41,8 @@ public class MqttSubscriber {
     private DeviceService deviceService;
     @Resource
     private SimpMessagingTemplate wsTemplate;
+    @Resource
+    private RuleEngine ruleEngine;
 
     @Resource
     private SimpMessagingTemplate messagingTemplate;
@@ -106,6 +112,8 @@ public class MqttSubscriber {
 
                 // ④ 遍历 JSON 对象中的每个字段
                 // 使用 Jackson 迭代器遍历所有键值对
+                /*  用来收集本条消息里 “属性 dataId → 数值” */
+                Map<Long, BigDecimal> valueMap = new HashMap<>();
                 try {
                     json.fields().forEachRemaining(entry -> {
                         String dataKey = entry.getKey();
@@ -128,7 +136,18 @@ public class MqttSubscriber {
                         mqttMapper.insertEmqxDeviceData(deviceData);
 
                         System.out.println("已写入 devicedata：" + deviceData);
+
+                        try {
+                            BigDecimal value = new BigDecimal(dataValue);
+                            valueMap.put(devTypeAttr.getId(), value);   // ★ 新增：放进 map
+                        } catch(NumberFormatException nfe){
+                            System.out.println("数值解析失败: "+dataValue);
+                        }
                     });
+                    /* ★★ 循环结束后，只调用一次批量判规则 ★★ */
+                    if (!valueMap.isEmpty()) {
+                        ruleEngine.evaluateBatch(deviceId, valueMap);
+                    }
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }

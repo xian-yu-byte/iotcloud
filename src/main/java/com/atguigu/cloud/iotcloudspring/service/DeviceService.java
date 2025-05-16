@@ -1,9 +1,6 @@
 package com.atguigu.cloud.iotcloudspring.service;
 
-import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceAttributePointDTO;
-import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceDTO;
-import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceTypeAttributeDTO;
-import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceTypeDTO;
+import com.atguigu.cloud.iotcloudspring.DTO.Device.*;
 import com.atguigu.cloud.iotcloudspring.DTO.Device.Response.*;
 import com.atguigu.cloud.iotcloudspring.pojo.ProjectAdd;
 import com.atguigu.cloud.iotcloudspring.pojo.device.Device;
@@ -57,6 +54,9 @@ public interface DeviceService {
 
     // 根据设备类型id获取设备类型关联设备数据
     List<DeviceConnectResponse> getConnectedDevices(Long deviceTypeId);
+
+    // 根据设备id查询对应设备类型下的属性
+    List<DeviceIDName> getAttributeNamesByDeviceId(Long deviceId);
 
     // 根据设备id获取设备关联设备类型数据
     String getDeviceTypeName(Long deviceTypeId);

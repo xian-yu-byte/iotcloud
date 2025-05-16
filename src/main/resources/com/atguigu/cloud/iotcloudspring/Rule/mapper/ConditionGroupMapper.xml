@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.cloud.iotcloudspring.Rule.mapper.ConditionGroupMapper">
+
+    <insert id="insert"
+            parameterType="com.atguigu.cloud.iotcloudspring.Rule.pojo.RuleConditionGroup"
+            useGeneratedKeys="true"
+            keyProperty="id"
+            keyColumn="id">
+        INSERT INTO rule_condition_group
+            (rule_id, logic_op, priority)
+        VALUES (#{ruleId}, #{logicOp}, #{priority})
+    </insert>
+
+    <select id="selectByRuleId" parameterType="long"
+            resultType="com.atguigu.cloud.iotcloudspring.Rule.pojo.RuleConditionGroup">
+        SELECT * FROM rule_condition_group
+        WHERE rule_id = #{ruleId}
+        ORDER BY priority
+    </select>
+
+</mapper>

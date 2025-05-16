@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.cloud.iotcloudspring.Rule.mapper.RuleActionMapper">
+    <insert id="insert">
+        INSERT INTO rule_action(rule_id, sort_order, action_type, action_params)
+        VALUES (#{ruleId}, #{sortOrder}, #{actionType}, #{actionParams})
+    </insert>
+
+    <select id="selectByRuleId" parameterType="long"
+            resultType="com.atguigu.cloud.iotcloudspring.Rule.pojo.RuleAction">
+        SELECT *
+        FROM rule_action
+        WHERE rule_id = #{ruleId}
+        ORDER BY sort_order
+    </select>
+</mapper>

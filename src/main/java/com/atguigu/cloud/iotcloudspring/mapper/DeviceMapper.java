@@ -1,15 +1,9 @@
 package com.atguigu.cloud.iotcloudspring.mapper;
 
-import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceAttributePointDTO;
-import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceDataFieldKeysDTO;
-import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceTypeAttributeDTO;
-import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceTypeDTO;
+import com.atguigu.cloud.iotcloudspring.DTO.Device.*;
 import com.atguigu.cloud.iotcloudspring.DTO.Device.Response.DeviceTypeAttributeResponse;
 import com.atguigu.cloud.iotcloudspring.DTO.IdDTO;
-import com.atguigu.cloud.iotcloudspring.pojo.device.Device;
-import com.atguigu.cloud.iotcloudspring.pojo.device.DeviceData;
-import com.atguigu.cloud.iotcloudspring.pojo.device.DeviceType;
-import com.atguigu.cloud.iotcloudspring.pojo.device.DeviceTypeAttribute;
+import com.atguigu.cloud.iotcloudspring.pojo.device.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -65,8 +59,11 @@ public interface DeviceMapper {
     // 根据项目ID查询设备列表
     List<Device> selectDevicesByProjectId(@Param("projectid") Long projectid);
 
-    //根据设备类型id查询关联设备
+    // 根据设备类型id查询关联设备
     List<Device> selectDeviceByDeviceTypeId(@Param("devicetypeid") Long devicetypeid);
+
+    // 根据设备id查询对应设备类型下的属性
+    List<DeviceIDName> selectAttributeNamesByDeviceId(@Param("deviceId") Long deviceId);
 
     //根据设备类型id查询设备类型名字
     String selectDeviceTypeNameById(@Param("id") Long id);

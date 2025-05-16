@@ -26,4 +26,8 @@ public interface TaskExecutionLogMapper {
 //            @Param("limit") Integer limit);
 
     IPage<LogDTO> selectLogs(Page<?> page, @Param("taskId") Long taskId);
+
+    List<LogDTO> selectLogsS(@Param("projectId")Long projectId, @Param("offset") int offset, @Param("pageSize") int pageSize);
+
+    int countLogs();
 }

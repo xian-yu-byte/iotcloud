@@ -1,9 +1,6 @@
 package com.atguigu.cloud.iotcloudspring.controller.http;
 
-import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceAttributePointDTO;
-import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceDTO;
-import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceTypeAttributeDTO;
-import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceTypeDTO;
+import com.atguigu.cloud.iotcloudspring.DTO.Device.*;
 import com.atguigu.cloud.iotcloudspring.DTO.Device.Response.*;
 import com.atguigu.cloud.iotcloudspring.pojo.Result;
 import com.atguigu.cloud.iotcloudspring.pojo.device.FieldTemplate;
@@ -187,6 +184,13 @@ public class DeviceController {
     public Result<List<DeviceConnectResponse>> getConnectedDevices(@PathVariable Long devicetypeid) {
         List<DeviceConnectResponse> responses = deviceService.getConnectedDevices(devicetypeid);
         return Result.success(responses);
+    }
+
+    // 根据设备id获取设备关联设备类型数据
+    @GetMapping("/{id}/attributes")
+    public Result<List<DeviceIDName>> getAttributes(@PathVariable("id") Long deviceId) {
+        List<DeviceIDName> attributes = deviceService.getAttributeNamesByDeviceId(deviceId);
+        return Result.success(attributes);
     }
 
     //根据设备类型id查询设备类型名称
