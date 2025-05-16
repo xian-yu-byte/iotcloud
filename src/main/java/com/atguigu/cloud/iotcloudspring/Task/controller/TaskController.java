@@ -174,4 +174,5 @@ public class TaskController {
         IPage<LogDTO> page = taskService.getExecutionLogsS(projectId,pageNum, pageSize);
         return Result.success(page);
     }
+    
 }

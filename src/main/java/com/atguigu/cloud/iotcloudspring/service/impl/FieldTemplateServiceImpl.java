@@ -14,7 +14,7 @@ public class FieldTemplateServiceImpl implements FieldTemplateService {
     private final FieldTemplateMapper fieldTemplateMapper;
 
     @Override
-    public List<FieldTemplate> listAll() {
-        return fieldTemplateMapper.selectAll();
+    public List<FieldTemplate> listAll(Long projectId) {
+        return fieldTemplateMapper.selectAll(projectId);
     }
 }

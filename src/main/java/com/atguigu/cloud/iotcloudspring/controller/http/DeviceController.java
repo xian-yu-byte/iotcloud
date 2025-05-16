@@ -200,9 +200,9 @@ public class DeviceController {
         return Result.success(deviceTypeName);
     }
 
-    @GetMapping("/fieldTemplates")
-    public Result<List<FieldTemplate>> listAll() {
-        List<FieldTemplate> list = fieldTemplateService.listAll();
+    @GetMapping("/{projectId}/fieldTemplates")
+    public Result<List<FieldTemplate>> listAll(@PathVariable("projectId") Long projectId) {
+        List<FieldTemplate> list = fieldTemplateService.listAll(projectId);
         return Result.success(list);
     }
 
@@ -236,6 +236,14 @@ public class DeviceController {
         Map<String, String> values = deviceService.getLatestDatas(devicekey, fieldKeys);
         return Result.success(values);
     }
+
+    @PostMapping("/insert/template")
+    public Result<Long> setTemplate(@RequestBody FieldTemplate template) {
+
+        Long created = deviceService.setTemplate(template);
+        return Result.success(created);
+    }
+
 
     /**
      * 健壮性很高的一个通用接口，可以根据deviceKey+fieldKey来查，也可以通过deviceId+devicetypeattributeId来查

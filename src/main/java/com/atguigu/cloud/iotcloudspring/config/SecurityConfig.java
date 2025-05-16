@@ -43,7 +43,6 @@ public class SecurityConfig {
                         // 其它接口都放行
                         .anyRequest().permitAll()
                 )
-                // 4) 在 JWT 过滤器之前加上你的自定义过滤器
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

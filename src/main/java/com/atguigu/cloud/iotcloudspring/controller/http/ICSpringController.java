@@ -42,8 +42,9 @@ public class ICSpringController {
     }
 
     // 创建项目
-    @PostMapping("AddProject")
-    public Result<String> addProject(@RequestBody ProjectAdd project) {
+    @PostMapping("/AddProject")
+    public Result<String> addProject(
+            @RequestBody ProjectAdd project) {
         boolean success = iCSpringService.addProject(project);
         return success ? Result.success("项目创建成功") : Result.error("项目创建失败");
     }

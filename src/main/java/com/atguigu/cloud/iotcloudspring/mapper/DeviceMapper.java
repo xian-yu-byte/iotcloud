@@ -85,6 +85,9 @@ public interface DeviceMapper {
             @Param("fieldKeys") List<String> fieldKeys
     );
 
+    // 根据项目id个性化设置不同的用户的字段模板
+    int insertFieldTemplate(FieldTemplate Template);
+
     /**
      * 查询某设备、某属性在指定时间区间内的历史数据
      *

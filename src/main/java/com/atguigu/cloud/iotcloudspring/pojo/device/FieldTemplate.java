@@ -13,6 +13,7 @@ import java.io.Serializable;
 @Table(name = "field_template")
 public class FieldTemplate implements Serializable {
     private Long id;
+    private Long projectId;
     private String fieldKey;
     private String displayName;
     private String dataType;

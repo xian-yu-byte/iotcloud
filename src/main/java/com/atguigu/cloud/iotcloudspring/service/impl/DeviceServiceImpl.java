@@ -7,10 +7,7 @@ import com.atguigu.cloud.iotcloudspring.mapper.DeviceMapper;
 import com.atguigu.cloud.iotcloudspring.mapper.ICMapper;
 import com.atguigu.cloud.iotcloudspring.mapper.MqttMapper;
 import com.atguigu.cloud.iotcloudspring.pojo.ProjectAdd;
-import com.atguigu.cloud.iotcloudspring.pojo.device.Device;
-import com.atguigu.cloud.iotcloudspring.pojo.device.DeviceData;
-import com.atguigu.cloud.iotcloudspring.pojo.device.DeviceType;
-import com.atguigu.cloud.iotcloudspring.pojo.device.DeviceTypeAttribute;
+import com.atguigu.cloud.iotcloudspring.pojo.device.*;
 import com.atguigu.cloud.iotcloudspring.service.DeviceService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -262,6 +259,12 @@ public class DeviceServiceImpl implements DeviceService {
                         DeviceDataFieldKeysDTO::getFieldKey,
                         DeviceDataFieldKeysDTO::getValue
                 ));
+    }
+
+    @Override
+    public Long setTemplate(FieldTemplate Template) {
+        deviceMapper.insertFieldTemplate(Template);
+        return Template.getId();
     }
 
     @Override

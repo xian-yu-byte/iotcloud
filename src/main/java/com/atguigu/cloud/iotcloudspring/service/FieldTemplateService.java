@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface FieldTemplateService {
     // 查询模板表的数据
-    List<FieldTemplate> listAll();
+    List<FieldTemplate> listAll(Long projectId);
 }

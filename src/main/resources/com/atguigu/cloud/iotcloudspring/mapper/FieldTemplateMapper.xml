@@ -15,6 +15,7 @@
 
     <select id="selectAll" resultMap="BaseResultMap">
         SELECT id,
+               project_id,
                field_key,
                display_name,
                data_type,
@@ -22,5 +23,9 @@
                default_value,
                description
         FROM field_template
+        WHERE project_id = #{projectId}
+           OR project_id IS NULL
+        ORDER BY project_id DESC,
+                 id;
     </select>
 </mapper>

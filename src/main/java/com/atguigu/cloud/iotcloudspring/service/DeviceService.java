@@ -5,6 +5,7 @@ import com.atguigu.cloud.iotcloudspring.DTO.Device.Response.*;
 import com.atguigu.cloud.iotcloudspring.pojo.ProjectAdd;
 import com.atguigu.cloud.iotcloudspring.pojo.device.Device;
 import com.atguigu.cloud.iotcloudspring.pojo.device.DeviceData;
+import com.atguigu.cloud.iotcloudspring.pojo.device.FieldTemplate;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -65,6 +66,9 @@ public interface DeviceService {
     String getLatestData(String deviceKey, String fieldkey);
 
     Map<String, String> getLatestDatas(String deviceKey, List<String> fieldKeys);
+
+    // 插入用户自定义的项目模板
+    Long setTemplate(FieldTemplate template);
 
     Device getByKey(String deviceKey);
 

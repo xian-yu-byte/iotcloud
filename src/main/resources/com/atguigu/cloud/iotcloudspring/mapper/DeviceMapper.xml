@@ -304,6 +304,25 @@
         WHERE rn = 1
     </select>
 
+    <insert id="insertFieldTemplate" parameterType="com.atguigu.cloud.iotcloudspring.pojo.device.FieldTemplate"
+            useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO field_template
+        (project_id,
+         field_key,
+         display_name,
+         data_type,
+         default_unit,
+         default_value,
+         description)
+        VALUES (#{projectId},
+                #{fieldKey},
+                #{displayName},
+                #{dataType},
+                #{defaultUnit},
+                #{defaultValue},
+                #{description})
+    </insert>
+
     <resultMap id="PointMap" type="com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceAttributePointDTO">
         <result column="datavalue" property="value"/>
         <result column="timestamp" property="timestamp"/>
