@@ -4,6 +4,7 @@ import com.atguigu.cloud.iotcloudspring.DTO.User.UserResponse;
 import com.atguigu.cloud.iotcloudspring.VO.ProjectMember;
 import com.atguigu.cloud.iotcloudspring.mapper.ICMapper;
 import com.atguigu.cloud.iotcloudspring.pojo.ProjectAdd;
+import com.atguigu.cloud.iotcloudspring.pojo.ProjectInvitation;
 import com.atguigu.cloud.iotcloudspring.pojo.Result;
 import com.atguigu.cloud.iotcloudspring.pojo.User.UserProject;
 import com.atguigu.cloud.iotcloudspring.pojo.User.users;
@@ -190,13 +191,13 @@ public class ICSpringServiceImpl implements ICSpringService {
 
     //  邀请用户加入项目
     @Override
-    public Result<Void> inviteProject(Long projectid, String username, String role) {
+    public Result<Void> inviteProject(Long projectid, String username, String role, int isInvite) {
         // 获取当前登录用户的用户名
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentUsername = authentication.getName();
 
         // 判断是否是在邀请自己
-        if (currentUsername.equals(username)) {
+        if (currentUsername.equals(username) && isInvite == 1) {
             return Result.error("不能邀请自己加入项目");
         }
         // 查找用户名是否存在
@@ -209,8 +210,23 @@ public class ICSpringServiceImpl implements ICSpringService {
         if (existingRecord != null) {
             return Result.error("用户已加入该项目");
         }
+        // 判断是否已经邀请
+        ProjectInvitation existingInvitation = icMapper.getInviteeList(existUser.getUsername()).stream()
+                .filter(invitation -> invitation.getInvitee().equals(existUser.getUsername()))
+                .findFirst()
+                .orElse(null);
+        if (existingInvitation != null && isInvite == 1) {
+            return Result.error("已经邀请过该用户");
+        }
 
-        return icMapper.addUserProject(existUser.getId(), projectid, role) ? Result.success() : Result.error("邀请用户加入项目失败");
+
+        if (isInvite == 1) {
+            // 添加邀请请求
+            return icMapper.addProjectInvitation(projectid, currentUsername, existUser.getId() , username, role) ? Result.success() : Result.error("邀请失败");
+        }else{
+            // 添加用户到项目
+            return icMapper.addUserProject(existUser.getId(), projectid, role) ? Result.success() : Result.error("加入项目失败");
+        }
     }
 
     //获取当前项目所有的用户列表
@@ -229,6 +245,24 @@ public class ICSpringServiceImpl implements ICSpringService {
     @Override
     public Boolean removeMember(Long userid) {
         return icMapper.removeMember(userid) > 0;
+    }
+
+    //获取邀请列表
+    @Override
+    public List<ProjectInvitation> getInviteList(String username, Long projectid, Boolean isInviter) {
+        if (isInviter){
+            //获取发出的邀请列表
+            return icMapper.getInviterList(username,projectid);
+        }else{
+            //获取收到的邀请列表
+            return icMapper.getInviteeList(username);
+        }
+    }
+
+    //取消邀请
+    @Override
+    public Boolean cancelInvite(Long inviteId) {
+        return icMapper.deleteInvite(inviteId) > 0;
     }
 }
 

@@ -2,6 +2,7 @@ package com.atguigu.cloud.iotcloudspring.service;
 
 import com.atguigu.cloud.iotcloudspring.VO.ProjectMember;
 import com.atguigu.cloud.iotcloudspring.pojo.ProjectAdd;
+import com.atguigu.cloud.iotcloudspring.pojo.ProjectInvitation;
 import com.atguigu.cloud.iotcloudspring.pojo.Result;
 import com.atguigu.cloud.iotcloudspring.pojo.User.UserProject;
 import com.atguigu.cloud.iotcloudspring.pojo.User.users;
@@ -46,7 +47,7 @@ public interface ICSpringService {
     Result<ProjectAdd> getProjectById(Long projectid);
 
     // 邀请用户加入项目
-    Result<Void> inviteProject(Long projectid, String username, String role);
+    Result<Void> inviteProject(Long projectid, String username, String role, int isInvite);
 
     //获取当前项目所有的用户列表
     List<ProjectMember> getProjectMember(Integer projectId);
@@ -56,4 +57,10 @@ public interface ICSpringService {
 
     //移除项目成员
     Boolean removeMember(Long userid);
+
+    //获取邀请列表
+    List<ProjectInvitation> getInviteList(String username, Long projectid, Boolean isInviter);
+
+    //取消邀请
+    Boolean cancelInvite(Long inviteId);
 }

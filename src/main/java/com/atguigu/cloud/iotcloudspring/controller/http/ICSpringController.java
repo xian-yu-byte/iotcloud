@@ -5,6 +5,7 @@ import com.atguigu.cloud.iotcloudspring.DTO.JoinProjectRequest;
 import com.atguigu.cloud.iotcloudspring.DTO.LeaveProjectRequest;
 import com.atguigu.cloud.iotcloudspring.VO.ProjectMember;
 import com.atguigu.cloud.iotcloudspring.pojo.ProjectAdd;
+import com.atguigu.cloud.iotcloudspring.pojo.ProjectInvitation;
 import com.atguigu.cloud.iotcloudspring.pojo.Result;
 import com.atguigu.cloud.iotcloudspring.pojo.User.ChangePasswordRequest;
 import com.atguigu.cloud.iotcloudspring.pojo.User.UserProject;
@@ -87,8 +88,23 @@ public class ICSpringController {
     @PostMapping("/invite")
     public Result<Void> inviteProject(@RequestParam Long projectid,
                                       @RequestParam String username,
-                                      @RequestParam String role) {
-        return iCSpringService.inviteProject(projectid, username, role);
+                                      @RequestParam String role,
+                                      @RequestParam int isInvite) {
+        return iCSpringService.inviteProject(projectid, username, role, isInvite);
+    }
+
+    //查看发出或收到的邀请
+    @GetMapping("/inviteList")
+    public Result<List<ProjectInvitation>> getInviteList(String username, Long projectid, Boolean isInviter){
+        List<ProjectInvitation> inviteList = iCSpringService.getInviteList(username,projectid,isInviter);
+        return Result.success(inviteList);
+    }
+
+    //取消或拒绝邀请
+    @DeleteMapping("/cancelInvite")
+    public Result<Void> cancelInvite(@RequestParam Long inviteId) {
+        Boolean success = iCSpringService.cancelInvite(inviteId);
+        return success ? Result.success() : Result.error("取消失败");
     }
 
     //修改用户角色

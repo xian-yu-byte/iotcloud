@@ -2,6 +2,7 @@ package com.atguigu.cloud.iotcloudspring.mapper;
 
 import com.atguigu.cloud.iotcloudspring.VO.ProjectMember;
 import com.atguigu.cloud.iotcloudspring.pojo.ProjectAdd;
+import com.atguigu.cloud.iotcloudspring.pojo.ProjectInvitation;
 import com.atguigu.cloud.iotcloudspring.pojo.Result;
 import com.atguigu.cloud.iotcloudspring.pojo.User.UserProject;
 import com.atguigu.cloud.iotcloudspring.pojo.User.users;
@@ -64,4 +65,15 @@ public interface ICMapper {
 
     //移除项目成员
     Long removeMember(Long userid);
+
+    // 添加项目邀请
+    Boolean addProjectInvitation(Long projectid, String inviter, Long inviteeID, String invitee, String role);
+
+    // 获取项目邀请列表
+    List<ProjectInvitation> getInviterList(String username,Long projectid);
+
+    List<ProjectInvitation> getInviteeList(String username);
+
+    // 删除项目邀请
+    int deleteInvite(Long inviteId);
 }

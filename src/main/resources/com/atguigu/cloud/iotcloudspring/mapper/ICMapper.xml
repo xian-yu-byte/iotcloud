@@ -51,6 +51,11 @@
         VALUES (#{userid}, #{projectid}, #{role}, now())
     </insert>
 
+    <insert id="addProjectInvitation">
+        INSERT INTO project_invitation (project_id, inviter, invitee_id, invitee, role, created_at)
+        VALUES (#{projectid}, #{inviter}, #{inviteeID}, #{invitee}, #{role}, now())
+    </insert>
+
     <!-- 根据用户ID查询关联记录 -->
     <select id="selectByUserId" parameterType="Long"
             resultType="com.atguigu.cloud.iotcloudspring.pojo.User.UserProject">
@@ -90,6 +95,12 @@
         WHERE userid = #{userid}
     </delete>
 
+    <delete id="deleteInvite">
+        DELETE
+        FROM project_invitation
+        WHERE id = #{inviteId}
+    </delete>
+
     <!-- 新增：查询当前用户已加入的项目详情 -->
     <select id="selectJoinedProjectsByUser" parameterType="Long"
             resultType="com.atguigu.cloud.iotcloudspring.pojo.ProjectAdd">
@@ -122,5 +133,15 @@
         WHERE up.projectid = #{projectId}
     </select>
 
+    <select id="getInviterList" resultType="com.atguigu.cloud.iotcloudspring.pojo.ProjectInvitation">
+        SELECT *
+        FROM project_invitation
+        WHERE inviter = #{username} AND project_id = #{projectid}
+    </select>
 
+    <select id="getInviteeList" resultType="com.atguigu.cloud.iotcloudspring.pojo.ProjectInvitation">
+        SELECT *
+        FROM project_invitation
+        WHERE invitee = #{username}
+    </select>
 </mapper>
