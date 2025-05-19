@@ -15,7 +15,7 @@ public class RuleLog {
     private Long Id;
     private Long ruleId;
     private Long deviceId;
-    private Long dateId;
+    private Long dataId;
     private BigDecimal value;
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime triggerTime;

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.cloud.iotcloudspring.Alarm.mapper.AlarmConditionMapper">
+    <insert id="insertBatch">
+        INSERT INTO alarm_condition
+        (alarm_id, seq, logical_op,
+        attribute_key, compare_op,
+        threshold_value, threshold_low, threshold_high)
+        VALUES
+        <foreach collection="list" item="c" separator=",">
+            (#{c.alarmId}, #{c.seq}, #{c.logicalOp},
+            #{c.attributeKey}, #{c.compareOp},
+            #{c.thresholdValue}, #{c.thresholdLow}, #{c.thresholdHigh})
+        </foreach>
+    </insert>
+</mapper>

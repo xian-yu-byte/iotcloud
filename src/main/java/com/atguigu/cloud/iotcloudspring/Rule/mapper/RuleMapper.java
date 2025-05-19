@@ -1,11 +1,13 @@
 package com.atguigu.cloud.iotcloudspring.Rule.mapper;
 
 import com.atguigu.cloud.iotcloudspring.Rule.DTO.RuleCardDTO;
+import com.atguigu.cloud.iotcloudspring.Rule.DTO.RuleDeviceDTO;
 import com.atguigu.cloud.iotcloudspring.Rule.pojo.Rule;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
 
+import javax.swing.text.StyledEditorKit;
 import java.util.List;
 
 @Mapper
@@ -18,4 +20,8 @@ public interface RuleMapper {
     Boolean updateEnableRule(@Param("ruleId") Long ruleId, @Param("enabled") Boolean enabled);
 
     List<Rule> selectEnabledByDevice(@Param("deviceId") Long deviceId);
+
+    Boolean delRule(@Param("ruleId") Long ruleId);
+
+    List<RuleDeviceDTO> selectDeviceNamesWithEnableByRuleId(@Param("ruleId") Long ruleId);
 }

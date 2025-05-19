@@ -2,6 +2,7 @@ package com.atguigu.cloud.iotcloudspring.Rule.config;
 
 import com.atguigu.cloud.iotcloudspring.Rule.pojo.Rule;
 import com.atguigu.cloud.iotcloudspring.Rule.pojo.RuleAction;
+import com.atguigu.cloud.iotcloudspring.Rule.reault.ActionResult;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -31,13 +33,14 @@ public class ActionExecutor {
      * @param deviceId  触发的设备 ID
      * @param valueNode 触发值 (JsonNode)
      */
-    public void runCloudFunctions(Rule rule,
-                                  List<RuleAction> actions,
-                                  Long deviceId,
-                                  JsonNode valueNode,
-                                  Long triggerDataId,
-                                  BigDecimal triggerValue) {
-
+    public ActionResult runCloudFunctions(Rule rule,
+                                          List<RuleAction> actions,
+                                          Long deviceId,
+                                          JsonNode valueNode,
+                                          Long triggerDataId,
+                                          BigDecimal triggerValue) {
+        boolean allSuccess = true;
+        List<String> errs = new ArrayList<>();
         log.info("evaluate rule={}, actions={}", rule.getId(), actions.size());
 
         for (RuleAction act : actions) {
@@ -62,8 +65,10 @@ public class ActionExecutor {
                 functionExecutor.execute(ap.path("functionId").asLong(), ctx);
 
             } catch (Exception e) {
-                log.error("云函数执行失败 rule={}, actionId={}", rule.getId(), act.getId(), e);
+                allSuccess = false;
+                errs.add("actionId=" + act.getId() + "：" + e.getMessage());
             }
         }
+        return new ActionResult(allSuccess, errs);
     }
 }

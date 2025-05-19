@@ -1,8 +1,8 @@
 package com.atguigu.cloud.iotcloudspring.service.impl;
 
+import com.atguigu.cloud.iotcloudspring.DTO.Device.ProjectDeviceStatsDTO;
 import com.atguigu.cloud.iotcloudspring.DTO.Device.Response.DeviceStatusResponse;
 import com.atguigu.cloud.iotcloudspring.mapper.DeviceStatusMapper;
-import com.atguigu.cloud.iotcloudspring.pojo.device.Device;
 import com.atguigu.cloud.iotcloudspring.service.DeviceStatusService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -16,10 +16,10 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
     @Override
     @Transactional
     public DeviceStatusResponse updateOrInsertDeviceStatus(Long id, String devicestatus) {
-        // 先根据设备 id 查询记录
+        // 根据设备 id 查询记录
         DeviceStatusResponse deviceStatusResponse = deviceStatusMapper.selectByDeviceId(id);
         if (deviceStatusResponse == null) {
-            // 如果不存在，则创建新的设备记录（注意：实际业务中，设备记录一般应该提前创建）
+            // 如果不存在，则创建新的设备记录
             deviceStatusResponse = new DeviceStatusResponse();
             deviceStatusResponse.setId(id);
             deviceStatusResponse.setDevicestatus(devicestatus);
@@ -32,5 +32,18 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
             System.out.println("更新设备状态：id=" + id + ", status=" + devicestatus);
         }
         return deviceStatusResponse;
+    }
+
+    @Override
+    public ProjectDeviceStatsDTO getProjectStats(Long projectId) {
+
+        // 总数 / 在线 / 离线
+        ProjectDeviceStatsDTO dto = deviceStatusMapper.selectSummary(projectId);
+
+        // accessCategory / communicationMode
+        dto.setAccessCategoryStats(deviceStatusMapper.groupByAccessCategory(projectId));
+        dto.setCommunicationModeStats(deviceStatusMapper.groupByCommMode(projectId));
+
+        return dto;
     }
 }

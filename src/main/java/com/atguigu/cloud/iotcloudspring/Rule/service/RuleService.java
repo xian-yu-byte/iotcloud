@@ -2,6 +2,8 @@ package com.atguigu.cloud.iotcloudspring.Rule.service;
 
 import com.atguigu.cloud.iotcloudspring.Rule.DTO.CreateRuleDTO;
 import com.atguigu.cloud.iotcloudspring.Rule.DTO.RuleCardDTO;
+import com.atguigu.cloud.iotcloudspring.Rule.DTO.RuleDeviceDTO;
+import com.atguigu.cloud.iotcloudspring.Rule.DTO.RuleTargetsDTO;
 
 import java.util.List;
 
@@ -22,4 +24,23 @@ public interface RuleService {
      * 根据规则id更新enable
      */
     Boolean updateEnableRule(Long ruleId, Boolean enable);
+
+    /**
+     *
+     * delRule
+     * */
+
+    Boolean delRule(Long ruleId);
+
+    /**
+     *
+     * 根据项目id获取规则的基本信息
+     * */
+    List<RuleTargetsDTO> listByProject(Long projectId ,Long ruleId);
+
+    /**
+     *
+     * 根据规则id获取该规则下的所有设备
+     * */
+    List<RuleDeviceDTO> getDevicesWithEnable(Long ruleId);
 }

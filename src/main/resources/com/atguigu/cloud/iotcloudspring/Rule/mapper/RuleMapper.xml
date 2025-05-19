@@ -41,4 +41,37 @@
                                                  (SELECT devicetypeid FROM device WHERE id = #{deviceId}))
             )
     </select>
+
+    <delete id="delRule">
+        delete
+        FROM rule
+        where id=#{ruleId}
+    </delete>
+
+    <select id="selectDeviceNamesWithEnableByRuleId"
+            resultType="com.atguigu.cloud.iotcloudspring.Rule.DTO.RuleDeviceDTO">
+        SELECT r.id,
+               d.devicename AS devicename,
+               r.enabled    AS enabled
+        FROM rule_target rt
+                 JOIN rule r
+                      ON rt.rule_id = r.id
+                 JOIN device d
+                      ON rt.target_type = 'DEVICE'
+                          AND rt.target_id = d.id
+        WHERE rt.rule_id = #{ruleId}
+
+        UNION ALL
+
+        SELECT r.id,
+               d2.devicename AS devicename,
+               r.enabled     AS enabled
+        FROM rule_target rt
+                 JOIN rule r
+                      ON rt.rule_id = r.id
+                 JOIN device d2
+                      ON rt.target_type = 'TYPE'
+                          AND rt.target_id = d2.devicetypeid
+        WHERE rt.rule_id = #{ruleId}
+    </select>
 </mapper>

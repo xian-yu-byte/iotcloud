@@ -4,24 +4,57 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.atguigu.cloud.iotcloudspring.mapper.DeviceStatusMapper">
 
-    <select id="selectByDeviceId" resultType="com.atguigu.cloud.iotcloudspring.DTO.Device.Response.DeviceStatusResponse">
+    <select id="selectByDeviceId"
+            resultType="com.atguigu.cloud.iotcloudspring.DTO.Device.Response.DeviceStatusResponse">
         SELECT id, devicestatus
         FROM device
         WHERE id = #{id}
     </select>
 
-<!--    <select id="selectByUsername" resultType="com.atguigu.cloud.iotcloudspring.pojo.device.Device">-->
-<!--        SELECT id, devicestatus FROM device WHERE mqttusername = #{mqttusername}-->
-<!--    </select>-->
+    <!--    <select id="selectByUsername" resultType="com.atguigu.cloud.iotcloudspring.pojo.device.Device">-->
+    <!--        SELECT id, devicestatus FROM device WHERE mqttusername = #{mqttusername}-->
+    <!--    </select>-->
 
     <insert id="insertDeviceStatus">
         INSERT INTO device (id, devicestatus)
         VALUES (#{id}, #{devicestatus})
     </insert>
 
-    <update id="updateDeviceStatus" parameterType="com.atguigu.cloud.iotcloudspring.DTO.Device.Response.DeviceStatusResponse">
+    <update id="updateDeviceStatus"
+            parameterType="com.atguigu.cloud.iotcloudspring.DTO.Device.Response.DeviceStatusResponse">
         UPDATE device
         SET devicestatus = #{devicestatus}
         WHERE id = #{id}
     </update>
+
+    <select id="selectSummary" resultType="com.atguigu.cloud.iotcloudspring.DTO.Device.ProjectDeviceStatsDTO">
+    <![CDATA[
+        SELECT #{projectId}                                 AS projectId,
+               COUNT(*)                                     AS totalDevices,
+               SUM(IF(d.devicestatus = '在线', 1, 0))       AS onlineDevices,
+               SUM(IF(d.devicestatus <> '在线'
+                          OR d.devicestatus IS NULL, 1, 0)) AS offlineDevices
+        FROM device d
+        WHERE d.projectid = #{projectId}
+        ]]>
+    </select>
+
+    <select id="groupByAccessCategory" resultType="com.atguigu.cloud.iotcloudspring.DTO.Device.EnumCount">
+        SELECT IFNULL(dt.accesscategory, '未分类') AS name,
+               COUNT(*)                            AS count
+        FROM device d
+                 LEFT JOIN devicetype dt ON dt.id = d.devicetypeid
+        WHERE d.projectid = #{projectId}
+        GROUP BY dt.accesscategory
+    </select>
+
+    <select id="groupByCommMode" resultType="com.atguigu.cloud.iotcloudspring.DTO.Device.EnumCount">
+        SELECT IFNULL(dt.communicationmode, '未定义') AS name,
+               COUNT(*)                               AS count
+        FROM device d
+                 LEFT JOIN devicetype dt ON dt.id = d.devicetypeid
+        WHERE d.projectid = #{projectId}
+        GROUP BY dt.communicationmode
+    </select>
+
 </mapper>

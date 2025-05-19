@@ -139,12 +139,12 @@ public class MqttSubscriber {
 
                         try {
                             BigDecimal value = new BigDecimal(dataValue);
-                            valueMap.put(devTypeAttr.getId(), value);   // ★ 新增：放进 map
+                            valueMap.put(devTypeAttr.getId(), value);   // 新增：放进 map
                         } catch(NumberFormatException nfe){
                             System.out.println("数值解析失败: "+dataValue);
                         }
                     });
-                    /* ★★ 循环结束后，只调用一次批量判规则 ★★ */
+                    /* 循环结束后，只调用一次批量判规则 */
                     if (!valueMap.isEmpty()) {
                         ruleEngine.evaluateBatch(deviceId, valueMap);
                     }

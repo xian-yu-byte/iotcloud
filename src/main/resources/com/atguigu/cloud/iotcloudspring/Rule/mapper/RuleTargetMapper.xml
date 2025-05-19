@@ -7,4 +7,31 @@
         INSERT INTO rule_target(rule_id,target_type,target_id)
         VALUES(#{ruleId},#{targetType},#{targetId})
     </insert>
+
+    <select id="selectByProjectId"
+            resultType="com.atguigu.cloud.iotcloudspring.Rule.DTO.RuleTargetsDTO">
+        SELECT
+            r.id,
+            r.trigger_event        AS triggerEvent,
+            r.created_time         AS createdTime,
+            r.enabled,
+            r.updated_time         AS updatedTime,
+            rt.target_type         AS targetType,
+            rt.target_id           AS targetId,
+            CASE
+                WHEN rt.target_type = 'DEVICE' THEN d.devicename
+                WHEN rt.target_type = 'TYPE'   THEN t.typename
+                END                    AS targetName
+        FROM rule r
+                 JOIN rule_target rt ON r.id = rt.rule_id
+                 LEFT JOIN device d
+                           ON rt.target_type = 'DEVICE'
+                               AND rt.target_id = d.id
+                 LEFT JOIN devicetype t
+                           ON rt.target_type = 'TYPE'
+                               AND rt.target_id = t.id
+        WHERE r.project_id = #{projectId} AND r.id = #{ruleId}
+        ORDER BY r.id, rt.id
+    </select>
+
 </mapper>

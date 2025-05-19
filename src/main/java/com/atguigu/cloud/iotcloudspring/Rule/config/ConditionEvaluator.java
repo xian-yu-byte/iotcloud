@@ -56,6 +56,11 @@ public class ConditionEvaluator {
             case "BETWEEN" -> it.getThresholdLow() != null && it.getThresholdHigh() != null &&
                     v.compareTo(it.getThresholdLow()) >= 0 &&
                     v.compareTo(it.getThresholdHigh()) <= 0;
+            case "NOT_BETWEEN" -> it.getThresholdLow() != null
+                    && it.getThresholdHigh() != null
+                    && (v.compareTo(it.getThresholdLow()) < 0
+                    || v.compareTo(it.getThresholdHigh()) > 0);
+
             default -> false;
         };
     }

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.cloud.iotcloudspring.Rule.mapper.RuleLogMapper">
+    <insert id="insert" parameterType="com.atguigu.cloud.iotcloudspring.Rule.pojo.RuleLog">
+        INSERT INTO rule_log
+        (rule_id, device_id, data_id, value, trigger_time, action_status, message)
+        VALUES
+            (#{ruleId}, #{deviceId}, #{dataId}, #{value},
+             #{triggerTime}, #{actionStatus}, #{message})
+    </insert>
+
+</mapper>

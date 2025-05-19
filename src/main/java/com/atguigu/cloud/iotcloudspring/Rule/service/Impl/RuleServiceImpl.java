@@ -118,15 +118,31 @@ public class RuleServiceImpl implements RuleService {
             act.setActionParams(params.toString());
             ruleActionMapper.insert(act);
         }
-
         return ruleId;
     }
 
+    @Override
     public List<RuleCardDTO> getRuleCard(Long projectId) {
         return ruleMapper.getRuleCard(projectId);
     }
 
+    @Override
     public Boolean updateEnableRule(Long ruleId, Boolean enabled) {
         return ruleMapper.updateEnableRule(ruleId, enabled);
+    }
+
+    @Override
+    public Boolean delRule(Long ruleId){
+        return ruleMapper.delRule(ruleId);
+    }
+
+    @Override
+    public List<RuleTargetsDTO> listByProject(Long projectId,Long ruleId) {
+        return ruleTargetMapper.selectByProjectId(projectId,ruleId);
+    }
+
+    @Override
+    public List<RuleDeviceDTO> getDevicesWithEnable(Long ruleId) {
+        return ruleMapper.selectDeviceNamesWithEnableByRuleId(ruleId);
     }
 }

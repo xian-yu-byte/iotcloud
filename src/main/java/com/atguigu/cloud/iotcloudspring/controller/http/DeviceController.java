@@ -279,4 +279,9 @@ public class DeviceController {
             );
         }
     }
+
+    @GetMapping("/device/{projectId}/all")
+    public Result<String> getAllDevices(@PathVariable Long projectId) {
+        return Result.success();
+    }
 }
