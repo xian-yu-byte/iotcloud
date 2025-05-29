@@ -7,9 +7,11 @@ import com.atguigu.cloud.iotcloudspring.DTO.Mqtt.Response.MqttTopicConfigRespons
 import com.atguigu.cloud.iotcloudspring.DTO.Mqtt.TopicRequest;
 import com.atguigu.cloud.iotcloudspring.controller.http.MqttWebSocket.MqttSubscriber;
 import com.atguigu.cloud.iotcloudspring.pojo.Result;
+import com.atguigu.cloud.iotcloudspring.pojo.mqtt.MqttTopicConfig;
 import com.atguigu.cloud.iotcloudspring.service.DeviceService;
 import com.atguigu.cloud.iotcloudspring.service.ICSpringService;
 import com.atguigu.cloud.iotcloudspring.service.MqttService;
+import com.atguigu.cloud.iotcloudspring.service.MqttTopicConfigService;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +32,9 @@ public class MqttController {
 
     @Resource
     private ICSpringService icSpringService;
+
+    @Resource
+    private MqttTopicConfigService mqttTopicConfigService;
 
     @GetMapping("/mqtt/config")
     public Result<MqttConfigDTO> getMqttConfig(@RequestParam(required = false) Long deviceid) {
@@ -108,6 +113,14 @@ public class MqttController {
     public Result<String> subscribeTopic(@RequestBody TopicRequest request) {
         try {
             String topic = request.getTopic();
+            MqttTopicConfig topicConfig = mqttTopicConfigService.getTopic(topic);
+
+            if (topicConfig == null) {
+                return Result.error("订阅失败：未存在的主题！");
+            }
+
+            mqttTopicConfigService.setTopicEffective(topicConfig.getId(), true);
+
             mqttSubscriber.subscribeTopic(topic);
             return Result.success("成功订阅主题：" + topic);
         } catch (Exception e) {
@@ -120,7 +133,16 @@ public class MqttController {
     public Result<String> unsubscribeTopic(@RequestBody TopicRequest request) {
         try {
             String topic = request.getTopic();
-            mqttSubscriber.unsubscribeTopic(topic);  // 假设你在 MqttSubscriber 中实现了此方法
+
+            MqttTopicConfig topicConfig = mqttTopicConfigService.getTopic(topic);
+
+            if (topicConfig == null) {
+                return Result.error("订阅失败：未存在的主题！");
+            }
+
+            mqttTopicConfigService.setTopicEffective(topicConfig.getId(), false);
+
+            mqttSubscriber.unsubscribeTopic(topic);
             return Result.success("成功取消订阅主题：" + topic);
         } catch (Exception e) {
             return Result.error("取消订阅失败：" + e.getMessage());

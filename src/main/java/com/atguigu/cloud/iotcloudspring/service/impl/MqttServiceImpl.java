@@ -77,6 +77,7 @@ public class MqttServiceImpl implements MqttService {
             vo.setFullTopic(fullTopic);
             vo.setTopicType(config.getTopicType());
             vo.setAutoSubscribed(config.getAutoSubscribed());
+            vo.setEffective(config.getEffective());
             vo.setDescription(config.getDescription());
             results.add(vo);
         }

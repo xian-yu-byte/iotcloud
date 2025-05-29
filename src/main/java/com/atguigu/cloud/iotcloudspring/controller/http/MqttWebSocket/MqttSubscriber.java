@@ -9,7 +9,10 @@ import com.atguigu.cloud.iotcloudspring.pojo.device.Device;
 import com.atguigu.cloud.iotcloudspring.pojo.device.DeviceData;
 import com.atguigu.cloud.iotcloudspring.pojo.device.DeviceMessageLog;
 import com.atguigu.cloud.iotcloudspring.pojo.device.DeviceTypeAttribute;
+import com.atguigu.cloud.iotcloudspring.pojo.mqtt.MqttTopicConfig;
 import com.atguigu.cloud.iotcloudspring.service.DeviceService;
+import com.atguigu.cloud.iotcloudspring.service.MqttTopicConfigService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -45,6 +48,8 @@ public class MqttSubscriber {
     @Resource
     private DeviceService deviceService;
     @Resource
+    private MqttTopicConfigService mqttTopicConfigService;
+    @Resource
     private SimpMessagingTemplate wsTemplate;
     @Resource
     private RuleEngine ruleEngine;
@@ -68,9 +73,25 @@ public class MqttSubscriber {
 //            options.setKeepAliveInterval(60);
             client.connect(options);
             System.out.println("MQTT 客户端已连接到 EMQX");
+
+            loadSubscribeTopic();
+
         } catch (MqttException e) {
             e.printStackTrace();
         }
+    }
+
+    public void loadSubscribeTopic() {
+        mqttTopicConfigService
+        .getEffectiveTopics().forEach(
+                c -> subscribeTopic(
+                        "user" + c.getUserId()
+                                + "/project" + c.getProjectId()
+                                + "/device" + c.getDeviceId()
+                                + "/" + c.getTopic()
+                )
+        );
+
     }
 
     /**
