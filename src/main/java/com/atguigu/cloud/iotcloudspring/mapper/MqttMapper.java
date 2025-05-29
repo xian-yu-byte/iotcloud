@@ -53,7 +53,8 @@ public interface MqttMapper {
             @Param("deviceKey") String deviceKey,
             @Param("topic") String topic,
             @Param("topicType") String topicType,
-            @Param("description") String description
+            @Param("description") String description,
+            @Param("effective") Boolean effective
     );
 
     //插入设备传递过来的数值
