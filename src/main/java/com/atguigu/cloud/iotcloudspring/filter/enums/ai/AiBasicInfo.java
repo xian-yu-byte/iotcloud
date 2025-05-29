@@ -1,5 +1,5 @@
 package com.atguigu.cloud.iotcloudspring.filter.enums.ai;
 
-public enum aiLanguagePref {
-    中文,英文
+public enum AiBasicInfo {
+    慢速,正常,快速
 }
