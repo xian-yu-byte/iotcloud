@@ -7,12 +7,11 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class DeviceAttributePointDTO {
+@NoArgsConstructor
+public class DeviceDataDTO {
+    private Long deviceId;
+    private String dataKey;
+    private String dataValue;
     private LocalDateTime timestamp;
-    private Double datavalue;
-    private String datakey;
-    private Double anomalyScore;   // IsolationForest 的 score
-    private Boolean abnormal;      // true=异常
 }

@@ -43,7 +43,9 @@ public interface DeviceMapper {
 
     Long updateDevice(Device device);
 
-    /** 根据 deviceKey 查设备 */
+    /**
+     * 根据 deviceKey 查设备
+     */
     Device selectByDeviceKey(@Param("deviceKey") String deviceKey);
 
     DeviceTypeAttribute selectByTypeAndName(@Param("deviceTypeId") Long deviceTypeId,
@@ -79,6 +81,7 @@ public interface DeviceMapper {
             @Param("deviceKey") String deviceKey,
             @Param("fieldkey") String fieldkey
     );
+
     // 根据 deviceKey 和 attributeName 查最新多条 devicedata 记录
     List<DeviceDataFieldKeysDTO> selectDeviceByDeviceKeyAndFieldKeys(
             @Param("deviceKey") String deviceKey,
@@ -98,17 +101,17 @@ public interface DeviceMapper {
      */
     List<DeviceAttributePointDTO> selectHistoryByKey(
             @Param("deviceKey") String deviceKey,
-            @Param("fieldKey")  String fieldKey,
+            @Param("fieldKey") String fieldKey,
             @Param("startTime") LocalDateTime startTime,
             @Param("endTime") LocalDateTime endTime
     );
 
     // 上面的第二张方法
     List<DeviceAttributePointDTO> selectHistoryById(
-            @Param("deviceId")    Long deviceId,
+            @Param("deviceId") Long deviceId,
             @Param("attributeId") Long attributeId,
-            @Param("startTime")   LocalDateTime startTime,
-            @Param("endTime")     LocalDateTime endTime
+            @Param("startTime") LocalDateTime startTime,
+            @Param("endTime") LocalDateTime endTime
     );
 
     // 根据设备类型id查询设备类型详情
@@ -126,8 +129,33 @@ public interface DeviceMapper {
     // 根据设备id查询deviceKey
     String deviceIdSelectDeviceKeyById(@Param("id") Long id);
 
-    /**
-     * 只查询某项目下、某设备类型的所有设备 ID
-     */
+    //只查询某项目下、某设备类型的所有设备 ID
     List<Long> listDeviceIdsByProjectAndType(Long projectId, Long deviceTypeId);
+
+    //上下行消息统计
+    List<MessageCountDTO> selectMessageCounts(@Param("deviceId") Long deviceId,
+                                              @Param("startTime") LocalDateTime startTime,
+                                              @Param("endTime") LocalDateTime endTime,
+                                              @Param("interval") String interval);
+
+    // 延时统计（只看上行 UP）
+    List<MessageLatencyDTO> selectMessageLatency(@Param("deviceId") Long deviceId,
+                                                 @Param("startTime") LocalDateTime startTime,
+                                                 @Param("endTime") LocalDateTime endTime,
+                                                 @Param("interval") String interval);
+
+    // 根据 projectId 查询所有设备 ID
+    List<Long> selectDeviceIdsByProjectId(@Param("projectId") Long projectId);
+
+    // 根据设备 ID 列表，按时间升序查 dataKey、dataValue、timestamp
+    List<DeviceDataDTO> selectDataByDeviceIds(@Param("deviceIds") List<Long> deviceIds);
+
+    // 统计自某时间以来新增记录数
+    int countSince(
+            @Param("projectId") Long projectId,
+            @Param("since") LocalDateTime since
+    );
+
+    // 拉取用于训练的全部历史数据（可加时间窗）
+    List<DataPointDTO> selectForTraining(@Param("projectId") Long projectId);
 }

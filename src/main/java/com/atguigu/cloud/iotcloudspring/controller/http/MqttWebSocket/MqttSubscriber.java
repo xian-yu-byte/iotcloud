@@ -7,6 +7,7 @@ import com.atguigu.cloud.iotcloudspring.mapper.MqttMapper;
 import com.atguigu.cloud.iotcloudspring.pojo.Result;
 import com.atguigu.cloud.iotcloudspring.pojo.device.Device;
 import com.atguigu.cloud.iotcloudspring.pojo.device.DeviceData;
+import com.atguigu.cloud.iotcloudspring.pojo.device.DeviceMessageLog;
 import com.atguigu.cloud.iotcloudspring.pojo.device.DeviceTypeAttribute;
 import com.atguigu.cloud.iotcloudspring.service.DeviceService;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -15,6 +16,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -24,11 +26,14 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.Map;
 
 @Component
+@Slf4j
 public class MqttSubscriber {
 
     private MqttClient client;
@@ -79,14 +84,14 @@ public class MqttSubscriber {
                 String payload = new String(message.getPayload(), StandardCharsets.UTF_8);
                 System.out.println("收到 EMQX 消息，主题：" + receivedTopic + "，内容：" + payload);
 
-                // ① 解析主题获取 deviceId
+                // 解析主题获取 deviceId
                 Long deviceId = parseDeviceIdFromTopic(receivedTopic);
                 if (deviceId <= 0) {
                     System.out.println("解析 deviceId 失败，跳过处理");
                     return;
                 }
 
-                // ② 使用 Jackson 解析 JSON 消息
+                // 使用 Jackson 解析 JSON 消息
                 ObjectMapper objectMapper = new ObjectMapper();
                 objectMapper.registerModule(new JavaTimeModule());
                 objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
@@ -98,7 +103,7 @@ public class MqttSubscriber {
                     return;
                 }
 
-                // ③ 查询 device 表，获取设备记录和 devicetypeid
+                // 查询 device 表，获取设备记录和 devicetypeid
                 Device device = deviceMapper.selectDeviceById(deviceId);
                 if (device == null) {
                     System.out.println("未找到对应的 device 记录，deviceId=" + deviceId);
@@ -110,13 +115,24 @@ public class MqttSubscriber {
                     return;
                 }
 
-                // ④ 遍历 JSON 对象中的每个字段
+                LocalDateTime deviceTs = null;
+                if (json.has("timestamp")) {
+                    try {
+                        deviceTs = LocalDateTime.parse(json.get("timestamp").asText());
+                    } catch (DateTimeParseException e) {
+                        log.warn("设备上报 timestamp 格式不对：{}", json.get("timestamp").asText());
+                    }
+                }
+
+                // 遍历 JSON 对象中的每个字段
                 // 使用 Jackson 迭代器遍历所有键值对
-                /*  用来收集本条消息里 “属性 dataId → 数值” */
                 Map<Long, BigDecimal> valueMap = new HashMap<>();
                 try {
                     json.fields().forEachRemaining(entry -> {
                         String dataKey = entry.getKey();
+                        if ("timestamp".equals(dataKey)) {
+                            return;
+                        }
                         String dataValue = entry.getValue().asText();
 
                         // 根据设备类型及属性名称查询 devicetypeattribute 表中对应的记录
@@ -139,12 +155,33 @@ public class MqttSubscriber {
 
                         try {
                             BigDecimal value = new BigDecimal(dataValue);
-                            valueMap.put(devTypeAttr.getId(), value);   // 新增：放进 map
-                        } catch(NumberFormatException nfe){
-                            System.out.println("数值解析失败: "+dataValue);
+                            valueMap.put(devTypeAttr.getId(), value);
+                        } catch (NumberFormatException nfe) {
+                            System.out.println("数值解析失败: " + dataValue);
                         }
                     });
-                    /* 循环结束后，只调用一次批量判规则 */
+
+                    LocalDateTime receiveTs = LocalDateTime.now();
+                    Long latencyMs = null;
+                    if (deviceTs != null) {
+                        latencyMs = Duration.between(deviceTs, receiveTs).toMillis();
+                    }
+                    // 插入日志 & 更新统计
+                    DeviceMessageLog upLog = new DeviceMessageLog();
+                    upLog.setDeviceId(deviceId);
+                    upLog.setDirection("UP");
+                    upLog.setTopic(receivedTopic);
+                    upLog.setPayload(payload);
+                    upLog.setCreatedAt(receiveTs);
+
+                    // 如果算出了时延再写进去
+                    if (latencyMs != null) {
+                        upLog.setLatencyMs(latencyMs);
+                    }
+                    mqttMapper.insertMessageLog(upLog);
+                    mqttMapper.upsertMessageStat(deviceId, 1, 0);
+
+                    // 触发规则引擎
                     if (!valueMap.isEmpty()) {
                         ruleEngine.evaluateBatch(deviceId, valueMap);
                     }
@@ -191,6 +228,4 @@ public class MqttSubscriber {
         client.unsubscribe(topic);
         System.out.println("成功取消订阅主题：" + topic);
     }
-
-
 }

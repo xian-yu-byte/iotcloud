@@ -233,7 +233,7 @@
     </select>
 
     <select id="selectAttributeNamesByDeviceId" resultType="com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceIDName">
-        SELECT dta.attributename,dta.id
+        SELECT dta.attributename, dta.id
         FROM device d
                  JOIN devicetypeattribute dta ON d.devicetypeid = dta.devicetypeid
         WHERE d.id = #{deviceId}
@@ -324,8 +324,9 @@
     </insert>
 
     <resultMap id="PointMap" type="com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceAttributePointDTO">
-        <result column="datavalue" property="value"/>
+        <result column="datavalue" property="datavalue"/>
         <result column="timestamp" property="timestamp"/>
+        <result column="datakey"   property="datakey"/>
     </resultMap>
 
     <!-- 方式 A：用 key 关联 -->
@@ -344,12 +345,16 @@
 
     <!-- 方式 B：直接用 ID -->
     <select id="selectHistoryById" resultMap="PointMap">
-        SELECT dd.datavalue, dd.`timestamp`
+        SELECT dd.datakey   AS datakey,
+               dd.datavalue AS datavalue,
+               dd.timestamp AS timestamp
         FROM devicedata dd
+                 JOIN devicetypeattribute dta
+                      ON dta.id = dd.devicetypeattributeid
         WHERE dd.deviceid = #{deviceId}
           AND dd.devicetypeattributeid = #{attributeId}
-          AND dd.`timestamp` BETWEEN #{startTime} AND #{endTime}
-        ORDER BY dd.`timestamp`
+          AND dd.timestamp BETWEEN #{startTime} AND #{endTime}
+        ORDER BY dd.timestamp
     </select>
 
     <select id="selectTypeDetailById" resultType="com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceTypeDTO">
@@ -387,5 +392,89 @@
         FROM device
         WHERE projectid = #{projectId}
           AND devicetypeid = #{deviceTypeId}
+    </select>
+
+    <select id="selectMessageCounts" resultType="com.atguigu.cloud.iotcloudspring.DTO.Device.MessageCountDTO">
+        SELECT
+        <choose>
+            <when test="interval=='MINUTE'">
+                DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:00')
+            </when>
+            <when test="interval=='DAY'">
+                DATE_FORMAT(created_at, '%Y-%m-%d 00:00:00')
+            </when>
+            <otherwise>
+                DATE_FORMAT(created_at, '%Y-%m-%d %H:00:00')
+            </otherwise>
+        </choose>
+        AS timestamp,
+        SUM(IF(direction='UP', 1, 0)) AS upCount,
+        SUM(IF(direction='DOWN', 1, 0)) AS downCount
+        FROM device_message_log
+        WHERE device_id = #{deviceId}
+        AND created_at BETWEEN #{startTime} AND #{endTime}
+        GROUP BY timestamp
+        ORDER BY timestamp
+    </select>
+
+    <select id="selectMessageLatency" resultType="com.atguigu.cloud.iotcloudspring.DTO.Device.MessageLatencyDTO">
+        SELECT
+        <choose>
+            <when test="interval=='MINUTE'">
+                DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:00')
+            </when>
+            <when test="interval=='DAY'">
+                DATE_FORMAT(created_at, '%Y-%m-%d 00:00:00')
+            </when>
+            <otherwise>
+                DATE_FORMAT(created_at, '%Y-%m-%d %H:00:00')
+            </otherwise>
+        </choose>
+        AS timestamp,
+        AVG(latency_ms) AS avgLatencyMs,
+        MAX(latency_ms) AS maxLatencyMs,
+        MIN(latency_ms) AS minLatencyMs
+        FROM device_message_log
+        WHERE device_id = #{deviceId}
+        AND direction = 'UP'
+        AND created_at BETWEEN #{startTime} AND #{endTime}
+        GROUP BY timestamp
+        ORDER BY timestamp
+    </select>
+
+    <select id="selectDeviceIdsByProjectId" resultType="long">
+        SELECT id
+        FROM device
+        WHERE projectid = #{projectId}
+    </select>
+
+    <select id="selectDataByDeviceIds" resultType="com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceDataDTO">
+        SELECT
+        dd.deviceid AS deviceId,
+        dd.datakey AS dataKey,
+        dd.datavalue AS dataValue,
+        dd.timestamp
+        FROM devicedata dd
+        WHERE dd.deviceid IN
+        <foreach item="id" collection="deviceIds" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        ORDER BY dd.timestamp
+    </select>
+
+    <select id="countSince" resultType="int">
+        SELECT COUNT(*)
+        FROM devicedata dd
+                 JOIN device d ON d.id = dd.deviceid
+        WHERE d.projectid = #{projectId}
+          AND dd.timestamp &gt; #{since}
+    </select>
+
+    <select id="selectForTraining" resultType="com.atguigu.cloud.iotcloudspring.DTO.Device.DataPointDTO">
+        SELECT dd.timestamp, dd.datakey, dd.datavalue
+        FROM devicedata dd
+                 JOIN device d ON d.id = dd.deviceid
+        WHERE d.projectid = #{projectId}
+        ORDER BY dd.timestamp
     </select>
 </mapper>

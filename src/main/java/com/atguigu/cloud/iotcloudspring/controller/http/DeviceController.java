@@ -4,21 +4,29 @@ import com.atguigu.cloud.iotcloudspring.DTO.Device.*;
 import com.atguigu.cloud.iotcloudspring.DTO.Device.Response.*;
 import com.atguigu.cloud.iotcloudspring.pojo.Result;
 import com.atguigu.cloud.iotcloudspring.pojo.device.FieldTemplate;
+import com.atguigu.cloud.iotcloudspring.service.AnomalyService;
 import com.atguigu.cloud.iotcloudspring.service.DeviceService;
 import com.atguigu.cloud.iotcloudspring.service.FieldTemplateService;
 import com.atguigu.cloud.iotcloudspring.service.UserService;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/IC")
 @CrossOrigin("*")
+@Slf4j
 public class DeviceController {
     @Resource
     private DeviceService deviceService;
@@ -28,6 +36,9 @@ public class DeviceController {
 
     @Resource
     private UserService userService;
+
+    @Resource
+    private AnomalyService anomalyService;
 
     //创建设备类型
     @PostMapping("/create")
@@ -250,13 +261,11 @@ public class DeviceController {
      */
     @GetMapping("/device/history")
     public Result<List<DeviceAttributePointDTO>> getHistory(
-            // 方式 A：通过 Key 查
+            @RequestParam Long projectId,
             @RequestParam(required = false) String deviceKey,
             @RequestParam(required = false) String fieldKey,
-            // 方式 B：直接拿 ID
             @RequestParam(required = false) Long deviceId,
             @RequestParam(required = false) Long attributeId,
-            // 通用的时间参数
             @RequestParam(required = false) Integer days,
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
@@ -265,23 +274,157 @@ public class DeviceController {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
             LocalDateTime endTime
     ) {
-        if (deviceId != null && attributeId != null) {
-            // 用数字 ID 查询
-            return Result.success(
-                    deviceService.fetchHistoryById(deviceId, attributeId,
-                            days, startTime, endTime)
-            );
-        } else {
-            // 用 key 查询
-            return Result.success(
-                    deviceService.fetchHistoryByKey(deviceKey, fieldKey,
-                            days, startTime, endTime)
-            );
+        // 拉历史原始数据
+        List<DeviceAttributePointDTO> history = (deviceId != null && attributeId != null)
+                ? deviceService.fetchHistoryById(deviceId, attributeId, days, startTime, endTime)
+                : deviceService.fetchHistoryByKey(deviceKey, fieldKey, days, startTime, endTime);
+
+        if (history.isEmpty()) {
+            return Result.error("无历史数据");
         }
+
+        // 构造滑窗批量请求
+        DateTimeFormatter fmt = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+        List<List<DataPointDTO>> windows = new ArrayList<>(history.size());
+        for (int i = 0; i < history.size(); i++) {
+            int start = Math.max(0, i - 9);
+            List<DataPointDTO> w = history.subList(start, i + 1).stream()
+                    .map(d -> {
+                        // 这里用 fieldKey 作为 datakey
+                        double v = d.getDatavalue() != null
+                                ? d.getDatavalue()
+                                : 0.0;
+                        String key = fieldKey != null ? fieldKey : history.getFirst().getDatakey();
+                        return new DataPointDTO(
+                                d.getTimestamp().format(fmt),
+                                key,
+                                v
+                        );
+                    })
+                    .collect(Collectors.toList());
+            windows.add(w);
+        }
+
+        // 批量推理
+        BatchInferResponse batch = anomalyService.batchInfer(projectId, windows);
+        List<Double> scores = batch.getScores();
+        List<Boolean> abns = batch.getAbnormals();
+
+        // 拼回 DTO
+        for (int i = 0; i < history.size(); i++) {
+            history.get(i).setAnomalyScore(scores.get(i));
+            history.get(i).setAbnormal(abns.get(i));
+        }
+
+        return Result.success(history);
     }
 
     @GetMapping("/device/{projectId}/all")
     public Result<String> getAllDevices(@PathVariable Long projectId) {
         return Result.success();
+    }
+
+    @GetMapping("/{deviceId}/counts")
+    public Result<List<MessageCountDTO>> getMessageCounts(
+            @PathVariable Long deviceId,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            LocalDateTime startTime,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            LocalDateTime endTime,
+            @RequestParam(defaultValue = "HOUR") String interval,
+            @RequestParam(required = false) Integer days
+    ) {
+        if (startTime == null || endTime == null) {
+            endTime = LocalDateTime.now();
+            startTime = endTime.minusDays(days != null ? days : 1);
+        }
+        List<MessageCountDTO> list = deviceService.getMessageCounts(deviceId, startTime, endTime, interval);
+        return Result.success(list);
+    }
+
+    @GetMapping("/{deviceId}/latency")
+    public Result<List<MessageLatencyDTO>> getMessageLatency(
+            @PathVariable Long deviceId,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            LocalDateTime startTime,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            LocalDateTime endTime,
+            @RequestParam(defaultValue = "HOUR") String interval,
+            @RequestParam(required = false) Integer days
+    ) {
+        if (startTime == null || endTime == null) {
+            endTime = LocalDateTime.now();
+            startTime = endTime.minusDays(days != null ? days : 1);
+        }
+        List<MessageLatencyDTO> list = deviceService.getMessageLatency(deviceId, startTime, endTime, interval);
+        return Result.success(list);
+    }
+
+    @GetMapping("/projects/{projectId}/data")
+    public Result<List<DeviceDataDTO>> getProjectData(
+            @PathVariable Long projectId) {
+        List<DeviceDataDTO> list = deviceService.getDataByProjectId(projectId);
+        if (list.isEmpty()) {
+            return Result.error("数据不足");
+        }
+        return Result.success(list);
+    }
+
+    /**
+     * 手动触发重训（应急）
+     */
+    @PostMapping("/projects/{projectId}/anomaly/train")
+    public Result<Void> train(@PathVariable Long projectId) {
+        // 这里也可以让前端传历史数据，否则就复用 /data
+        List<DeviceDataDTO> list = deviceService.getDataByProjectId(projectId);
+        if (list.size() < 20) {
+            return Result.error("训练数据不足，至少20条");
+        }
+        // 转成 Python 那边的 DataPointDTO
+        DateTimeFormatter ISO_FMT = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+
+        // 或自定义 "yyyy-MM-dd HH:mm:ss"
+        List<DataPointDTO> pts = list.stream()
+                .map(d -> {
+                    try {
+                        double v = Double.parseDouble(d.getDataValue());
+                        String isoTs = d.getTimestamp().format(ISO_FMT);   // ← 关键
+                        return new DataPointDTO(isoTs, d.getDataKey(), v);
+                    } catch (NumberFormatException ex) {
+                        log.warn("跳过非法 datavalue='{}'  recordId={}", d.getDataValue(), d.getDeviceId());
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        // 3. 再次判断条数，保证模型训练够数据
+        if (pts.size() < 20) {
+            return Result.error("可用训练数据不足，至少 20 条（过滤非法值后）");
+        }
+        anomalyService.train(projectId, pts);
+        return Result.success();
+    }
+
+    /**
+     * 手动或前端轮询调用推理
+     */
+    @PostMapping("/projects/{projectId}/anomaly/infer")
+    public Result<InferResponseDto> infer(@PathVariable Long projectId) {
+        List<DeviceDataDTO> list = deviceService.getDataByProjectId(projectId);
+        if (list.size() < 5) {
+            return Result.error("时序数据不足，至少5条");
+        }
+        DateTimeFormatter ISO_FMT = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+        List<DataPointDTO> pts = list.stream()
+                .map(d -> new DataPointDTO(d.getTimestamp().format(ISO_FMT), d.getDataKey(),
+                        Double.parseDouble(d.getDataValue())))
+                .collect(Collectors.toList());
+        InferResponseDto resp = anomalyService.infer(projectId, pts);
+        return Result.success(resp);
     }
 }

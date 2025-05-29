@@ -38,18 +38,18 @@
         </where>
     </select>
 
-<!--    <select id="selectByDeviceId" resultType="com.atguigu.cloud.iotcloudspring.pojo.mqtt.MqttTopicConfig">-->
-<!--        SELECT id,-->
-<!--               project_id,-->
-<!--               device_id,-->
-<!--               topic,-->
-<!--               topic_type,-->
-<!--               description,-->
-<!--               created_at,-->
-<!--               updated_at-->
-<!--        FROM mqtt_topic_config-->
-<!--        WHERE device_id = #{deviceId}-->
-<!--    </select>-->
+    <!--    <select id="selectByDeviceId" resultType="com.atguigu.cloud.iotcloudspring.pojo.mqtt.MqttTopicConfig">-->
+    <!--        SELECT id,-->
+    <!--               project_id,-->
+    <!--               device_id,-->
+    <!--               topic,-->
+    <!--               topic_type,-->
+    <!--               description,-->
+    <!--               created_at,-->
+    <!--               updated_at-->
+    <!--        FROM mqtt_topic_config-->
+    <!--        WHERE device_id = #{deviceId}-->
+    <!--    </select>-->
 
     <select id="selectDeviceTopicByKey" resultType="com.atguigu.cloud.iotcloudspring.pojo.mqtt.MqttTopicConfig">
         SELECT user_id, project_id, device_id, topic, id
@@ -60,7 +60,7 @@
           AND topic = #{topic}
     </select>
 
-    <update id="updateDeviceTopicByKey" >
+    <update id="updateDeviceTopicByKey">
         UPDATE mqtt_topic_config
         SET topic = #{newTopic},
         topic_type = #{topicType},
@@ -88,13 +88,13 @@
     </select>
 
     <!-- 更新自定义主题 -->
-<!--    <update id="updateDeviceTopic">-->
-<!--        UPDATE mqtt_topic_config-->
-<!--        SET topic = #{topic}-->
-<!--        WHERE user_id = #{userId}-->
-<!--          AND project_id = #{projectId}-->
-<!--          AND device_id = #{deviceId}-->
-<!--    </update>-->
+    <!--    <update id="updateDeviceTopic">-->
+    <!--        UPDATE mqtt_topic_config-->
+    <!--        SET topic = #{topic}-->
+    <!--        WHERE user_id = #{userId}-->
+    <!--          AND project_id = #{projectId}-->
+    <!--          AND device_id = #{deviceId}-->
+    <!--    </update>-->
 
     <!-- 插入自定义主题 -->
     <insert id="insertDeviceTopic" parameterType="com.atguigu.cloud.iotcloudspring.pojo.mqtt.MqttTopicConfig">
@@ -128,8 +128,24 @@
                 #{timestamp})
     </insert>
 
+    <insert id="insertMessageLog" parameterType="com.atguigu.cloud.iotcloudspring.pojo.device.DeviceMessageLog">
+        INSERT INTO device_message_log
+            (device_id, direction, topic, payload, latency_ms, created_at)
+        VALUES (#{deviceId}, #{direction}, #{topic}, #{payload}, #{latencyMs}, #{createdAt})
+    </insert>
+
+    <insert id="upsertMessageStat" parameterType="map">
+        INSERT INTO device_message_stat(device_id, up_count, down_count, last_update)
+        VALUES (#{deviceId}, #{up}, #{down}, NOW())
+        ON DUPLICATE KEY UPDATE up_count   = up_count + #{up},
+                                down_count = down_count + #{down},
+                                last_update= NOW()
+    </insert>
+
     <delete id="deleteDeviceTopicById" parameterType="java.lang.Long">
-        DELETE FROM mqtt_topic_config WHERE id = #{id}
+        DELETE
+        FROM mqtt_topic_config
+        WHERE id = #{id}
     </delete>
 
 </mapper>

@@ -4,7 +4,6 @@ import com.atguigu.cloud.iotcloudspring.DTO.Device.*;
 import com.atguigu.cloud.iotcloudspring.DTO.Device.Response.*;
 import com.atguigu.cloud.iotcloudspring.pojo.ProjectAdd;
 import com.atguigu.cloud.iotcloudspring.pojo.device.Device;
-import com.atguigu.cloud.iotcloudspring.pojo.device.DeviceData;
 import com.atguigu.cloud.iotcloudspring.pojo.device.FieldTemplate;
 
 import java.time.LocalDateTime;
@@ -83,10 +82,10 @@ public interface DeviceService {
                                                     LocalDateTime endTime);
 
     List<DeviceAttributePointDTO> fetchHistoryById(Long deviceId,
-                                             Long attributeId,
-                                             Integer days,
-                                             LocalDateTime startTime,
-                                             LocalDateTime endTime);
+                                                   Long attributeId,
+                                                   Integer days,
+                                                   LocalDateTime startTime,
+                                                   LocalDateTime endTime);
 
     //  获取设备类型详情
     DeviceTypeDTO getDeviceTypeDetailById(Long typeId);
@@ -104,4 +103,19 @@ public interface DeviceService {
 
     // 根据设备类型id和项目id获取设备id
     List<Long> listDeviceIdsByProjectAndType(Long projectId, Long deviceTypeId);
+
+    // 根据设备id查询相应时间的上报和下发次数
+    List<MessageCountDTO> getMessageCounts(Long deviceId,
+                                           LocalDateTime start,
+                                           LocalDateTime end,
+                                           String interval);
+
+    // 根据设备id查询相应时间的上报和下发时延
+    List<MessageLatencyDTO> getMessageLatency(Long deviceId,
+                                              LocalDateTime start,
+                                              LocalDateTime end,
+                                              String interval);
+
+    // 查询某个 project 下，所有设备的 dataKey/dataValue/timestamp
+    List<DeviceDataDTO> getDataByProjectId(Long projectId);
 }

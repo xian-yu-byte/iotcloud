@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.cloud.iotcloudspring.mapper.TrainingLogMapper">
+
+    <select id="selectAllProjectIds" resultType="long">
+        SELECT project_id
+        FROM project_training_log
+    </select>
+
+    <select id="selectByProjectId" parameterType="long" resultType="com.atguigu.cloud.iotcloudspring.DTO.TrainingLog">
+        SELECT project_id        AS projectId,
+               last_trained_at   AS lastTrainedAt,
+               last_record_count AS lastRecordCount
+        FROM project_training_log
+        WHERE project_id = #{projectId}
+    </select>
+
+    <insert id="insert" parameterType="com.atguigu.cloud.iotcloudspring.DTO.TrainingLog">
+        INSERT INTO project_training_log
+            (project_id, last_trained_at, last_record_count)
+        VALUES (#{projectId}, #{lastTrainedAt}, #{lastRecordCount})
+    </insert>
+
+    <update id="update" parameterType="com.atguigu.cloud.iotcloudspring.DTO.TrainingLog">
+        UPDATE project_training_log
+        SET last_trained_at   = #{lastTrainedAt},
+            last_record_count = #{lastRecordCount}
+        WHERE project_id = #{projectId}
+    </update>
+</mapper>

@@ -9,15 +9,18 @@ import com.atguigu.cloud.iotcloudspring.mapper.MqttMapper;
 import com.atguigu.cloud.iotcloudspring.pojo.ProjectAdd;
 import com.atguigu.cloud.iotcloudspring.pojo.device.*;
 import com.atguigu.cloud.iotcloudspring.service.DeviceService;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -165,7 +168,7 @@ public class DeviceServiceImpl implements DeviceService {
     // 后续需要优化
     @Override
     public DeviceDetailResponse getDeviceDetail(Long deviceId) {
-        // 1. 查询设备静态信息
+        // 查询设备静态信息
         Device device = deviceMapper.selectDeviceById(deviceId);
         if (device == null) {
             return null; // 可根据需要抛出异常或返回特定错误信息
@@ -182,22 +185,35 @@ public class DeviceServiceImpl implements DeviceService {
         response.setDevicestatus(device.getDevicestatus());
         response.setDevicetypeid(device.getDevicetypeid());
 
-        // 2. 根据 deviceTypeId 查询设备类型名称
+        // 根据 deviceTypeId 查询设备类型名称
         DeviceType deviceType = deviceMapper.selectDeviceTypeById(device.getDevicetypeid());
         if (deviceType != null) {
             response.setDevicetypename(deviceType.getTypename());
         }
 
-        // 3. 查询设备动态数据（例如，根据设备ID查询最新上报数据）
+        // 查询设备动态数据
         List<DeviceData> dataList = deviceMapper.selectDeviceDataByDeviceId(deviceId);
-        List<DeviceDataResponse> deviceDataResponses = dataList.stream().map(data -> {
-            DeviceDataResponse d = new DeviceDataResponse();
-            BeanUtils.copyProperties(data, d);
-            return d;
-        }).collect(Collectors.toList());
+        Map<Long, DeviceData> latestByAttr = dataList.stream()
+                .collect(Collectors.toMap(
+                        DeviceData::getDevicetypeattributeid,
+                        Function.identity(),
+                        (d1, d2) ->
+                                d1.getTimestamp().isAfter(d2.getTimestamp()) ? d1 : d2
+                ));
+
+        // 把每个属性最新的数据映射成 Response 对象
+        List<DeviceDataResponse> deviceDataResponses = latestByAttr.values().stream()
+                .map(data -> {
+                    DeviceDataResponse d = new DeviceDataResponse();
+                    BeanUtils.copyProperties(data, d);
+                    return d;
+                })
+                .collect(Collectors.toList());
+
         response.setDevicedata(deviceDataResponses);
 
-        // 4. 查询该设备类型定义的属性
+
+        // 查询该设备类型定义的属性
         List<DeviceTypeAttribute> attributes = deviceMapper.selectAttributesByDeviceTypeId(device.getDevicetypeid());
         List<DeviceTypeAttributeResponse> attributeResponses = attributes.stream().map(attr -> {
             DeviceTypeAttributeResponse a = new DeviceTypeAttributeResponse();
@@ -391,5 +407,30 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     public List<Long> listDeviceIdsByProjectAndType(Long projectId, Long deviceTypeId) {
         return deviceMapper.listDeviceIdsByProjectAndType(projectId, deviceTypeId);
+    }
+
+    @Override
+    public List<MessageCountDTO> getMessageCounts(Long deviceId,
+                                                  LocalDateTime start,
+                                                  LocalDateTime end,
+                                                  String interval) {
+        return deviceMapper.selectMessageCounts(deviceId, start, end, interval);
+    }
+
+    @Override
+    public List<MessageLatencyDTO> getMessageLatency(Long deviceId,
+                                                     LocalDateTime start,
+                                                     LocalDateTime end,
+                                                     String interval) {
+        return deviceMapper.selectMessageLatency(deviceId, start, end, interval);
+    }
+
+    @Override
+    public List<DeviceDataDTO> getDataByProjectId(Long projectId) {
+        List<Long> deviceIds = deviceMapper.selectDeviceIdsByProjectId(projectId);
+        if (CollectionUtils.isEmpty(deviceIds)) {
+            return Collections.emptyList();
+        }
+        return deviceMapper.selectDataByDeviceIds(deviceIds);
     }
 }
