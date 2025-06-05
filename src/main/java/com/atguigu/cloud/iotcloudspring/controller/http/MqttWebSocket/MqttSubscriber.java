@@ -1,5 +1,6 @@
 package com.atguigu.cloud.iotcloudspring.controller.http.MqttWebSocket;
 
+import com.atguigu.cloud.iotcloudspring.Alarm.service.AlarmService;
 import com.atguigu.cloud.iotcloudspring.DTO.Device.Response.DeviceDetailResponse;
 import com.atguigu.cloud.iotcloudspring.Rule.config.RuleEngine;
 import com.atguigu.cloud.iotcloudspring.mapper.DeviceMapper;
@@ -48,6 +49,8 @@ public class MqttSubscriber {
     private SimpMessagingTemplate wsTemplate;
     @Resource
     private RuleEngine ruleEngine;
+    @Resource
+    private AlarmService alarmService;
 
     @Resource
     private SimpMessagingTemplate messagingTemplate;
@@ -128,21 +131,18 @@ public class MqttSubscriber {
                 // 使用 Jackson 迭代器遍历所有键值对
                 Map<Long, BigDecimal> valueMap = new HashMap<>();
                 try {
+                    // 解析 JSON，把字段名转成 devTypeAttr.getId()，再放到 valueMap
                     json.fields().forEachRemaining(entry -> {
                         String dataKey = entry.getKey();
-                        if ("timestamp".equals(dataKey)) {
-                            return;
-                        }
+                        if ("timestamp".equals(dataKey)) return;
                         String dataValue = entry.getValue().asText();
 
-                        // 根据设备类型及属性名称查询 devicetypeattribute 表中对应的记录
                         DeviceTypeAttribute devTypeAttr = deviceMapper
                                 .selectByTypeAndName(devicetypeid, dataKey);
-                        if (devTypeAttr == null) {
-                            System.out.println("未找到 devicetypeattribute，devicetypeid="
-                                    + devicetypeid + ", attributename=" + dataKey + "，跳过该属性");
-                            return;
-                        }
+                        log.info(">> selectByTypeAndName({}, \"{}\")", devicetypeid, dataKey);
+                        if (devTypeAttr == null) return;
+
+                        // 写入 DeviceData（原逻辑保留）
                         DeviceData deviceData = new DeviceData();
                         deviceData.setDeviceid(deviceId);
                         deviceData.setDevicetypeattributeid(devTypeAttr.getId());
@@ -151,39 +151,36 @@ public class MqttSubscriber {
                         deviceData.setTimestamp(LocalDateTime.now());
                         mqttMapper.insertEmqxDeviceData(deviceData);
 
-                        System.out.println("已写入 devicedata：" + deviceData);
-
                         try {
                             BigDecimal value = new BigDecimal(dataValue);
                             valueMap.put(devTypeAttr.getId(), value);
-                        } catch (NumberFormatException nfe) {
-                            System.out.println("数值解析失败: " + dataValue);
-                        }
+                        } catch (NumberFormatException ignore) { }
                     });
 
+                    log.info(">> valueMap = {}", valueMap);
+
+                    // 插入日志 & 更新统计（原逻辑保留）
                     LocalDateTime receiveTs = LocalDateTime.now();
                     Long latencyMs = null;
                     if (deviceTs != null) {
                         latencyMs = Duration.between(deviceTs, receiveTs).toMillis();
                     }
-                    // 插入日志 & 更新统计
                     DeviceMessageLog upLog = new DeviceMessageLog();
                     upLog.setDeviceId(deviceId);
                     upLog.setDirection("UP");
                     upLog.setTopic(receivedTopic);
                     upLog.setPayload(payload);
                     upLog.setCreatedAt(receiveTs);
-
-                    // 如果算出了时延再写进去
                     if (latencyMs != null) {
                         upLog.setLatencyMs(latencyMs);
                     }
                     mqttMapper.insertMessageLog(upLog);
                     mqttMapper.upsertMessageStat(deviceId, 1, 0);
 
-                    // 触发规则引擎
+                    // 触发规则引擎（ID→数值）
                     if (!valueMap.isEmpty()) {
                         ruleEngine.evaluateBatch(deviceId, valueMap);
+                        alarmService.evaluateBatch(deviceId, valueMap);
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();

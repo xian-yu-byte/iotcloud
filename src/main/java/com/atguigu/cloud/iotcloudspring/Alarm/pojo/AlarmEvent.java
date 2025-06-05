@@ -1,5 +1,6 @@
 package com.atguigu.cloud.iotcloudspring.Alarm.pojo;
 
+import com.atguigu.cloud.iotcloudspring.Alarm.enums.EventStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,6 @@ public class AlarmEvent {
     private BigDecimal currentValue;
     private String alertLevel;
     private LocalDateTime triggerTime;
-    private String status;
-    private String clearedTime;
+    private EventStatus status;
+    private LocalDateTime clearedTime;
 }

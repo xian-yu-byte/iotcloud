@@ -158,4 +158,8 @@ public interface DeviceMapper {
 
     // 拉取用于训练的全部历史数据（可加时间窗）
     List<DataPointDTO> selectForTraining(@Param("projectId") Long projectId);
+
+    // 根据attr表的主键找到属性名
+    String selectAttributeKeyById(@Param("id") Long id);
+
 }

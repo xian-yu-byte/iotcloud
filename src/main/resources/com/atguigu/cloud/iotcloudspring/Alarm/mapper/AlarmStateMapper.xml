@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.cloud.iotcloudspring.Alarm.mapper.AlarmStateMapper">
+    <insert id="upsert" parameterType="com.atguigu.cloud.iotcloudspring.Alarm.pojo.AlarmState">
+        INSERT INTO alarm_state (alarm_id,
+                                 device_id,
+                                 `count`,
+                                 first_time,
+                                 is_open)
+        VALUES (#{alarmId},
+                #{deviceId},
+                #{count},
+                #{firstTime},
+                #{isOpen})
+        ON DUPLICATE KEY UPDATE `count`    = VALUES(`count`),
+                                first_time = VALUES(first_time),
+                                is_open    = VALUES(is_open)
+    </insert>
+</mapper>

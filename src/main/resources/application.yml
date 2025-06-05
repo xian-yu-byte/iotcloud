@@ -37,7 +37,7 @@ wechat:
   appid:   wx5eeb767a9004cd92
   secret:  c36b38bd86d792625974559c70050ed6
   template-id:
-    alarm: YOUR_ALARM_TEMPLATE_ID
+    alarm: 8CDxXL-hbfw1bUXUwKp_my8S8ahEce7rB9T7C4SQ74A
 #  ssl:
 #    enabled: true
 #    key-store: classpath:keystore.p12

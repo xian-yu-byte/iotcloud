@@ -54,6 +54,9 @@ public interface ICMapper {
     // 根据项目ID查询项目
     ProjectAdd selectProjectById(@Param("id") Long id);
 
+    // 根据项目id查询项目名称
+    String selectProjectNameById(@Param("id") Long id);
+
     // 邀请用户加入项目
     Boolean addUserProject(Long userid, Long projectid, String role);
 

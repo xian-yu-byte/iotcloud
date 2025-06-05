@@ -477,4 +477,10 @@
         WHERE d.projectid = #{projectId}
         ORDER BY dd.timestamp
     </select>
+
+    <select id="selectAttributeKeyById" resultType="java.lang.String">
+        SELECT attributename
+        FROM devicetypeattribute
+        where id = #{id}
+    </select>
 </mapper>

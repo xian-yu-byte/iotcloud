@@ -125,6 +125,12 @@
         WHERE id = #{id}
     </select>
 
+    <select id="selectProjectNameById" resultType="java.lang.String">
+        select projectname
+        from projectadd
+        where id = #{id}
+    </select>
+
     <!--获取当前项目所有的用户列表-->
     <select id="getProjectMember" resultType="com.atguigu.cloud.iotcloudspring.VO.ProjectMember">
         SELECT up.userid, u.username, up.role
@@ -136,7 +142,8 @@
     <select id="getInviterList" resultType="com.atguigu.cloud.iotcloudspring.pojo.ProjectInvitation">
         SELECT *
         FROM project_invitation
-        WHERE inviter = #{username} AND project_id = #{projectid}
+        WHERE inviter = #{username}
+          AND project_id = #{projectid}
     </select>
 
     <select id="getInviteeList" resultType="com.atguigu.cloud.iotcloudspring.pojo.ProjectInvitation">
