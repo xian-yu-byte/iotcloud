@@ -331,7 +331,7 @@ public class DeviceServiceImpl implements DeviceService {
         try {
             mqttMapper.insertNew(
                     userId, projectId, deviceId, deviceKey,
-                    fullTopic, "下发", ""
+                    fullTopic, "下发", "", true
             );
         } catch (Exception e) {
             log.error("e: ", e);

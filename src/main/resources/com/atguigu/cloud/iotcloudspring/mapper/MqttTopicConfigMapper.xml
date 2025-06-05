@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.cloud.iotcloudspring.mapper.MqttTopicConfigMapper">
+
+    <resultMap id="BaseResultMap" type="com.atguigu.cloud.iotcloudspring.pojo.mqtt.MqttTopicConfig">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="user_id" column="user_id" jdbcType="BIGINT"/>
+            <result property="project_id" column="project_id" jdbcType="BIGINT"/>
+            <result property="device_id" column="device_id" jdbcType="BIGINT"/>
+            <result property="device_key" column="device_key" jdbcType="VARCHAR"/>
+            <result property="topic" column="topic" jdbcType="VARCHAR"/>
+            <result property="topic_type" column="topic_type" jdbcType="OTHER"/>
+            <result property="auto_subscribed" column="auto_subscribed" jdbcType="TINYINT"/>
+            <result property="effective" column="effective" jdbcType="TINYINT"/>
+            <result property="description" column="description" jdbcType="VARCHAR"/>
+            <result property="created_at" column="created_at" jdbcType="TIMESTAMP"/>
+            <result property="updated_at" column="updated_at" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,user_id,project_id,
+        device_id,device_key,topic,
+        topic_type,auto_subscribed,effective,
+        description,created_at,updated_at
+    </sql>
+</mapper>

@@ -1,5 +1,5 @@
 package com.atguigu.cloud.iotcloudspring.filter.enums.mqtt;
 
-public enum mqttTopicConfig {
+public enum MqttTopicConfigType {
     上报,下发,上报和下发
 }
