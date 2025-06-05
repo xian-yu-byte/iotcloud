@@ -1,8 +1,6 @@
 package com.atguigu.cloud.iotcloudspring.Alarm.controller;
 
-import com.atguigu.cloud.iotcloudspring.Alarm.DTO.AlarmRuleCreateDTO;
-import com.atguigu.cloud.iotcloudspring.Alarm.DTO.AlarmRuleDetailDTO;
-import com.atguigu.cloud.iotcloudspring.Alarm.DTO.AlarmRuleShowDTO;
+import com.atguigu.cloud.iotcloudspring.Alarm.DTO.*;
 import com.atguigu.cloud.iotcloudspring.Alarm.service.AlarmService;
 import com.atguigu.cloud.iotcloudspring.pojo.Result;
 import jakarta.validation.Valid;
@@ -45,5 +43,18 @@ public class AlarmController {
         if (isSuccess) {
             return Result.success();
         } else return Result.error("删除失败");
+    }
+
+    @GetMapping("/alarmRules/logoInfoHistory/{alarmId}")
+    public Result<List<AlarmLogoInfoHistoryDTO>> getLogoInfoHistory(@PathVariable("alarmId") Long alarmId) {
+        List<AlarmLogoInfoHistoryDTO> list = alarmService.getLogoInfoHistory(alarmId);
+        return Result.success(list);
+    }
+
+    @GetMapping("/alarmRules/fullHistory/{projectId}")
+    public Result<List<AlarmLogoInfoHistorysDTO>> getFullHistoryByProjectId(
+            @PathVariable("projectId") Long projectId) {
+        List<AlarmLogoInfoHistorysDTO> list = alarmService.getFullHistoryByProjectId(projectId);
+        return Result.success(list);
     }
 }

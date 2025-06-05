@@ -1,8 +1,6 @@
 package com.atguigu.cloud.iotcloudspring.Alarm.service;
 
-import com.atguigu.cloud.iotcloudspring.Alarm.DTO.AlarmRuleCreateDTO;
-import com.atguigu.cloud.iotcloudspring.Alarm.DTO.AlarmRuleDetailDTO;
-import com.atguigu.cloud.iotcloudspring.Alarm.DTO.AlarmRuleShowDTO;
+import com.atguigu.cloud.iotcloudspring.Alarm.DTO.*;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -18,4 +16,8 @@ public interface AlarmService {
     AlarmRuleDetailDTO getAlarmRuleDetail(Long alarmId);
 
     Boolean isDelAlarmRules(Long alarmId);
+
+    List<AlarmLogoInfoHistoryDTO> getLogoInfoHistory(Long alarmId);
+
+    List<AlarmLogoInfoHistorysDTO> getFullHistoryByProjectId(Long projectId);
 }

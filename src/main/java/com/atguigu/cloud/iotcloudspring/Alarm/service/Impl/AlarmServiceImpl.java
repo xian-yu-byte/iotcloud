@@ -30,8 +30,10 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -283,7 +285,146 @@ public class AlarmServiceImpl implements AlarmService {
     }
 
     @Override
-    public Boolean isDelAlarmRules(Long alarmId){
+    public Boolean isDelAlarmRules(Long alarmId) {
         return alarmRuleMapper.deleteAlarmById(alarmId);
+    }
+
+    @Override
+    public List<AlarmLogoInfoHistoryDTO> getLogoInfoHistory(Long alarmId) {
+        List<AlarmLogoInfoHistoryRawDTO> rawList = alarmEventMapper.selectHistoryByAlarmId(alarmId);
+
+        List<AlarmLogoInfoHistoryDTO> converted = rawList.stream().map(raw -> {
+            AlarmLogoInfoHistoryDTO dto = new AlarmLogoInfoHistoryDTO();
+            dto.setDeviceName(raw.getDeviceName());
+            dto.setTriggerTime(raw.getTriggerTime());
+
+            Long attrId = Long.valueOf(raw.getAttributeKey());
+            String attrName = deviceMapper.selectAttributeKeyById(attrId);
+            if (attrName == null) {
+                attrName = raw.getAttributeKey().toString();
+            }
+
+            String reason;
+            if ("BETWEEN".equals(raw.getCompareOp()) || "NOT_BETWEEN".equals(raw.getCompareOp())) {
+                reason = String.format("%s %s %s AND %s",
+                        attrName,
+                        raw.getCompareOp(),
+                        raw.getThresholdLow(),
+                        raw.getThresholdHigh());
+            } else {
+                reason = String.format("%s %s %s",
+                        attrName,
+                        raw.getCompareOp(),
+                        raw.getThresholdValue());
+            }
+            dto.setReason(reason);
+
+            return dto;
+        }).toList();
+
+        Map<String, List<AlarmLogoInfoHistoryDTO>> grouped =
+                converted.stream().collect(Collectors.groupingBy(
+                        dto -> dto.getDeviceName() + "|" + dto.getTriggerTime().toString()
+                ));
+
+        List<AlarmLogoInfoHistoryDTO> mergedList = new ArrayList<>();
+        grouped.forEach((key, listOfDtos) -> {
+            String deviceName = listOfDtos.get(0).getDeviceName();
+            LocalDateTime triggerTime = listOfDtos.get(0).getTriggerTime();
+
+            if (listOfDtos.size() == 1) {
+                mergedList.add(listOfDtos.get(0));
+            } else {
+                String combinedReason = listOfDtos.stream()
+                        .map(AlarmLogoInfoHistoryDTO::getReason)
+                        .collect(Collectors.joining(" 且 "));
+                AlarmLogoInfoHistoryDTO mergedDto = new AlarmLogoInfoHistoryDTO();
+                mergedDto.setDeviceName(deviceName);
+                mergedDto.setTriggerTime(triggerTime);
+                mergedDto.setReason(combinedReason);
+                mergedList.add(mergedDto);
+            }
+        });
+
+        // 按 triggerTime 倒序排列
+        mergedList.sort(Comparator.comparing(AlarmLogoInfoHistoryDTO::getTriggerTime).reversed());
+
+        return mergedList;
+    }
+
+    @Override
+    public List<AlarmLogoInfoHistorysDTO> getFullHistoryByProjectId(Long projectId) {
+
+        List<AlarmLogoInfoHistoryFullRawDTO> rawList =
+                alarmEventMapper.selectFullHistoryByProjectId(projectId);
+
+        List<AlarmLogoInfoHistorysDTO> converted = rawList.stream()
+                .map(raw -> {
+                    AlarmLogoInfoHistorysDTO dto = new AlarmLogoInfoHistorysDTO();
+                    dto.setDeviceName(raw.getDeviceName());
+                    dto.setAlarmName(raw.getAlarmName());
+                    dto.setAlertLevel(raw.getAlertLevel());
+                    dto.setTriggerTime(raw.getTriggerTime());
+
+                    // —— 这里是关键：先查属性名称 ——
+                    Long attrId = Long.valueOf(raw.getAttributeKey());
+                    String attrName = deviceMapper.selectAttributeKeyById(attrId);
+                    if (attrName == null) {
+                        // 如果查不到，就用 ID 的字符串形式兜底
+                        attrName = String.valueOf(attrId);
+                    }
+
+                    String reason;
+                    if ("BETWEEN".equals(raw.getCompareOp()) || "NOT_BETWEEN".equals(raw.getCompareOp())) {
+                        reason = String.format("%s %s %s AND %s",
+                                attrName,                 // 这时 attrName 比如 “温度”
+                                raw.getCompareOp(),       // 比如 “BETWEEN”
+                                raw.getThresholdLow(),    // 范围下限
+                                raw.getThresholdHigh()    // 范围上限
+                        );
+                    } else {
+                        reason = String.format("%s %s %s",
+                                attrName,                 // e.g. “温度”
+                                raw.getCompareOp(),       // e.g. “>”
+                                raw.getThresholdValue()   // 单值阈
+                        );
+                    }
+                    dto.setReason(reason);
+
+                    return dto;
+                })
+                .toList();
+
+        Map<String, List<AlarmLogoInfoHistorysDTO>> grouped =
+                converted.stream().collect(Collectors.groupingBy(
+                        e -> e.getDeviceName() + "|" + e.getTriggerTime().toString() + "|" + e.getAlarmName()
+                ));
+
+        List<AlarmLogoInfoHistorysDTO> mergedList = new ArrayList<>();
+        grouped.forEach((key, listOfDtos) -> {
+            String deviceName  = listOfDtos.get(0).getDeviceName();
+            String alarmName   = listOfDtos.get(0).getAlarmName();
+            String alertLevel  = listOfDtos.get(0).getAlertLevel();
+            LocalDateTime triggerTime = listOfDtos.get(0).getTriggerTime();
+
+            if (listOfDtos.size() == 1) {
+                mergedList.add(listOfDtos.get(0));
+            } else {
+                String combinedReason = listOfDtos.stream()
+                        .map(AlarmLogoInfoHistorysDTO::getReason)
+                        .collect(Collectors.joining(" 且 "));
+                AlarmLogoInfoHistorysDTO mergedDto = new AlarmLogoInfoHistorysDTO();
+                mergedDto.setDeviceName(deviceName);
+                mergedDto.setAlarmName(alarmName);
+                mergedDto.setAlertLevel(alertLevel);
+                mergedDto.setTriggerTime(triggerTime);
+                mergedDto.setReason(combinedReason);
+                mergedList.add(mergedDto);
+            }
+        });
+
+        mergedList.sort(Comparator.comparing(AlarmLogoInfoHistorysDTO::getTriggerTime).reversed());
+
+        return mergedList;
     }
 }

@@ -4,4 +4,49 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.atguigu.cloud.iotcloudspring.Alarm.mapper.AlarmEventMapper">
 
+    <select id="selectHistoryByAlarmId" resultType="com.atguigu.cloud.iotcloudspring.Alarm.DTO.AlarmLogoInfoHistoryRawDTO">
+        SELECT d.devicename      AS deviceName,
+               h.attribute_key   AS attributeKey,
+               c.compare_op      AS compareOp,
+               c.threshold_value AS thresholdValue,
+               c.threshold_low   AS thresholdLow,
+               c.threshold_high  AS thresholdHigh,
+               h.trigger_time    AS triggerTime
+        FROM alarm_event h
+                 LEFT JOIN device d
+                           ON h.device_id = d.id
+                 LEFT JOIN alarm_condition c
+                           ON h.alarm_id = c.alarm_id
+                               AND h.attribute_key = c.attribute_key
+        WHERE h.alarm_id = #{alarmId}
+        ORDER BY h.trigger_time DESC
+    </select>
+
+    <select id="selectFullHistoryByProjectId"
+            resultType="com.atguigu.cloud.iotcloudspring.Alarm.DTO.AlarmLogoInfoHistoryFullRawDTO">
+        SELECT r.id              AS ruleId,
+               r.name            AS alarmName,
+               r.alert_level     AS alertLevel,
+
+               d.devicename      AS deviceName,
+
+               c.attribute_key   AS attributeKey,
+               c.compare_op      AS compareOp,
+               c.threshold_value AS thresholdValue,
+               c.threshold_low   AS thresholdLow,
+               c.threshold_high  AS thresholdHigh,
+
+               h.trigger_time    AS triggerTime
+        FROM alarm_rule r
+                 INNER JOIN alarm_event h
+                            ON h.alarm_id = r.id
+                 INNER JOIN alarm_condition c
+                            ON c.alarm_id = h.alarm_id
+                                AND c.attribute_key = h.attribute_key
+                 INNER JOIN device d
+                            ON d.id = h.device_id
+        WHERE r.project_id = #{projectId}
+        ORDER BY h.trigger_time DESC
+    </select>
+
 </mapper>
