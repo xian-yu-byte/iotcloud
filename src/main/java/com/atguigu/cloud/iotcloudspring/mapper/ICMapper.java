@@ -23,6 +23,9 @@ public interface ICMapper {
     //查询用户名是否存在
     users selectUserByUsername(String username);
 
+    // 删除当前用户
+    Boolean deleteUser(@Param("id") Long id);
+
     //注册用户
     Long RegisteredUser(users user);
 

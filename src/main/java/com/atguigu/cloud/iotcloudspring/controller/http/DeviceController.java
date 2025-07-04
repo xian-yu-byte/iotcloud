@@ -9,9 +9,10 @@ import com.atguigu.cloud.iotcloudspring.service.DeviceService;
 import com.atguigu.cloud.iotcloudspring.service.FieldTemplateService;
 import com.atguigu.cloud.iotcloudspring.service.UserService;
 import jakarta.annotation.Resource;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/IC")
 @CrossOrigin("*")
 @Slf4j
+@AllArgsConstructor
 public class DeviceController {
     @Resource
     private DeviceService deviceService;
@@ -39,6 +41,8 @@ public class DeviceController {
 
     @Resource
     private AnomalyService anomalyService;
+
+    private final SimpMessagingTemplate template;
 
     //创建设备类型
     @PostMapping("/create")
@@ -426,5 +430,21 @@ public class DeviceController {
                 .collect(Collectors.toList());
         InferResponseDto resp = anomalyService.infer(projectId, pts);
         return Result.success(resp);
+    }
+
+    //websocket实时获得数据改为http轮询获得数据接口
+    @GetMapping("/app/detail/{id}")
+    public Result<DeviceDetailResponse> getDeviceHttpDetail(@PathVariable Long id) {
+        DeviceDetailResponse response = deviceService.getDeviceDetail(id);
+        return Result.success(response);
+    }
+
+    // 黄rb的接收接口
+    @PostMapping("/control")
+    public Result<Void> control(@RequestBody Map<String, Object> payload) {
+        // 1) 可以在这里做业务校验/日志……
+        // 2) 直接把整个 Map 广播给所有订阅者
+        template.convertAndSend("/topic/device/state", payload);
+        return Result.success();
     }
 }

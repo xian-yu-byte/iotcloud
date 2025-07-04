@@ -49,4 +49,28 @@
         ORDER BY h.trigger_time DESC
     </select>
 
+    <select id="selectByProjectAndAttribute" resultType="com.atguigu.cloud.iotcloudspring.Alarm.DTO.AlarmEventDTO">
+        SELECT e.id,
+               e.alarm_id      AS alarmId,
+               e.device_id     AS deviceId,
+               d.devicename    AS deviceName,
+               e.attribute_key AS attributeKey,
+               e.current_value AS currentValue,
+               e.alert_level   AS alertLevel,
+               e.trigger_time  AS triggerTime,
+               e.status
+        FROM alarm_event e
+                 JOIN device d ON e.device_id = d.id
+        WHERE d.projectid = #{projectId}
+          AND e.status = 'OPEN'
+        ORDER BY e.trigger_time DESC
+    </select>
+
+    <update id="markCleared">
+        UPDATE alarm_event
+        SET status       = 'CLEARED',
+            cleared_time = NOW()
+        WHERE id = #{id}
+    </update>
+
 </mapper>

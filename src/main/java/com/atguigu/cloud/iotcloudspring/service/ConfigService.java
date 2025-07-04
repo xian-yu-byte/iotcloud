@@ -1,5 +1,6 @@
 package com.atguigu.cloud.iotcloudspring.service;
 
+import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceSummaryDTO;
 import com.atguigu.cloud.iotcloudspring.DTO.IdDTO;
 
 import java.util.List;
@@ -24,4 +25,6 @@ public interface ConfigService {
     Map<String, Object> getAgentModels(String macAddress, Map<String, String> selectedModule);
 
     IdDTO getById(String devicekey);
+
+    List<DeviceSummaryDTO> findSummaries(Long projectId, String name, String location);
 }

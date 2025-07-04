@@ -2,9 +2,7 @@ package com.atguigu.cloud.iotcloudspring.controller.http;
 
 import com.atguigu.cloud.iotcloudspring.Common.constant.Constant;
 import com.atguigu.cloud.iotcloudspring.Common.page.PageData;
-import com.atguigu.cloud.iotcloudspring.Common.service.BaseService;
 import com.atguigu.cloud.iotcloudspring.Common.service.CommonService;
-import com.atguigu.cloud.iotcloudspring.Common.user.UserDetail;
 import com.atguigu.cloud.iotcloudspring.Common.utils.ConvertUtils;
 import com.atguigu.cloud.iotcloudspring.Common.utils.ValidatorUtils;
 import com.atguigu.cloud.iotcloudspring.DTO.Ai.*;
@@ -23,8 +21,7 @@ import io.swagger.v3.oas.annotations.Parameters;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.springframework.stereotype.Controller;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -36,17 +33,15 @@ import java.util.Map;
 @CrossOrigin("*")
 @AllArgsConstructor
 public class AiController {
+
     @Resource
     private AgentService agentService;
-
-    private final CommonService commonService;
-
+    @Resource
+    private CommonService commonService;
     @Resource
     private AgentTemplateService agentTemplateService;
-
     @Resource
     private TimbreService timbreService;
-
     @Resource
     private SecurityUser securityUser;
 

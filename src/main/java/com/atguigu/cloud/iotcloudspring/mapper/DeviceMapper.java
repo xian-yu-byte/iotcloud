@@ -28,6 +28,10 @@ public interface DeviceMapper {
 
     List<DeviceTypeAttribute> selectAttributesByDeviceTypeId(@Param("devicetypeid") Long devicetypeid);
 
+    List<Device> findByProjectNameLocation(@Param("projectId") Long projectId,
+                                           @Param("name") String name,
+                                           @Param("location") String location);
+
     Long deleteDeviceTypeAttributeById(@Param("id") Long id);
 
     //创建设备,返回设备及删除，修改
@@ -161,5 +165,17 @@ public interface DeviceMapper {
 
     // 根据attr表的主键找到属性名
     String selectAttributeKeyById(@Param("id") Long id);
+
+    // 更新设备所属节点
+    int updateNodeId(@Param("id") Long id, @Param("nodeId") Long nodeId);
+
+    // 插入后查询
+    Device selectById(@Param("id") Long id);
+
+    //查询某节点下的所有设备
+    List<Device> listByNodeId(@Param("nodeId") Long nodeId);
+
+    List<DeviceDataDTO> selectLatestWindow(@Param("projectId") Long projectId,
+                                           @Param("window") int window);
 
 }

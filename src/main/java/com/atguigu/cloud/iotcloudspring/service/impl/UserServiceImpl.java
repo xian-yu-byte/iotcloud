@@ -19,4 +19,9 @@ public class UserServiceImpl implements UserService {
         return user != null ? user.getId() : null;
     }
 
+    @Override
+    public Boolean deleteUser(Long userId){
+        return icMapper.deleteUser(userId);
+    }
+
 }

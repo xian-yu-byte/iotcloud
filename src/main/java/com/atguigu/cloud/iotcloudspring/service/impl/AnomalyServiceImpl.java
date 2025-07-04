@@ -7,15 +7,21 @@ import com.atguigu.cloud.iotcloudspring.DTO.Device.Response.BatchInferResponse;
 import com.atguigu.cloud.iotcloudspring.DTO.Device.Response.InferRequest;
 import com.atguigu.cloud.iotcloudspring.DTO.Device.Response.TrainRequest;
 import com.atguigu.cloud.iotcloudspring.service.AnomalyService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
+@Slf4j
 public class AnomalyServiceImpl implements AnomalyService {
 
 
@@ -71,8 +77,7 @@ public class AnomalyServiceImpl implements AnomalyService {
     }
 
     @Override
-    public BatchInferResponse batchInfer(Long projectId,
-                                         List<List<DataPointDTO>> windows) {
+    public BatchInferResponse batchInfer(Long projectId, List<List<DataPointDTO>> windows) {
         String url = String.format("%s/infer_batch/%d", baseUrl, projectId);
         BatchInferRequest req = new BatchInferRequest(windows);
 
@@ -80,12 +85,28 @@ public class AnomalyServiceImpl implements AnomalyService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<BatchInferRequest> entity = new HttpEntity<>(req, headers);
 
-        ResponseEntity<BatchInferResponse> resp = restTemplate.exchange(
-                url, HttpMethod.POST, entity, BatchInferResponse.class
-        );
-        if (!resp.getStatusCode().is2xxSuccessful() || resp.getBody() == null) {
-            throw new RuntimeException("批量推理失败 HTTP " + resp.getStatusCodeValue());
+        try {
+            ResponseEntity<BatchInferResponse> resp = restTemplate.exchange(
+                    url, HttpMethod.POST, entity, BatchInferResponse.class
+            );
+            if (!resp.getStatusCode().is2xxSuccessful() || resp.getBody() == null) {
+                throw new RuntimeException("批量推理失败，HTTP " + resp.getStatusCodeValue());
+            }
+            return resp.getBody();
         }
-        return resp.getBody();
+        // 捕获错误
+        catch (RestClientException e) {
+            log.warn("Anomaly 服务不可用，跳过孤立森林推理，返回默认空分数和正常标记", e);
+
+            int n = windows.size();
+            // 全部打 0 分，全部认为正常
+            List<Double> defaultScores = Collections.nCopies(n, 0.0);
+            List<Boolean> defaultAbnormals = Collections.nCopies(n, false);
+
+            BatchInferResponse fallback = new BatchInferResponse();
+            fallback.setScores(defaultScores);
+            fallback.setAbnormals(defaultAbnormals);
+            return fallback;
+        }
     }
 }

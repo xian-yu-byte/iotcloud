@@ -74,43 +74,33 @@ public class WeChatTestController {
      * GET /api/wechat/debug?userId=10
      */
     @GetMapping("/debug")
-    public Map<String, Object> debug(@RequestParam Long userId) {
-        tokenService.refreshToken();
-        String token = tokenService.getAccessToken();
+    public Map<String, Object> debug(@RequestParam Long userId,
+                                     @RequestParam(defaultValue = "false") boolean force) {
 
+        // 1) 如明确想刷新，带 ?force=true；否则直接用缓存
+        if (force) {
+            tokenService.refreshToken(true);   // 强制刷新
+        }
+        String token = tokenService.getTokenSafely();   // 统一入口
+
+        // 2) 拿 openid
         UserOpenid uo = openidMapper.selectOne(
-                new QueryWrapper<UserOpenid>().eq("user_id", userId)
-        );
+                new QueryWrapper<UserOpenid>().eq("user_id", userId));
         String openid = uo == null ? null : uo.getOpenid();
 
+        // 3) 调 userInfo
         String userInfoResp = "N/A";
         if (openid != null) {
             String infoUrl = String.format(
                     "https://api.weixin.qq.com/cgi-bin/user/info?access_token=%s&openid=%s&lang=zh_CN",
-                    token, openid
-            );
+                    token, openid);
             userInfoResp = rest.getForObject(infoUrl, String.class);
         }
 
+        // 4) 再调模板消息（用刚才 token）
         String sendResp = "N/A";
         if (openid != null) {
-            // 1. 构造 payload
-            String now = LocalDateTime.now()
-                    .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-            JSONObject data = new JSONObject();
-            data.put("thing8", new JSONObject().fluentPut("value", "调试设备名称"));
-            data.put("character_string13", new JSONObject().fluentPut("value", "DEVICE-TEST-001"));
-            data.put("time5", new JSONObject().fluentPut("value", now));
-            data.put("thing6", new JSONObject().fluentPut("value", "调试原因：温度超限"));
-            data.put("character_string12", new JSONObject().fluentPut("value", "重要"));
-
-            JSONObject payload = new JSONObject();
-            payload.put("touser", openid);
-            payload.put("template_id", config.getAlarmTemplateId());
-            payload.put("url", "https://iotclouds.top/");
-            payload.put("data", data);
-
-            // 2. 发送并获取原始返回值
+            JSONObject payload = buildDebugPayload(openid);   // 抽个方法更简洁
             String sendUrl = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=" + token;
             sendResp = rest.postForObject(sendUrl, payload.toJSONString(), String.class);
         }
@@ -121,6 +111,26 @@ public class WeChatTestController {
                 "userInfoApi", userInfoResp,
                 "templateSend", sendResp
         );
+    }
+
+    /**
+     * 把 payload 构造单独封装，避免 debug 方法过长
+     */
+    private JSONObject buildDebugPayload(String openid) {
+        String now = LocalDateTime.now()
+                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        JSONObject data = new JSONObject()
+                .fluentPut("thing8", new JSONObject().fluentPut("value", "调试设备名称"))
+                .fluentPut("character_string13", new JSONObject().fluentPut("value", "DEVICE-TEST-001"))
+                .fluentPut("time5", new JSONObject().fluentPut("value", now))
+                .fluentPut("thing6", new JSONObject().fluentPut("value", "调试原因：温度超限"))
+                .fluentPut("character_string12", new JSONObject().fluentPut("value", "重要"));
+
+        return new JSONObject()
+                .fluentPut("touser", openid)
+                .fluentPut("template_id", config.getAlarmTemplateId())
+                .fluentPut("url", "https://iotclouds.top/")
+                .fluentPut("data", data);
     }
 }
 

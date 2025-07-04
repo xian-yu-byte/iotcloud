@@ -5,6 +5,7 @@ import com.atguigu.cloud.iotcloudspring.Common.exception.RenException;
 import com.atguigu.cloud.iotcloudspring.Common.redis.RedisKeys;
 import com.atguigu.cloud.iotcloudspring.Common.redis.RedisUtils;
 import com.atguigu.cloud.iotcloudspring.Common.utils.JsonUtils;
+import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceSummaryDTO;
 import com.atguigu.cloud.iotcloudspring.DTO.Device.Response.DeviceTypeAttributeResponse;
 import com.atguigu.cloud.iotcloudspring.DTO.IdDTO;
 import com.atguigu.cloud.iotcloudspring.DTO.User.SysParamsDTO;
@@ -14,6 +15,7 @@ import com.atguigu.cloud.iotcloudspring.pojo.Model.AiModelConfig;
 import com.atguigu.cloud.iotcloudspring.pojo.ai.AiAgent;
 import com.atguigu.cloud.iotcloudspring.pojo.ai.AiAgentTemplate;
 import com.atguigu.cloud.iotcloudspring.pojo.ai.AiDevice;
+import com.atguigu.cloud.iotcloudspring.pojo.device.Device;
 import com.atguigu.cloud.iotcloudspring.pojo.device.DeviceTypeAttribute;
 import com.atguigu.cloud.iotcloudspring.service.*;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -27,6 +29,7 @@ import org.springframework.stereotype.Service;
 
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -314,13 +317,27 @@ public class ConfigServiceImpl implements ConfigService {
 
     @Override
     public IdDTO getById(String deviceKey) {
-        // ① 查设备基础信息
+        // 查设备基础信息
         IdDTO info = deviceMapper.selectDeviceKeyById(deviceKey);
-        // ② 查该设备类型的所有属性
+        // 查该设备类型的所有属性
         List<DeviceTypeAttribute> attrs =
                 deviceMapper.selectAttributesByDeviceTypeId(info.getDevicetypeid());
-        // ③ 填充到 DTO
+        // 填充到 DTO
         info.setAttributes(attrs);
         return info;
     }
+
+    @Override
+    public List<DeviceSummaryDTO> findSummaries(Long projectId, String name, String location) {
+        List<Device> devices = deviceMapper.findByProjectNameLocation(projectId, name, location);
+        return devices.stream().map(dev -> {
+            DeviceSummaryDTO dto = new DeviceSummaryDTO();
+            dto.setId(dev.getId());
+            dto.setDeviceKey(dev.getDevicekey());
+            dto.setDeviceName(dev.getDevicename());
+            dto.setDeviceLocation(dev.getDevicelocation());
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
 }

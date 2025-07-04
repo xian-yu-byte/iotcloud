@@ -118,4 +118,18 @@ public interface DeviceService {
 
     // 查询某个 project 下，所有设备的 dataKey/dataValue/timestamp
     List<DeviceDataDTO> getDataByProjectId(Long projectId);
+
+    // 将已有设备挂载到某个节点
+    Device assignNode(Long deviceId, Long nodeId);
+
+    //列出挂在某节点下的所有设备
+    List<Device> listByNodeId(Long nodeId);
+
+    /**
+     * 取指定项目最近 N 个时间步（按 timestamp 降序）的 4 个指标数据
+     * @param projectId  项目 ID
+     * @param windowSize 时间步长度（如 144）
+     * @return List<DeviceDataDTO> 共 windowSize×4 行
+     */
+    List<DeviceDataDTO> getLatestWindow(Long projectId, int windowSize);
 }

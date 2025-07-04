@@ -6,4 +6,6 @@ public interface UserService {
 
     Long findUserIdByUsername(String username);
 
+    Boolean deleteUser(Long userId);
+
 }

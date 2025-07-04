@@ -62,6 +62,18 @@
         WHERE devicetypeid = #{devicetypeid}
     </select>
 
+    <select id="findByProjectNameLocation" resultType="com.atguigu.cloud.iotcloudspring.pojo.device.Device">
+        SELECT id, devicekey, devicename, devicelocation
+        FROM device
+        WHERE projectid = #{projectId}
+        <if test="name != null and name != ''">
+            AND devicename = #{name}
+        </if>
+        <if test="location != null and location != ''">
+            AND devicelocation = #{location}
+        </if>
+    </select>
+
     <delete id="deleteDeviceTypeAttributeById" parameterType="java.lang.Long">
         DELETE
         FROM devicetypeattribute
@@ -69,10 +81,10 @@
     </delete>
 
     <insert id="insertDevice" parameterType="com.atguigu.cloud.iotcloudspring.pojo.device.Device">
-        INSERT INTO device (projectid, devicetypeid, devicename, devicelocation, devicekey, devicecommunication,
+        INSERT INTO device (projectid, devicetypeid, nodeid,devicename, devicelocation, devicekey, devicecommunication,
                             deviceinformation,
                             createtime, updatetime)
-        VALUES (#{projectid}, #{devicetypeid}, #{devicename}, #{devicelocation}, #{devicekey}, #{devicecommunication},
+        VALUES (#{projectid}, #{devicetypeid}, #{nodeid},#{devicename}, #{devicelocation}, #{devicekey}, #{devicecommunication},
                 #{deviceinformation}, NOW(), NOW())
     </insert>
 
@@ -482,5 +494,50 @@
         SELECT attributename
         FROM devicetypeattribute
         where id = #{id}
+    </select>
+
+    <update id="updateNodeId">
+        UPDATE device
+        SET nodeid = #{nodeId},
+            updatetime = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <select id="selectById" resultType="com.atguigu.cloud.iotcloudspring.pojo.device.Device" parameterType="long">
+        SELECT *
+        FROM device
+        WHERE id = #{id}
+    </select>
+
+
+    <select id="listByNodeId" resultType="com.atguigu.cloud.iotcloudspring.pojo.device.Device" parameterType="long">
+        SELECT *
+        FROM device
+        WHERE nodeid = #{nodeId}
+        ORDER BY createtime DESC
+    </select>
+
+    <select id="selectLatestWindow"
+            resultType="com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceDataDTO">
+        WITH proj_devices AS (SELECT id
+                              FROM device
+                              WHERE projectid = #{projectId}),
+             full_timestamps AS (SELECT dd.timestamp
+                                 FROM devicedata dd
+                                          JOIN proj_devices pd ON dd.deviceid = pd.id
+                                 WHERE dd.datakey IN ('humidity', 'temperature', 'pm10', 'pm2_5')
+                                 GROUP BY dd.timestamp
+                                 HAVING COUNT(DISTINCT dd.datakey) = 4
+                                 ORDER BY dd.timestamp DESC
+                                 LIMIT #{window})
+        SELECT dd.deviceid  AS deviceId,
+               dd.datakey   AS dataKey,
+               dd.datavalue AS dataValue,
+               dd.timestamp AS timestamp
+        FROM devicedata dd
+                 JOIN full_timestamps ft ON dd.timestamp = ft.timestamp
+                 JOIN proj_devices pd ON dd.deviceid = pd.id
+        WHERE dd.datakey IN ('humidity', 'temperature', 'pm10', 'pm2_5')
+        ORDER BY dd.timestamp
     </select>
 </mapper>

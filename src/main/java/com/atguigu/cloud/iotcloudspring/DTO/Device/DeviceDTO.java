@@ -11,6 +11,7 @@ public class DeviceDTO {
     private Long id;
     private Long projectid;
     private Long devicetypeid;
+    private Long nodeid;
     private String devicename;
     private String mqttusername;
     private String mqttpassword;

@@ -57,4 +57,22 @@ public class AlarmController {
         List<AlarmLogoInfoHistorysDTO> list = alarmService.getFullHistoryByProjectId(projectId);
         return Result.success(list);
     }
+
+    @GetMapping("/alarmEvent/fullHistory")
+    public Result<List<AlarmEventDTO>> getEvents(
+            @RequestParam Long projectId
+    ) {
+        List<AlarmEventDTO> list = alarmService.listByProjectAndAttribute(projectId);
+        return Result.success(list);
+    }
+
+    @PutMapping("/status/{id}")
+    public Result<Void> clearEvent(@PathVariable("id") Long eventId) {
+        boolean ok = alarmService.markCleared(eventId);
+        if (ok) {
+            return Result.success(null);
+        } else {
+            return Result.error("更新失败，找不到对应的告警事件");
+        }
+    }
 }

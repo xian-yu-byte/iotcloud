@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.cloud.iotcloudspring.IotNode.mapper.IotNodeMapper">
+    <resultMap id="BaseResultMap" type="com.atguigu.cloud.iotcloudspring.IotNode.pojo.IotNode">
+        <id column="id" property="id"/>
+        <result column="project_id"      property="projectId"/>
+        <result column="parent_id"       property="parentId"/>
+        <result column="node_type"       property="nodeType"/>
+        <result column="node_name"       property="nodeName"/>
+        <result column="description"     property="description"/>
+        <result column="additional_info" property="additionalInfo"/>
+        <result column="create_time"     property="createTime"/>
+        <result column="update_time"     property="updateTime"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.atguigu.cloud.iotcloudspring.IotNode.pojo.IotNode" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO iot_node
+        (project_id, parent_id, node_type, node_name, description, additional_info)
+        VALUES
+            (#{projectId}, #{parentId}, #{nodeType}, #{nodeName}, #{description}, #{additionalInfo})
+    </insert>
+
+    <select id="selectById" resultMap="BaseResultMap" parameterType="long">
+        SELECT * FROM iot_node WHERE id = #{id}
+    </select>
+
+    <select id="findByParentId" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        SELECT *
+        FROM iot_node
+        <where>
+            <if test="parentId == null">
+                parent_id IS NULL
+            </if>
+            <if test="parentId != null">
+                parent_id = #{parentId}
+            </if>
+        </where>
+        ORDER BY create_time ASC
+    </select>
+
+
+    <delete id="deleteById" parameterType="long">
+        DELETE FROM iot_node
+        WHERE id = #{id}
+    </delete>
+
+    <update id="updateDeviceNode" parameterType="long">
+        UPDATE device
+        SET nodeid = NULL
+        WHERE id = #{id}
+    </update>
+</mapper>

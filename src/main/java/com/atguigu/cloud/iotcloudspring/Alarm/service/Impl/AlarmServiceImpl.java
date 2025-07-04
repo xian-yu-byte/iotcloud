@@ -427,4 +427,14 @@ public class AlarmServiceImpl implements AlarmService {
 
         return mergedList;
     }
+
+    @Override
+    public List<AlarmEventDTO> listByProjectAndAttribute(Long projectId) {
+        return alarmEventMapper.selectByProjectAndAttribute(projectId);
+    }
+
+    @Override
+    public boolean markCleared(Long eventId) {
+        return alarmEventMapper.markCleared(eventId) > 0;
+    }
 }

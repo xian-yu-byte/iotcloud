@@ -13,6 +13,7 @@ public class Device {
     private Long id;
     private Long projectid;
     private Long devicetypeid;
+    private Long nodeid;
     private String devicename;
     private String devicekey;
     private String devicelocation;

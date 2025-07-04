@@ -20,6 +20,12 @@
         WHERE username = #{username}
     </select>
 
+    <delete id="deleteUser">
+        delete
+        FROM users
+        where id = #{id}
+    </delete>
+
     <insert id="RegisteredUser">
         insert into users (username, password, email, phone, role_id, create_date)
         VALUES (#{username}, #{password}, #{email}, #{phone}, #{role_id}, #{create_date})

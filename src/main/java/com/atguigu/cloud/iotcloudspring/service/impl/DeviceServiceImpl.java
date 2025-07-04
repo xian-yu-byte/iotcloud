@@ -16,10 +16,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -134,7 +131,7 @@ public class DeviceServiceImpl implements DeviceService {
         Device device = new Device();
         String deviceKey = "device_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
         BeanUtils.copyProperties(deviceDTO, device);
-        device.setMqttusername("ceshi");
+        device.setMqttusername("cloud");
         device.setMqttpassword("123456");
         device.setDevicekey(deviceKey);
         deviceMapper.insertDevice(device);
@@ -432,5 +429,27 @@ public class DeviceServiceImpl implements DeviceService {
             return Collections.emptyList();
         }
         return deviceMapper.selectDataByDeviceIds(deviceIds);
+    }
+
+    @Override
+    public Device assignNode(Long deviceId, Long nodeId) {
+        // 1. 更新挂载关系
+        deviceMapper.updateNodeId(deviceId, nodeId);
+        // 2. 返回最新的设备记录
+        return deviceMapper.selectById(deviceId);
+    }
+
+    @Override
+    public List<Device> listByNodeId(Long nodeId) {
+        return deviceMapper.listByNodeId(nodeId);
+    }
+
+
+    @Override
+    public List<DeviceDataDTO> getLatestWindow(Long projectId, int window) {
+        List<DeviceDataDTO> list = deviceMapper.selectLatestWindow(projectId, window);
+        // 时间正序
+        list.sort(Comparator.comparing(DeviceDataDTO::getTimestamp));
+        return list;
     }
 }

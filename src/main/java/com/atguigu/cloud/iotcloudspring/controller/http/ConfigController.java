@@ -6,6 +6,7 @@ import com.atguigu.cloud.iotcloudspring.Common.utils.ResultConfig;
 import com.atguigu.cloud.iotcloudspring.Common.utils.ValidatorUtils;
 import com.atguigu.cloud.iotcloudspring.DTO.Ai.AgentModelsDTO;
 import com.atguigu.cloud.iotcloudspring.DTO.Config.ConfigSecretDTO;
+import com.atguigu.cloud.iotcloudspring.DTO.Device.DeviceSummaryDTO;
 import com.atguigu.cloud.iotcloudspring.DTO.IdDTO;
 import com.atguigu.cloud.iotcloudspring.pojo.Result;
 import com.atguigu.cloud.iotcloudspring.service.ConfigService;
@@ -14,6 +15,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/IC")
@@ -56,5 +59,16 @@ public class ConfigController {
     public Result<IdDTO> getIdByDeviceKey(@PathVariable("devicekey") String devicekey) {
         IdDTO id = configService.getById(devicekey);
         return Result.success(id);
+    }
+
+    // 返回这个项目下某个设备的详细信息
+    @GetMapping("/api/devices")
+    public Result<List<DeviceSummaryDTO>> listDevices(
+            @RequestParam Long projectId,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String location
+    ) {
+        List<DeviceSummaryDTO> list = configService.findSummaries(projectId, name, location);
+        return Result.success(list);
     }
 }

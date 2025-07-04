@@ -189,4 +189,12 @@ public class ICSpringController {
         // 获取项目详细信息
         return iCSpringService.getProjectById(projectid);
     }
+
+    // 删除当前用户
+    @DeleteMapping("/deleteUser/{userId}")
+    public Result<Void> deleteUser(@PathVariable Long userId) {
+        Boolean success = userService.deleteUser(userId);
+        return success ? Result.success() : Result.error("删除失败");
+    }
+
 }

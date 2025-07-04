@@ -20,4 +20,8 @@ public interface AlarmService {
     List<AlarmLogoInfoHistoryDTO> getLogoInfoHistory(Long alarmId);
 
     List<AlarmLogoInfoHistorysDTO> getFullHistoryByProjectId(Long projectId);
+
+    List<AlarmEventDTO> listByProjectAndAttribute(Long projectId);
+
+    boolean markCleared(Long eventId);
 }
