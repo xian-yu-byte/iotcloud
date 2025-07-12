@@ -8,5 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TopicRequest {
-    private String topic; // 主题
+    private String topic;
+    private Boolean isOpen;
 }

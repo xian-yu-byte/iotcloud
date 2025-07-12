@@ -69,4 +69,8 @@ public interface MqttMapper {
 
     //删除主题
     Long deleteDeviceTopicById(@Param("id") Long id);
+
+    // 更新当前主题是否启用
+    int updateIsOpenByTopic(@Param("deviceId") Long deviceId,
+                            @Param("isOpen") int isOpen);
 }

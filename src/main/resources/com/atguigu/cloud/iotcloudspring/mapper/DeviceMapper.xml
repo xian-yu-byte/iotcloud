@@ -497,10 +497,12 @@
     </select>
 
     <update id="updateNodeId">
-        UPDATE device
-        SET nodeid = #{nodeId},
-            updatetime = NOW()
-        WHERE id = #{id}
+        UPDATE device d
+        JOIN iot_node n ON n.id = #{nodeId}
+        SET d.nodeid         = #{nodeId},
+        d.devicelocation = n.node_name,
+        d.updatetime     = NOW()
+        WHERE d.id = #{id}
     </update>
 
     <select id="selectById" resultType="com.atguigu.cloud.iotcloudspring.pojo.device.Device" parameterType="long">

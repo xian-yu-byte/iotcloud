@@ -148,4 +148,9 @@
         WHERE id = #{id}
     </delete>
 
+    <update id="updateIsOpenByTopic">
+        UPDATE mqtt_topic_config
+        SET is_open = #{isOpen}
+        WHERE device_id = #{deviceId}
+    </update>
 </mapper>

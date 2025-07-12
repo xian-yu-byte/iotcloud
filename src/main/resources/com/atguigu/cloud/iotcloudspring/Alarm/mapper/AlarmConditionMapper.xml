@@ -18,18 +18,17 @@
     </insert>
 
     <select id="selectByAlarmId" resultType="com.atguigu.cloud.iotcloudspring.Alarm.DTO.AlarmRuleEditDTO">
-        SELECT
-            id,
-            alarm_id        AS alarmId,
-            seq,
-            logical_op      AS logicalOp,
-            attribute_key   AS attributeKey,
-            compare_op      AS compareOp,
-            threshold_value AS thresholdValue,
-            threshold_low   AS thresholdLow,
-            threshold_high  AS thresholdHigh
+        SELECT id,
+               alarm_id        AS alarmId,
+               seq,
+               logical_op      AS logicalOp,
+               attribute_key   AS attributeKey,
+               compare_op      AS compareOp,
+               threshold_value AS thresholdValue,
+               threshold_low   AS thresholdLow,
+               threshold_high  AS thresholdHigh
         FROM alarm_condition
         WHERE alarm_id = #{alarmId}
-        ORDER BY seq ASC
+        ORDER BY seq
     </select>
 </mapper>

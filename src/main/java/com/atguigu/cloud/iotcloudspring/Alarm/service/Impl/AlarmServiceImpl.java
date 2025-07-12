@@ -14,18 +14,28 @@ import com.atguigu.cloud.iotcloudspring.Alarm.service.AlarmService;
 import com.atguigu.cloud.iotcloudspring.WeChat.mapper.UserOpenidMapper;
 import com.atguigu.cloud.iotcloudspring.WeChat.pojo.UserOpenid;
 import com.atguigu.cloud.iotcloudspring.WeChat.service.Impl.WeChatMessageService;
+import com.atguigu.cloud.iotcloudspring.controller.http.MqttWebSocket.MqttSubscriber;
 import com.atguigu.cloud.iotcloudspring.mapper.DeviceMapper;
 import com.atguigu.cloud.iotcloudspring.mapper.ICMapper;
 import com.atguigu.cloud.iotcloudspring.pojo.ProjectAdd;
 import com.atguigu.cloud.iotcloudspring.pojo.device.Device;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -48,6 +58,7 @@ public class AlarmServiceImpl implements AlarmService {
     private final UserOpenidMapper userOpenidMapper;
     private final DeviceMapper deviceMapper;
     private final WeChatMessageService weChatMessageService;
+    private final MqttClient mqttClient;
 
     @Transactional
     @Override
@@ -195,6 +206,43 @@ public class AlarmServiceImpl implements AlarmService {
                 ev.setStatus(EventStatus.OPEN);
                 alarmEventMapper.insert(ev);
 
+                /* ⭐ 7.1.1 生成要发的 JSON ----------------------------------------- */
+
+                String lastAttrName = deviceMapper.selectAttributeKeyById(lastAttrId);
+
+                ObjectMapper om = new ObjectMapper()
+                        .registerModule(new JavaTimeModule())
+                        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+                try {
+                    String alarmJson = om.writeValueAsString(Map.of(
+                            "eventId", ev.getId(),
+                            "deviceId", deviceId,
+                            "deviceName", deviceName,
+                            "projectId", projectId,
+                            "property", lastAttrName,
+                            "value", ev.getCurrentValue(),
+                            "ruleName", rule.getName(),
+                            "level", rule.getAlertLevel(),
+                            "timestamp", ev.getTriggerTime()
+                    ));
+
+                    String topic = String.format("alarm/%d/%d", projectId, deviceId);
+
+                    // QoS 1 非保留
+                    MqttMessage msg = new MqttMessage(alarmJson.getBytes(StandardCharsets.UTF_8));
+                    msg.setQos(1);
+                    msg.setRetained(false);
+
+                    mqttClient.publish(topic, msg);               // ← 直接发
+                    log.info("🔔 已向 {} 发布告警：{}", topic, alarmJson);
+
+                } catch (JsonProcessingException e) {
+                    log.error("序列化告警 JSON 失败，跳过 MQTT 发布。", e);
+                } catch (MqttException e) {
+                    log.error("MQTT 发布失败", e);
+                }
+
                 // 7.2 推送给所有绑定 openid，这里需要把 attrId 转成属性名来显示
                 List<UserOpenid> subs = userOpenidMapper
                         .selectList(new QueryWrapper<UserOpenid>()
@@ -202,7 +250,6 @@ public class AlarmServiceImpl implements AlarmService {
                 log.info("→ 项目 {} 对应的用户 {} 的 openid 列表: {}", projectId, projectOwnerUserId, subs);
                 // 查属性名：因为 attribute_key 原来存的是 ID
                 // 如果你要在消息里显示哪个字段触发，可以额外查一次属性名：
-                String lastAttrName = deviceMapper.selectAttributeKeyById(lastAttrId);
 
                 for (UserOpenid u : subs) {
                     log.info("  准备向 openid={} 发送告警模板消息", u.getOpenid());
@@ -402,9 +449,9 @@ public class AlarmServiceImpl implements AlarmService {
 
         List<AlarmLogoInfoHistorysDTO> mergedList = new ArrayList<>();
         grouped.forEach((key, listOfDtos) -> {
-            String deviceName  = listOfDtos.get(0).getDeviceName();
-            String alarmName   = listOfDtos.get(0).getAlarmName();
-            String alertLevel  = listOfDtos.get(0).getAlertLevel();
+            String deviceName = listOfDtos.get(0).getDeviceName();
+            String alarmName = listOfDtos.get(0).getAlarmName();
+            String alertLevel = listOfDtos.get(0).getAlertLevel();
             LocalDateTime triggerTime = listOfDtos.get(0).getTriggerTime();
 
             if (listOfDtos.size() == 1) {

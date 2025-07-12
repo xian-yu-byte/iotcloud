@@ -105,11 +105,13 @@ public class MqttController {
 
     // 订阅主题
     @PostMapping("/mqtt/subscribe")
-    public Result<String> subscribeTopic(@RequestBody TopicRequest request) {
+    public Result<TopicRequest> subscribeTopic(@RequestBody TopicRequest request) {
         try {
             String topic = request.getTopic();
+            Boolean isOpen = request.getIsOpen();
             mqttSubscriber.subscribeTopic(topic);
-            return Result.success("成功订阅主题：" + topic);
+            TopicRequest tpre = new TopicRequest(topic, isOpen);
+            return Result.success(tpre);
         } catch (Exception e) {
             return Result.error("订阅失败：" + e.getMessage());
         }
@@ -117,11 +119,13 @@ public class MqttController {
 
     // 取消订阅主题
     @PostMapping("/mqtt/unsubscribe")
-    public Result<String> unsubscribeTopic(@RequestBody TopicRequest request) {
+    public Result<TopicRequest> unsubscribeTopic(@RequestBody TopicRequest request) {
         try {
             String topic = request.getTopic();
-            mqttSubscriber.unsubscribeTopic(topic);  // 假设你在 MqttSubscriber 中实现了此方法
-            return Result.success("成功取消订阅主题：" + topic);
+            Boolean isOpen = request.getIsOpen();
+            mqttSubscriber.unsubscribeTopic(topic);
+            TopicRequest tpre = new TopicRequest(topic, isOpen);
+            return Result.success(tpre);
         } catch (Exception e) {
             return Result.error("取消订阅失败：" + e.getMessage());
         }

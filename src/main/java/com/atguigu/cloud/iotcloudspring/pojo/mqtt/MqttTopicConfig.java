@@ -18,6 +18,7 @@ public class MqttTopicConfig {
     private String deviceKey;
     private String topic;          // mqtt_topic.topic
     private mqttTopicConfig topicType;      // mqtt_topic.topic_type (enum) 固定主题 自定义主题
+    private Boolean isOpen;
     private String autoSubscribed;
     private String description;    // mqtt_topic.description
     private LocalDateTime createdAt;

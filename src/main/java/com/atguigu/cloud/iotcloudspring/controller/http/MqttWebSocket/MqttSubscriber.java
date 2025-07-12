@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -37,6 +38,11 @@ import java.util.Map;
 @Slf4j
 public class MqttSubscriber {
 
+    /**
+     * -- GETTER --
+     * 如果你还想获取原生 client，可加 getter
+     */
+    @Getter
     private MqttClient client;
 
     @Resource
@@ -58,7 +64,7 @@ public class MqttSubscriber {
     @PostConstruct
     public void init() {
         try {
-            // 这里替换成你自己的 EMQX Broker 地址和端口，例如 tcp://broker.emqx.io:1883
+            //  EMQX Broker 地址和端口，例如 tcp://broker.emqx.io:1883
             // private final String brokerUrl = "ssl://vaa0511b.ala.cn-hangzhou.emqxsl.cn:8883";
             String brokerUrl = "tcp://1.94.32.220:1883";
             client = new MqttClient(brokerUrl, MqttClient.generateClientId(), new MemoryPersistence());
@@ -82,13 +88,13 @@ public class MqttSubscriber {
      * @param topic 例如 "user10/project17/device1/测试"
      */
     public void subscribeTopic(String topic) {
+        Long deviceId = parseDeviceIdFromTopic(topic);
         try {
             client.subscribe(topic, (receivedTopic, message) -> {
                 String payload = new String(message.getPayload(), StandardCharsets.UTF_8);
                 System.out.println("收到 EMQX 消息，主题：" + receivedTopic + "，内容：" + payload);
 
                 // 解析主题获取 deviceId
-                Long deviceId = parseDeviceIdFromTopic(receivedTopic);
                 if (deviceId <= 0) {
                     System.out.println("解析 deviceId 失败，跳过处理");
                     return;
@@ -197,6 +203,7 @@ public class MqttSubscriber {
                     ex.printStackTrace();
                 }
             });
+            mqttMapper.updateIsOpenByTopic(deviceId, 1);
             System.out.println("成功订阅主题：" + topic);
         } catch (MqttException e) {
             e.printStackTrace();
@@ -225,4 +232,15 @@ public class MqttSubscriber {
         client.unsubscribe(topic);
         System.out.println("成功取消订阅主题：" + topic);
     }
+
+    /** 对外统一的发布封装 */
+    public void publish(String topic, String json) {
+        try {
+            client.publish(topic, json.getBytes(StandardCharsets.UTF_8), /*QoS*/1, /*retain*/false);
+            log.info("MQTT PUB → {}  {}", topic, json);
+        } catch (MqttException e) {
+            log.error("MQTT 发布失败: {}", topic, e);
+        }
+    }
+
 }
