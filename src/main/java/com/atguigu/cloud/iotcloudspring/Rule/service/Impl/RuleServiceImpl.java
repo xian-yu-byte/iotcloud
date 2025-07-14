@@ -83,7 +83,7 @@ public class RuleServiceImpl implements RuleService {
             ObjectNode params = objectMapper.createObjectNode();
             // 仅当动作类型需要下发命令 / 云函数时才拼 topic
             if ("云函数编辑".equals(dtoAct.getActionType())
-                    || "DEVICE_CMD".equals(dtoAct.getActionType())) {
+                    || "向设备下发命令".equals(dtoAct.getActionType())) {
 
                 // 1. 取设备 key
                 String dev = deviceService.getDeviceKeyById(dtoAct.getTargetDeviceId());

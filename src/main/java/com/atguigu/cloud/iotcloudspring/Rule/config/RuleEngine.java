@@ -1,11 +1,7 @@
 package com.atguigu.cloud.iotcloudspring.Rule.config;
 
-import com.atguigu.cloud.iotcloudspring.Rule.mapper.RuleActionMapper;
-import com.atguigu.cloud.iotcloudspring.Rule.mapper.RuleLogMapper;
-import com.atguigu.cloud.iotcloudspring.Rule.mapper.RuleMapper;
-import com.atguigu.cloud.iotcloudspring.Rule.pojo.Rule;
-import com.atguigu.cloud.iotcloudspring.Rule.pojo.RuleAction;
-import com.atguigu.cloud.iotcloudspring.Rule.pojo.RuleLog;
+import com.atguigu.cloud.iotcloudspring.Rule.mapper.*;
+import com.atguigu.cloud.iotcloudspring.Rule.pojo.*;
 import com.atguigu.cloud.iotcloudspring.Rule.reault.ActionResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;

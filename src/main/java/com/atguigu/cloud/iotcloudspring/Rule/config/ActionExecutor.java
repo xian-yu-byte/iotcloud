@@ -45,7 +45,8 @@ public class ActionExecutor {
 
         for (RuleAction act : actions) {
             if (!("CLOUD_FUNCTION".equals(act.getActionType())
-                    || "云函数编辑".equals(act.getActionType())))
+                    || "云函数编辑".equals(act.getActionType())
+            ||"向设备下发命令".equals(act.getActionType())))
                 continue;
 
             try {
